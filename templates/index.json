@@ -204,6 +204,39 @@
         "price": 390
       }
     },
+    "bundle_deals_home": {
+      "type": "bundle-deals",
+      "name": "Bundle Deals",
+      "settings": {
+        "eyebrow": "✨ LIMITED-TIME DEALS",
+        "heading": "Value | Bundles",
+        "subheading": "Grab more, pay less — curated bundles at one fixed price.",
+        "collection": "bundles",
+        "products_to_show": 6,
+        "columns_desktop": "3",
+        "show_save_badge": true,
+        "save_badge_prefix": "SAVE",
+        "corner_tag": "BUNDLE",
+        "button_label": "Grab This Bundle",
+        "show_view_all": true,
+        "view_all_label": "See All Bundles",
+        "bg_1": "#ffd9ec",
+        "bg_2": "#d9e4ff",
+        "bg_3": "#fff6e9",
+        "bg_4": "#f3e9ff",
+        "accent_color": "#ff3d77",
+        "accent_text_color": "#ffffff",
+        "save_badge_color": "#ff2d55",
+        "button_color_a": "#ff5c8a",
+        "button_color_b": "#ff8a3d",
+        "card_bg": "#ffffff",
+        "text_color": "#241c2e",
+        "muted_color": "#7c7587",
+        "max_width": 1200,
+        "padding_top": 56,
+        "padding_bottom": 64
+      }
+    },
     "collection_grid_ByLdQT": {
       "type": "collection-grid",
       "name": "Collection Grid",
@@ -802,6 +835,7 @@
     "summer_hero_main",
     "tiny_show_pieces_main",
     "byob_builder_home",
+    "bundle_deals_home",
     "collection_grid_ByLdQT",
     "fan_favourites_YxtPg4",
     "grab_and_go_aFNKW8",

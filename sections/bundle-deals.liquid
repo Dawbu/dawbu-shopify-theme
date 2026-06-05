@@ -1,0 +1,278 @@
+{% comment %}
+  Section: Bundle Deals
+  Eye-catching, colourful showcase of pre-made bundle products (a collection of
+  fixed-price bundles). Each card shows the bundle image, an offer/SAVE badge,
+  the offer price vs original, and a buy button.
+  Theme editor → Add section → Bundle Deals.
+  v1.0.0
+{% endcomment %}
+
+{%- liquid
+  assign col = section.settings.collection
+  assign limit = section.settings.products_to_show
+-%}
+
+{%- style -%}
+  #bdl-{{ section.id }} {
+    background:
+      radial-gradient(120% 120% at 0% 0%, {{ section.settings.bg_1 }} 0%, rgba(255,255,255,0) 55%),
+      radial-gradient(120% 120% at 100% 0%, {{ section.settings.bg_2 }} 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, {{ section.settings.bg_3 }} 0%, {{ section.settings.bg_4 }} 100%);
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    --bdl-accent: {{ section.settings.accent_color }};
+    --bdl-accent-text: {{ section.settings.accent_text_color }};
+    --bdl-text: {{ section.settings.text_color }};
+    --bdl-muted: {{ section.settings.muted_color }};
+    --bdl-card-bg: {{ section.settings.card_bg }};
+    --bdl-save-bg: {{ section.settings.save_badge_color }};
+    --bdl-btn-a: {{ section.settings.button_color_a }};
+    --bdl-btn-b: {{ section.settings.button_color_b }};
+    --bdl-cols-d: {{ section.settings.columns_desktop }};
+  }
+
+  #bdl-{{ section.id }} .bdl-inner { max-width: {{ section.settings.max_width }}px; margin: 0 auto; padding: 0 16px; }
+
+  #bdl-{{ section.id }} .bdl-head { text-align: center; margin-bottom: 26px; }
+  #bdl-{{ section.id }} .bdl-eyebrow {
+    display: inline-block;
+    font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--bdl-accent-text);
+    background: var(--bdl-accent);
+    border-radius: 50px; padding: 7px 16px; margin-bottom: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.14);
+  }
+  #bdl-{{ section.id }} .bdl-title {
+    font-size: clamp(24px, 4.4vw, 40px); line-height: 1.04; margin: 0; font-weight: 900;
+    color: var(--bdl-text); letter-spacing: -0.01em;
+  }
+  #bdl-{{ section.id }} .bdl-title .bdl-em { color: var(--bdl-accent); }
+  #bdl-{{ section.id }} .bdl-sub { margin: 10px auto 0; max-width: 600px; color: var(--bdl-muted); font-size: 15px; }
+
+  #bdl-{{ section.id }} .bdl-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+  }
+
+  /* Card */
+  #bdl-{{ section.id }} .bdl-card {
+    position: relative; display: flex; flex-direction: column;
+    background: var(--bdl-card-bg); border-radius: 20px; overflow: hidden;
+    text-decoration: none; color: var(--bdl-text);
+    border: 2px solid var(--c, var(--bdl-accent));
+    box-shadow: 0 8px 22px rgba(17,17,17,.10);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  #bdl-{{ section.id }} .bdl-card::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 6px;
+    background: var(--c, var(--bdl-accent)); z-index: 2;
+  }
+  #bdl-{{ section.id }} .bdl-card:hover { transform: translateY(-6px); box-shadow: 0 18px 38px rgba(17,17,17,.18); }
+  /* colourful per-card accents */
+  #bdl-{{ section.id }} .bdl-card:nth-child(6n+1) { --c: #ff5c8a; }
+  #bdl-{{ section.id }} .bdl-card:nth-child(6n+2) { --c: #7c4dff; }
+  #bdl-{{ section.id }} .bdl-card:nth-child(6n+3) { --c: #ff8a3d; }
+  #bdl-{{ section.id }} .bdl-card:nth-child(6n+4) { --c: #18b6a2; }
+  #bdl-{{ section.id }} .bdl-card:nth-child(6n+5) { --c: #3a6df0; }
+  #bdl-{{ section.id }} .bdl-card:nth-child(6n+6) { --c: #18a558; }
+
+  #bdl-{{ section.id }} .bdl-media { position: relative; aspect-ratio: 1 / 1; background: #fff; overflow: hidden; }
+  #bdl-{{ section.id }} .bdl-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+  #bdl-{{ section.id }} .bdl-card:hover .bdl-media img { transform: scale(1.06); }
+
+  #bdl-{{ section.id }} .bdl-save {
+    position: absolute; top: 12px; left: 0; z-index: 3;
+    background: var(--bdl-save-bg); color: #fff; font-weight: 900; font-size: 12px;
+    padding: 6px 12px 6px 10px; border-radius: 0 50px 50px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,.22);
+    letter-spacing: .3px;
+  }
+  #bdl-{{ section.id }} .bdl-tag {
+    position: absolute; top: 12px; right: 12px; z-index: 3;
+    background: rgba(255,255,255,.92); color: var(--c, var(--bdl-accent));
+    font-weight: 800; font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 5px 9px; border-radius: 50px;
+  }
+
+  #bdl-{{ section.id }} .bdl-info { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  #bdl-{{ section.id }} .bdl-name {
+    font-size: 14px; font-weight: 700; line-height: 1.3; margin: 0;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  #bdl-{{ section.id }} .bdl-price-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  #bdl-{{ section.id }} .bdl-now { font-size: 19px; font-weight: 900; color: var(--bdl-text); }
+  #bdl-{{ section.id }} .bdl-was { font-size: 13px; color: #9aa0a6; text-decoration: line-through; }
+  #bdl-{{ section.id }} .bdl-off { font-size: 11px; font-weight: 800; color: var(--bdl-save-bg); }
+
+  #bdl-{{ section.id }} .bdl-btn {
+    margin-top: auto;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    background: linear-gradient(135deg, var(--bdl-btn-a), var(--bdl-btn-b));
+    color: #fff; font-weight: 800; font-size: 13.5px;
+    padding: 11px 12px; border-radius: 12px; text-align: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,.16);
+  }
+
+  #bdl-{{ section.id }} .bdl-viewall-wrap { text-align: center; margin-top: 30px; }
+  #bdl-{{ section.id }} .bdl-viewall {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bdl-accent); color: var(--bdl-accent-text);
+    font-weight: 900; font-size: 14px; padding: 12px 28px; border-radius: 50px;
+    text-decoration: none; box-shadow: 0 10px 24px rgba(0,0,0,.16);
+    transition: transform .15s ease;
+  }
+  #bdl-{{ section.id }} .bdl-viewall:hover { transform: translateY(-2px); }
+
+  #bdl-{{ section.id }} .bdl-empty { text-align: center; padding: 36px; color: var(--bdl-muted); }
+
+  @media (min-width: 750px) {
+    #bdl-{{ section.id }} .bdl-grid { grid-template-columns: repeat(var(--bdl-cols-d), 1fr); gap: 22px; }
+    #bdl-{{ section.id }} .bdl-name { font-size: 15px; }
+    #bdl-{{ section.id }} .bdl-now { font-size: 22px; }
+    #bdl-{{ section.id }} .bdl-info { padding: 16px 16px 18px; }
+  }
+{%- endstyle -%}
+
+<section id="bdl-{{ section.id }}" class="bdl-section" data-track-section="bundle_deals">
+  <div class="bdl-inner">
+    <div class="bdl-head">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="bdl-eyebrow">{{ section.settings.eyebrow }}</span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="bdl-title">
+          {%- assign parts = section.settings.heading | split: '|' -%}
+          {%- for part in parts -%}
+            {%- if forloop.last and parts.size > 1 -%}
+              <span class="bdl-em">{{ part | strip }}</span>
+            {%- else -%}
+              {{ part | strip }}
+            {%- endif -%}
+            {%- unless forloop.last %} {% endunless -%}
+          {%- endfor -%}
+        </h2>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="bdl-sub">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if col != blank and col.products_count > 0 -%}
+      <div class="bdl-grid">
+        {%- assign shown = 0 -%}
+        {%- for product in col.products -%}
+          {%- if shown >= limit -%}{%- break -%}{%- endif -%}
+          {%- assign shown = shown | plus: 1 -%}
+          {%- assign on_sale = false -%}
+          {%- if product.compare_at_price > product.price -%}{%- assign on_sale = true -%}{%- endif -%}
+          <a class="bdl-card" href="{{ product.url }}">
+            <div class="bdl-media">
+              {%- if on_sale and section.settings.show_save_badge -%}
+                {%- assign save_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+                <span class="bdl-save">{{ section.settings.save_badge_prefix }} {{ save_pct }}%</span>
+              {%- endif -%}
+              {%- if section.settings.corner_tag != blank -%}
+                <span class="bdl-tag">{{ section.settings.corner_tag }}</span>
+              {%- endif -%}
+              {%- if product.featured_media -%}
+                <img
+                  src="{{ product.featured_media | image_url: width: 600 }}"
+                  srcset="{{ product.featured_media | image_url: width: 400 }} 400w, {{ product.featured_media | image_url: width: 600 }} 600w, {{ product.featured_media | image_url: width: 800 }} 800w"
+                  sizes="(min-width: 750px) 30vw, 45vw"
+                  width="{{ product.featured_media.width }}"
+                  height="{{ product.featured_media.height }}"
+                  alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                  loading="lazy"
+                >
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'bdl-img' }}
+              {%- endif -%}
+            </div>
+            <div class="bdl-info">
+              <h3 class="bdl-name">{{ product.title }}</h3>
+              <div class="bdl-price-row">
+                {%- if product.price_varies -%}
+                  <span class="bdl-now">From {{ product.price_min | money }}</span>
+                {%- else -%}
+                  <span class="bdl-now">{{ product.price | money }}</span>
+                {%- endif -%}
+                {%- if on_sale -%}
+                  <s class="bdl-was">{{ product.compare_at_price | money }}</s>
+                  {%- assign save_pct2 = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+                  <span class="bdl-off">{{ save_pct2 }}% OFF</span>
+                {%- endif -%}
+              </div>
+              <span class="bdl-btn">{{ section.settings.button_label }}</span>
+            </div>
+          </a>
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.show_view_all -%}
+        <div class="bdl-viewall-wrap">
+          <a class="bdl-viewall" href="{{ col.url }}">
+            {{ section.settings.view_all_label }}
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      <div class="bdl-empty">
+        {%- if col == blank -%}
+          Pick your <strong>bundles collection</strong> in the theme editor (Bundle Deals → Bundle).
+        {%- else -%}
+          The collection “{{ col.title }}” has no products yet.
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bundle Deals",
+  "tag": "section",
+  "class": "section-bundle-deals",
+  "settings": [
+    { "type": "header", "content": "Heading" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow / badge", "default": "✨ LIMITED-TIME DEALS" },
+    { "type": "text", "id": "heading", "label": "Heading (use | for accent word)", "default": "Value | Bundles", "info": "Text after | shows in the accent colour." },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Grab more, pay less — curated bundles at one fixed price." },
+    { "type": "header", "content": "Bundle" },
+    { "type": "collection", "id": "collection", "label": "Bundles collection", "info": "A collection of your ready-made bundle products." },
+    { "type": "range", "id": "products_to_show", "min": 3, "max": 18, "step": 1, "label": "Bundles to show", "default": 6 },
+    {
+      "type": "select", "id": "columns_desktop", "label": "Columns on desktop",
+      "options": [ { "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" } ],
+      "default": "3", "info": "Mobile always shows 2 per row."
+    },
+    { "type": "checkbox", "id": "show_save_badge", "label": "Show SAVE % badge", "default": true },
+    { "type": "text", "id": "save_badge_prefix", "label": "Save badge prefix", "default": "SAVE" },
+    { "type": "text", "id": "corner_tag", "label": "Corner tag", "default": "BUNDLE", "info": "Small tag on each card. Leave blank to hide." },
+    { "type": "text", "id": "button_label", "label": "Card button label", "default": "Grab This Bundle" },
+    { "type": "header", "content": "View all button" },
+    { "type": "checkbox", "id": "show_view_all", "label": "Show View All button", "default": true },
+    { "type": "text", "id": "view_all_label", "label": "View All label", "default": "See All Bundles" },
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "bg_1", "label": "Glow top-left", "default": "#ffd9ec" },
+    { "type": "color", "id": "bg_2", "label": "Glow top-right", "default": "#d9e4ff" },
+    { "type": "color", "id": "bg_3", "label": "Background top", "default": "#fff6e9" },
+    { "type": "color", "id": "bg_4", "label": "Background bottom", "default": "#f3e9ff" },
+    { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#ff3d77" },
+    { "type": "color", "id": "accent_text_color", "label": "Accent text colour", "default": "#ffffff" },
+    { "type": "color", "id": "save_badge_color", "label": "Save badge colour", "default": "#ff2d55" },
+    { "type": "color", "id": "button_color_a", "label": "Button gradient start", "default": "#ff5c8a" },
+    { "type": "color", "id": "button_color_b", "label": "Button gradient end", "default": "#ff8a3d" },
+    { "type": "color", "id": "card_bg", "label": "Card background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text colour", "default": "#241c2e" },
+    { "type": "color", "id": "muted_color", "label": "Muted text colour", "default": "#7c7587" },
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "max_width", "min": 900, "max": 1600, "step": 20, "unit": "px", "label": "Max width", "default": 1200 },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Padding top", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Padding bottom", "default": 64 }
+  ],
+  "presets": [
+    { "name": "Bundle Deals" }
+  ]
+}
+{% endschema %}
