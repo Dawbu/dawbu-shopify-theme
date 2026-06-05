@@ -1,0 +1,521 @@
+{% comment %}
+  Section: Summer Hero
+  Slideshow hero (heading, sub, CTA, seasonal badge, prev/next arrows) with a
+  row of category cards sitting over the bottom edge.
+  Theme editor → Add section → Summer Hero.
+{% endcomment %}
+
+{%- liquid
+  assign slides = section.blocks | where: 'type', 'slide'
+  assign cats = section.blocks | where: 'type', 'category'
+-%}
+
+<section
+  class="summer-hero"
+  id="SummerHero-{{ section.id }}"
+  data-track-section="summer_hero"
+  style="
+    --sh-bg: {{ section.settings.background_color }};
+    --sh-heading: {{ section.settings.heading_color }};
+    --sh-text: {{ section.settings.text_color }};
+    --sh-btn-bg: {{ section.settings.button_bg }};
+    --sh-btn-text: {{ section.settings.button_text_color }};
+    --sh-badge: {{ section.settings.badge_color }};
+    --sh-arrow-bg: {{ section.settings.arrow_bg }};
+    --sh-arrow-color: {{ section.settings.arrow_color }};
+    --sh-radius: {{ section.settings.corner_radius }}px;
+    --sh-min-d: {{ section.settings.min_height_desktop }}px;
+    --sh-min-m: {{ section.settings.min_height_mobile }}px;
+    --sh-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --sh-cat-bg: {{ section.settings.cat_bg }};
+    --sh-cat-label-bg: {{ section.settings.cat_label_bg }};
+    --sh-cat-border: {{ section.settings.cat_border }};
+    --sh-cat-text: {{ section.settings.cat_text }};
+    --sh-cols: {{ section.settings.cat_columns }};
+    --sh-pt-d: {{ section.settings.padding_top_desktop }}px;
+    --sh-pb-d: {{ section.settings.padding_bottom_desktop }}px;
+    --sh-pt-m: {{ section.settings.padding_top_mobile }}px;
+    --sh-pb-m: {{ section.settings.padding_bottom_mobile }}px;
+  "
+>
+  <div class="summer-hero__inner">
+    {%- if slides.size > 0 -%}
+      <div
+        class="summer-hero__slider"
+        data-sh-slider
+        data-autoplay="{{ section.settings.autoplay }}"
+        data-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
+      >
+        <div class="summer-hero__track" data-sh-track>
+          {%- for block in slides -%}
+            {%- liquid
+              assign img = block.settings.image
+              assign img_m = block.settings.image_mobile
+              assign is_first = false
+              if forloop.first
+                assign is_first = true
+              endif
+            -%}
+            <div class="summer-hero__slide" data-sh-slide {{ block.shopify_attributes }}>
+              {%- if img != blank or img_m != blank -%}
+                <picture class="summer-hero__media">
+                  {%- if img_m != blank -%}
+                    <source
+                      media="(max-width: 749px)"
+                      srcset="{{ img_m | image_url: width: 800 }} 1x, {{ img_m | image_url: width: 1200 }} 2x"
+                    >
+                  {%- endif -%}
+                  {%- if img != blank -%}
+                    <img
+                      src="{{ img | image_url: width: 1600 }}"
+                      srcset="{{ img | image_url: width: 900 }} 900w, {{ img | image_url: width: 1400 }} 1400w, {{ img | image_url: width: 1900 }} 1900w, {{ img | image_url: width: 2600 }} 2600w"
+                      sizes="100vw"
+                      alt="{{ img.alt | default: block.settings.heading | escape }}"
+                      width="{{ img.width }}"
+                      height="{{ img.height }}"
+                      loading="{% if is_first %}eager{% else %}lazy{% endif %}"
+                      fetchpriority="{% if is_first %}high{% else %}low{% endif %}"
+                    >
+                  {%- endif -%}
+                </picture>
+              {%- else -%}
+                <div class="summer-hero__media summer-hero__media--placeholder">
+                  {{ 'hero-apparel-1' | placeholder_svg_tag: 'summer-hero__placeholder-svg' }}
+                </div>
+              {%- endif -%}
+
+              {%- if section.settings.overlay_opacity > 0 -%}
+                <span class="summer-hero__overlay" aria-hidden="true"></span>
+              {%- endif -%}
+
+              {%- if block.settings.badge != blank -%}
+                <span class="summer-hero__badge">{{ block.settings.badge }}</span>
+              {%- endif -%}
+
+              <div class="summer-hero__content summer-hero__content--{{ block.settings.text_alignment }}">
+                {%- if block.settings.heading != blank -%}
+                  <h2 class="summer-hero__heading">{{ block.settings.heading }}</h2>
+                {%- endif -%}
+                {%- if block.settings.subheading != blank -%}
+                  <p class="summer-hero__sub">{{ block.settings.subheading }}</p>
+                {%- endif -%}
+                {%- if block.settings.button_label != blank -%}
+                  <a
+                    class="summer-hero__btn"
+                    href="{{ block.settings.button_link | default: '#' }}"
+                    data-track-click="hero_cta_click"
+                    data-track-params='{"label":"{{ block.settings.button_label | escape }}"}'
+                  >
+                    {{ block.settings.button_label }}
+                  </a>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if slides.size > 1 -%}
+          <button type="button" class="summer-hero__arrow summer-hero__arrow--prev" data-sh-prev aria-label="Previous slide">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+              <path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="summer-hero__arrow summer-hero__arrow--next" data-sh-next aria-label="Next slide">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+              <path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.show_categories and cats.size > 0 -%}
+      <div class="summer-hero__cats" style="--sh-cat-count: {{ cats.size }};">
+        {%- for block in cats -%}
+          {%- liquid
+            assign c_img = block.settings.image
+            assign c_url = block.settings.url | default: '#'
+          -%}
+          <a class="summer-hero__cat" href="{{ c_url }}" {{ block.shopify_attributes }}>
+            <span
+              class="summer-hero__cat-media"
+              {%- if block.settings.tile_color != blank %} style="--sh-cat-tile: {{ block.settings.tile_color }};"{% endif -%}
+            >
+              {%- if c_img != blank -%}
+                <img
+                  src="{{ c_img | image_url: width: 320 }}"
+                  srcset="{{ c_img | image_url: width: 200 }} 200w, {{ c_img | image_url: width: 320 }} 320w, {{ c_img | image_url: width: 480 }} 480w"
+                  sizes="(min-width: 750px) 180px, 40vw"
+                  alt="{{ c_img.alt | default: block.settings.label | escape }}"
+                  width="{{ c_img.width }}"
+                  height="{{ c_img.height }}"
+                  loading="lazy"
+                >
+              {%- else -%}
+                {{ 'product-apparel-1' | placeholder_svg_tag: 'summer-hero__placeholder-svg' }}
+              {%- endif -%}
+            </span>
+            {%- if block.settings.label != blank -%}
+              <span class="summer-hero__cat-label">{{ block.settings.label }}</span>
+            {%- endif -%}
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  #SummerHero-{{ section.id }} {
+    background: var(--sh-bg);
+    padding: var(--sh-pt-d) 0 var(--sh-pb-d);
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__inner {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+
+  /* Slider */
+  #SummerHero-{{ section.id }} .summer-hero__slider {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--sh-radius);
+  }
+  #SummerHero-{{ section.id }} .summer-hero__track {
+    display: flex;
+    transition: transform .5s cubic-bezier(.4, 0, .2, 1);
+    will-change: transform;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__slide {
+    position: relative;
+    flex: 0 0 100%;
+    min-width: 100%;
+    min-height: var(--sh-min-d);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__media img,
+  #SummerHero-{{ section.id }} .summer-hero__media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__media--placeholder { background: #cfe6f7; }
+  #SummerHero-{{ section.id }} .summer-hero__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, var(--sh-overlay));
+  }
+  #SummerHero-{{ section.id }} .summer-hero__badge {
+    position: absolute;
+    top: clamp(16px, 4vw, 48px);
+    right: clamp(24px, 5vw, 90px);
+    z-index: 3;
+    color: var(--sh-badge);
+    font-family: 'Caveat', 'Comic Sans MS', 'Poppins', cursive;
+    font-size: clamp(28px, 4.4vw, 64px);
+    font-weight: 700;
+    line-height: 1;
+    transform: rotate(-4deg);
+    pointer-events: none;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__content {
+    position: relative;
+    z-index: 2;
+    padding: clamp(20px, 5vw, 64px) clamp(20px, 6vw, 96px);
+    max-width: 620px;
+    color: var(--sh-text);
+  }
+  #SummerHero-{{ section.id }} .summer-hero__content--center { text-align: center; margin: 0 auto; }
+  #SummerHero-{{ section.id }} .summer-hero__content--right { margin-left: auto; text-align: right; }
+  #SummerHero-{{ section.id }} .summer-hero__heading {
+    margin: 0 0 .35em;
+    color: var(--sh-heading);
+    font-size: clamp(28px, 4.6vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.5px;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__sub {
+    margin: 0 0 1.4em;
+    font-size: clamp(16px, 2vw, 28px);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 38px;
+    background: var(--sh-btn-bg);
+    color: var(--sh-btn-text);
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: clamp(15px, 1.6vw, 20px);
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .12);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, .18);
+  }
+
+  /* Arrows */
+  #SummerHero-{{ section.id }} .summer-hero__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--sh-arrow-bg);
+    color: var(--sh-arrow-color);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
+    transition: transform .15s ease, background .15s ease;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__arrow:hover { transform: translateY(-50%) scale(1.08); }
+  #SummerHero-{{ section.id }} .summer-hero__arrow--prev { left: clamp(8px, 1.5vw, 24px); }
+  #SummerHero-{{ section.id }} .summer-hero__arrow--next { right: clamp(8px, 1.5vw, 24px); }
+
+  /* Category cards */
+  #SummerHero-{{ section.id }} .summer-hero__cats {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: clamp(10px, 1.6vw, 24px);
+    max-width: 1280px;
+    margin: clamp(-70px, -5vw, -48px) auto 0;
+    padding: 0 clamp(16px, 3vw, 32px);
+  }
+  #SummerHero-{{ section.id }} .summer-hero__cat {
+    flex: 0 0 calc((100% - (var(--sh-cols) - 1) * clamp(10px, 1.6vw, 24px)) / var(--sh-cols));
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__cat-media {
+    width: 100%;
+    aspect-ratio: 1 / 0.82;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: var(--sh-cat-tile, var(--sh-cat-bg));
+    border-radius: 18px 18px 6px 6px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__cat-media img,
+  #SummerHero-{{ section.id }} .summer-hero__cat-media svg {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: transform .25s ease;
+  }
+  #SummerHero-{{ section.id }} .summer-hero__cat:hover .summer-hero__cat-media img { transform: scale(1.06); }
+  #SummerHero-{{ section.id }} .summer-hero__cat-label {
+    position: relative;
+    margin-top: -10px;
+    padding: 9px 14px;
+    min-width: 78%;
+    text-align: center;
+    background: var(--sh-cat-label-bg);
+    color: var(--sh-cat-text);
+    border: 1.5px solid var(--sh-cat-border);
+    border-radius: 12px;
+    font-size: clamp(13px, 1.2vw, 17px);
+    font-weight: 600;
+    line-height: 1.15;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .06);
+  }
+
+  @media (max-width: 749px) {
+    #SummerHero-{{ section.id }} { padding: var(--sh-pt-m) 0 var(--sh-pb-m); }
+    #SummerHero-{{ section.id }} .summer-hero__slide { min-height: var(--sh-min-m); }
+    #SummerHero-{{ section.id }} .summer-hero__content { max-width: 100%; padding: 22px 20px; }
+    #SummerHero-{{ section.id }} .summer-hero__arrow { width: 38px; height: 38px; }
+    #SummerHero-{{ section.id }} .summer-hero__cats {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      margin-top: -36px;
+      padding-bottom: 6px;
+    }
+    #SummerHero-{{ section.id }} .summer-hero__cats::-webkit-scrollbar { display: none; }
+    #SummerHero-{{ section.id }} .summer-hero__cat {
+      flex: 0 0 38vw;
+      max-width: 38vw;
+      scroll-snap-align: start;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.getElementById('SummerHero-{{ section.id }}');
+    if (!root) return;
+    var slider = root.querySelector('[data-sh-slider]');
+    if (!slider) return;
+    var track = slider.querySelector('[data-sh-track]');
+    var slides = slider.querySelectorAll('[data-sh-slide]');
+    if (!track || slides.length < 2) return;
+
+    var index = 0;
+    var total = slides.length;
+    var timer = null;
+    var autoplay = slider.getAttribute('data-autoplay') === 'true';
+    var speed = parseInt(slider.getAttribute('data-speed'), 10) || 5000;
+
+    function go(i) {
+      index = (i + total) % total;
+      track.style.transform = 'translateX(' + (-index * 100) + '%)';
+    }
+    function next() { go(index + 1); }
+    function prev() { go(index - 1); }
+
+    function start() {
+      if (!autoplay) return;
+      stop();
+      timer = setInterval(next, speed);
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+    var prevBtn = slider.querySelector('[data-sh-prev]');
+    var nextBtn = slider.querySelector('[data-sh-next]');
+    if (prevBtn) prevBtn.addEventListener('click', function () { prev(); start(); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { next(); start(); });
+
+    slider.addEventListener('mouseenter', stop);
+    slider.addEventListener('mouseleave', start);
+
+    // Basic touch swipe
+    var startX = null;
+    slider.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; stop(); }, { passive: true });
+    slider.addEventListener('touchend', function (e) {
+      if (startX === null) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); }
+      startX = null;
+      start();
+    }, { passive: true });
+
+    go(0);
+    start();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Summer Hero",
+  "tag": "section",
+  "class": "section-summer-hero",
+  "max_blocks": 30,
+  "settings": [
+    { "type": "header", "content": "Slider" },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto-rotate slides", "default": true },
+    { "type": "range", "id": "autoplay_speed", "label": "Seconds per slide", "min": 3, "max": 10, "step": 1, "unit": "s", "default": 5 },
+    { "type": "range", "id": "overlay_opacity", "label": "Image dark overlay", "min": 0, "max": 70, "step": 5, "unit": "%", "default": 0 },
+    { "type": "header", "content": "Hero size" },
+    { "type": "range", "id": "min_height_desktop", "label": "Min height — desktop", "min": 280, "max": 720, "step": 10, "unit": "px", "default": 430 },
+    { "type": "range", "id": "min_height_mobile", "label": "Min height — mobile", "min": 220, "max": 560, "step": 10, "unit": "px", "default": 340 },
+    { "type": "range", "id": "corner_radius", "label": "Corner radius", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Section background", "default": "#ffffff" },
+    { "type": "color", "id": "heading_color", "label": "Heading", "default": "#0b3a6f" },
+    { "type": "color", "id": "text_color", "label": "Subheading text", "default": "#0b3a6f" },
+    { "type": "color", "id": "badge_color", "label": "Seasonal badge", "default": "#6b7a1f" },
+    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#ffd200" },
+    { "type": "color", "id": "button_text_color", "label": "Button text", "default": "#1a1a1a" },
+    { "type": "color", "id": "arrow_bg", "label": "Arrow background", "default": "#ffffff" },
+    { "type": "color", "id": "arrow_color", "label": "Arrow icon", "default": "#1a1a1a" },
+    { "type": "header", "content": "Category cards" },
+    { "type": "checkbox", "id": "show_categories", "label": "Show category cards", "default": true },
+    { "type": "range", "id": "cat_columns", "label": "Cards per row (desktop)", "min": 2, "max": 8, "step": 1, "default": 8 },
+    { "type": "color", "id": "cat_bg", "label": "Tile background", "default": "#fbe0e8" },
+    { "type": "color", "id": "cat_label_bg", "label": "Label background", "default": "#ffffff" },
+    { "type": "color", "id": "cat_border", "label": "Label border", "default": "#e9aebb" },
+    { "type": "color", "id": "cat_text", "label": "Label text", "default": "#1a1a1a" },
+    { "type": "header", "content": "Section spacing" },
+    { "type": "range", "id": "padding_top_desktop", "label": "Padding top — desktop", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom_desktop", "label": "Padding bottom — desktop", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top — mobile", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom — mobile", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 28 }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Desktop image", "info": "Wide image, e.g. 1900×500px." },
+        { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (optional)" },
+        { "type": "text", "id": "badge", "label": "Seasonal badge", "default": "Summer '26" },
+        { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "All New Summer Styles" },
+        { "type": "text", "id": "subheading", "label": "Subheading", "default": "Walk Gear | T-Shirts | Mats & more" },
+        { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop Now" },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        {
+          "type": "select", "id": "text_alignment", "label": "Text position",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "left"
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "name": "Category card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Transparent PNG works best." },
+        { "type": "text", "id": "label", "label": "Label", "default": "Category" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "color", "id": "tile_color", "label": "Tile background (optional)", "info": "Overrides the section tile color for this card." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Summer Hero",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "category", "settings": { "label": "Grooming" } },
+        { "type": "category", "settings": { "label": "Ice Creams" } },
+        { "type": "category", "settings": { "label": "Walk Gear" } },
+        { "type": "category", "settings": { "label": "Dog Toys" } },
+        { "type": "category", "settings": { "label": "T-Shirts" } },
+        { "type": "category", "settings": { "label": "Cat Toys" } },
+        { "type": "category", "settings": { "label": "Creamy Treats" } },
+        { "type": "category", "settings": { "label": "Biscuits" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
