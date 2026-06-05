@@ -190,24 +190,19 @@
       }
     },
     "byob_builder_home": {
-      "type": "byob-cta",
+      "type": "byob-teaser",
       "name": "Build Your Own Collection",
       "settings": {
-        "emoji": "🧩",
+        "eyebrow": "BUILD YOUR OWN",
         "heading": "Build Your Own Collection",
-        "subheading": "Pick any 6 minis for ₹390 — mix & match your way.",
-        "button_label": "START BUILDING",
+        "lede": "Pick any {N} minis — pay just Rs. {P}. Mix and match whatever you love.",
+        "slots_title": "Add Any {N} Products In The Box",
+        "quantity": 6,
+        "price": 390,
+        "button_label": "Start Building",
         "link": "/pages/byob-builder",
-        "bg_1": "#fff0f6",
-        "bg_2": "#eaf2ff",
-        "border_color": "#ffd1e3",
-        "text_color": "#241c2e",
-        "muted_color": "#7c7587",
-        "btn_bg": "#ff5c8a",
-        "btn_text": "#ffffff",
-        "max_width": 1100,
-        "padding_top": 24,
-        "padding_bottom": 24
+        "padding_top": 8,
+        "padding_bottom": 8
       }
     },
     "fan_favourites_YxtPg4": {
