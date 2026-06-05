@@ -46,7 +46,7 @@
     margin-bottom: 12px;
   }
   #tsp-{{ section.id }} .tsp-title {
-    font-size: clamp(26px, 5vw, 46px);
+    font-size: clamp(20px, 3.4vw, 32px);
     line-height: 1.05;
     margin: 0;
     color: var(--tsp-text);
@@ -72,22 +72,28 @@
   #tsp-{{ section.id }} .tsp-tab {
     appearance: none;
     cursor: pointer;
-    border: 2px solid var(--tsp-accent);
-    background: #fff;
-    color: var(--tsp-accent);
+    border: 2px solid transparent;
     font-weight: 700;
-    font-size: 14px;
-    padding: 9px 20px;
+    font-size: 12px;
+    padding: 6px 14px;
     border-radius: 50px;
-    transition: transform .12s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
-    box-shadow: 0 2px 0 rgba(0,0,0,.04);
+    transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,.07);
     white-space: nowrap;
   }
-  #tsp-{{ section.id }} .tsp-tab:hover { transform: translateY(-2px); }
+  /* cute colourful chips */
+  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+1) { background: #ffe0ee; color: #e84393; border-color: #ffc6df; }
+  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+2) { background: #d8f6e6; color: #10976b; border-color: #bdeed3; }
+  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+3) { background: #dbe8ff; color: #3a6df0; border-color: #c2d6ff; }
+  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+4) { background: #fff1c2; color: #c98a04; border-color: #ffe49a; }
+  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+5) { background: #ece0ff; color: #7c4dff; border-color: #dccbff; }
+  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+6) { background: #ffe2d1; color: #e8590c; border-color: #ffcdb0; }
+  #tsp-{{ section.id }} .tsp-tab:hover { transform: translateY(-2px); filter: brightness(.98); }
   #tsp-{{ section.id }} .tsp-tab.is-active {
     background: var(--tsp-accent);
     color: var(--tsp-accent-text);
-    box-shadow: 0 6px 16px rgba(0,0,0,.14);
+    border-color: var(--tsp-accent);
+    box-shadow: 0 8px 18px rgba(255,92,138,.34);
   }
 
   /* ── Panels & grid ── */
@@ -156,7 +162,7 @@
 
   #tsp-{{ section.id }} .tsp-info { padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
   #tsp-{{ section.id }} .tsp-name {
-    font-size: 14px;
+    font-size: 12.5px;
     font-weight: 600;
     line-height: 1.3;
     margin: 0;
@@ -166,7 +172,7 @@
     overflow: hidden;
   }
   #tsp-{{ section.id }} .tsp-price-row { margin-top: auto; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-  #tsp-{{ section.id }} .tsp-price { font-size: 16px; font-weight: 800; color: var(--tsp-text); }
+  #tsp-{{ section.id }} .tsp-price { font-size: 14px; font-weight: 800; color: var(--tsp-text); }
   #tsp-{{ section.id }} .tsp-compare { font-size: 13px; color: #9aa0a6; text-decoration: line-through; }
   #tsp-{{ section.id }} .tsp-cta {
     margin-top: 4px;
@@ -176,9 +182,9 @@
     background: var(--tsp-accent);
     color: var(--tsp-accent-text);
     font-weight: 700;
-    font-size: 13px;
-    padding: 8px 10px;
-    border-radius: 12px;
+    font-size: 11.5px;
+    padding: 6px 9px;
+    border-radius: 10px;
     text-align: center;
   }
 
@@ -191,8 +197,8 @@
     background: var(--tsp-accent);
     color: var(--tsp-accent-text);
     font-weight: 800;
-    font-size: 15px;
-    padding: 13px 30px;
+    font-size: 13px;
+    padding: 10px 24px;
     border-radius: 50px;
     text-decoration: none;
     box-shadow: 0 8px 20px rgba(0,0,0,.12);
@@ -205,7 +211,7 @@
   /* ── Desktop ── */
   @media (min-width: 750px) {
     #tsp-{{ section.id }} .tsp-grid { grid-template-columns: repeat(var(--tsp-cols-d), 1fr); gap: 22px; }
-    #tsp-{{ section.id }} .tsp-name { font-size: 15px; }
+    #tsp-{{ section.id }} .tsp-name { font-size: 13.5px; }
     #tsp-{{ section.id }} .tsp-info { padding: 14px 14px 16px; }
   }
 {%- endstyle -%}
@@ -392,7 +398,7 @@
       "type": "text",
       "id": "eyebrow",
       "label": "Eyebrow / badge",
-      "default": "HANDPICKED"
+      "default": ""
     },
     {
       "type": "text",
@@ -405,7 +411,7 @@
       "type": "text",
       "id": "subheading",
       "label": "Subheading",
-      "default": "Cute little builds to show off on your shelf."
+      "default": ""
     },
     {
       "type": "header",
@@ -486,13 +492,13 @@
       "type": "color",
       "id": "bg_color",
       "label": "Background top",
-      "default": "#e9f5ff"
+      "default": "#fff0f6"
     },
     {
       "type": "color",
       "id": "bg_color_2",
       "label": "Background bottom",
-      "default": "#fff7e6"
+      "default": "#eaf2ff"
     },
     {
       "type": "color",
@@ -504,7 +510,7 @@
       "type": "color",
       "id": "accent_color",
       "label": "Accent color",
-      "default": "#0b3a6f"
+      "default": "#ff5c8a"
     },
     {
       "type": "color",
@@ -516,13 +522,13 @@
       "type": "color",
       "id": "text_color",
       "label": "Text color",
-      "default": "#121212"
+      "default": "#2b2b3a"
     },
     {
       "type": "color",
       "id": "muted_color",
       "label": "Muted text color",
-      "default": "#6b7280"
+      "default": "#8a8a9a"
     },
     {
       "type": "range",
@@ -542,7 +548,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding top",
-      "default": 56
+      "default": 0
     },
     {
       "type": "range",
