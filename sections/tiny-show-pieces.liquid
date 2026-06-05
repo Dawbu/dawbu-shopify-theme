@@ -72,28 +72,22 @@
   #tsp-{{ section.id }} .tsp-tab {
     appearance: none;
     cursor: pointer;
-    border: 2px solid transparent;
-    font-weight: 800;
+    border: 2px solid var(--tsp-accent);
+    background: #fff;
+    color: var(--tsp-accent);
+    font-weight: 700;
     font-size: 14px;
     padding: 9px 20px;
     border-radius: 50px;
-    transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
-    box-shadow: 0 3px 8px rgba(0,0,0,.07);
+    transition: transform .12s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+    box-shadow: 0 2px 0 rgba(0,0,0,.04);
     white-space: nowrap;
   }
-  /* cute colourful chips */
-  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+1) { background: #ffe0ee; color: #e84393; border-color: #ffc6df; }
-  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+2) { background: #d8f6e6; color: #10976b; border-color: #bdeed3; }
-  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+3) { background: #dbe8ff; color: #3a6df0; border-color: #c2d6ff; }
-  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+4) { background: #fff1c2; color: #c98a04; border-color: #ffe49a; }
-  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+5) { background: #ece0ff; color: #7c4dff; border-color: #dccbff; }
-  #tsp-{{ section.id }} .tsp-tab:nth-child(6n+6) { background: #ffe2d1; color: #e8590c; border-color: #ffcdb0; }
-  #tsp-{{ section.id }} .tsp-tab:hover { transform: translateY(-2px); filter: brightness(.98); }
+  #tsp-{{ section.id }} .tsp-tab:hover { transform: translateY(-2px); }
   #tsp-{{ section.id }} .tsp-tab.is-active {
     background: var(--tsp-accent);
     color: var(--tsp-accent-text);
-    border-color: var(--tsp-accent);
-    box-shadow: 0 8px 18px rgba(255,92,138,.34);
+    box-shadow: 0 6px 16px rgba(0,0,0,.14);
   }
 
   /* ── Panels & grid ── */
@@ -398,7 +392,7 @@
       "type": "text",
       "id": "eyebrow",
       "label": "Eyebrow / badge",
-      "default": ""
+      "default": "HANDPICKED"
     },
     {
       "type": "text",
@@ -411,7 +405,7 @@
       "type": "text",
       "id": "subheading",
       "label": "Subheading",
-      "default": ""
+      "default": "Cute little builds to show off on your shelf."
     },
     {
       "type": "header",
@@ -492,13 +486,13 @@
       "type": "color",
       "id": "bg_color",
       "label": "Background top",
-      "default": "#fff0f6"
+      "default": "#e9f5ff"
     },
     {
       "type": "color",
       "id": "bg_color_2",
       "label": "Background bottom",
-      "default": "#eaf2ff"
+      "default": "#fff7e6"
     },
     {
       "type": "color",
@@ -510,7 +504,7 @@
       "type": "color",
       "id": "accent_color",
       "label": "Accent color",
-      "default": "#ff5c8a"
+      "default": "#0b3a6f"
     },
     {
       "type": "color",
@@ -522,13 +516,13 @@
       "type": "color",
       "id": "text_color",
       "label": "Text color",
-      "default": "#2b2b3a"
+      "default": "#121212"
     },
     {
       "type": "color",
       "id": "muted_color",
       "label": "Muted text color",
-      "default": "#8a8a9a"
+      "default": "#6b7280"
     },
     {
       "type": "range",
@@ -548,7 +542,7 @@
       "step": 4,
       "unit": "px",
       "label": "Padding top",
-      "default": 0
+      "default": 56
     },
     {
       "type": "range",
