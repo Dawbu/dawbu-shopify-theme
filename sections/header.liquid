@@ -332,37 +332,46 @@
   }
   .dawbu-search.dawbu-search--collapsible[hidden] { display: none; }
 
+  /* hamburger (mobile) */
+  .dawbu-burger {
+    display: none; flex-direction: column; gap: 4px; flex: 0 0 auto;
+    background: none; border: 0; cursor: pointer; padding: 6px; margin-left: -0.4rem;
+  }
+  .dawbu-burger span { display: block; width: 22px; height: 2.5px; border-radius: 2px; background: var(--dh-text, #121212); transition: transform .2s ease, opacity .2s ease; }
+  .dawbu-burger.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .dawbu-burger.is-open span:nth-child(2) { opacity: 0; }
+  .dawbu-burger.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* primary nav — inline on desktop */
   .dawbu-nav {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.8rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    display: flex; align-items: center; gap: 0.6rem;
+    flex: 1 1 auto; justify-content: center; min-width: 0;
+    overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
   }
   .dawbu-nav::-webkit-scrollbar { display: none; }
   .dawbu-nav__item {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1.3rem;
-    border-radius: 50px;
-    font-size: 1.4rem;
-    font-weight: 600;
-    line-height: 1;
-    color: var(--dh-text, #121212);
-    text-decoration: none;
-    white-space: nowrap;
+    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.2rem; border-radius: 50px; font-size: 1.4rem; font-weight: 600; line-height: 1;
+    color: var(--dh-text, #121212); text-decoration: none; white-space: nowrap;
     transition: background 0.2s ease, color 0.2s ease;
   }
   .dawbu-nav__item:hover { background: var(--dh-search-bg, #f4f5f7); color: var(--dh-accent, #0b3a6f); }
   .dawbu-nav__home { padding: 0.7rem 1rem; }
-  .dawbu-nav__home .svg-wrapper svg { width: 2rem; height: 2rem; display: block; }
+  .dawbu-nav__home .svg-wrapper svg { width: 1.9rem; height: 1.9rem; display: block; }
+  .dawbu-nav__home-label { display: none; }
 
-  @media (min-width: 990px) {
-    .dawbu-nav { justify-content: center; gap: 0.8rem; margin-top: 1rem; }
+  /* mobile: icons only; links collapse into the hamburger dropdown */
+  @media (max-width: 989px) {
+    .dawbu-burger { display: flex; }
+    .dawbu-nav {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 25;
+      display: none; flex-direction: column; align-items: stretch; gap: 0.2rem;
+      background: #fff; padding: 0.8rem; border-top: 1px solid var(--dh-search-border, #e3e5e9);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    }
+    .dawbu-nav.is-open { display: flex; }
+    .dawbu-nav__item { width: 100%; justify-content: flex-start; font-size: 1.6rem; padding: 1rem 1.2rem; }
+    .dawbu-nav__home-label { display: inline; }
   }
 </style>
 
@@ -380,9 +389,9 @@
     {%- endif -%}
 
     <div class="dawbu-header__main">
-      {%- if section.settings.menu != blank -%}
-        {%- render 'header-drawer' -%}
-      {%- endif -%}
+      <button type="button" class="dawbu-burger" data-nav-toggle aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
 
       <a href="{{ routes.root_url }}" class="dawbu-header__logo" aria-label="{{ shop.name | escape }}">
         {%- if settings.logo != blank -%}
@@ -400,6 +409,20 @@
           <span class="h3">{{ shop.name }}</span>
         {%- endif -%}
       </a>
+
+      <nav class="dawbu-nav" aria-label="Primary" data-nav>
+        <a class="dawbu-nav__item dawbu-nav__home" href="{{ routes.root_url }}" aria-label="Home">
+          <span class="svg-wrapper">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="dawbu-nav__home-label">Home</span>
+        </a>
+        {%- if section.settings.nav1_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav1_url | default: '/collections/all' }}">{{ section.settings.nav1_label }}</a>{%- endif -%}
+        {%- if section.settings.nav2_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav2_url | default: '/collections/miniature-toys' }}">{{ section.settings.nav2_label }}</a>{%- endif -%}
+        {%- if section.settings.nav3_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav3_url | default: '/collections/glowing-products' }}">{{ section.settings.nav3_label }}</a>{%- endif -%}
+        {%- if section.settings.nav4_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav4_url | default: '/collections/bundles' }}">{{ section.settings.nav4_label }}</a>{%- endif -%}
+        {%- if section.settings.nav5_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav5_url | default: '/pages/byob-builder' }}">{{ section.settings.nav5_label }}</a>{%- endif -%}
+      </nav>
 
       <div class="dawbu-search dawbu-search--collapsible" data-search-panel hidden>
         {%- if settings.predictive_search_enabled -%}
@@ -511,18 +534,6 @@
       </div>
     </div>
 
-    <nav class="dawbu-nav" aria-label="Primary">
-      <a class="dawbu-nav__item dawbu-nav__home" href="{{ routes.root_url }}" aria-label="Home">
-        <span class="svg-wrapper">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
-      </a>
-      {%- if section.settings.nav1_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav1_url | default: '/collections/all' }}">{{ section.settings.nav1_label }}</a>{%- endif -%}
-      {%- if section.settings.nav2_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav2_url | default: '/collections/miniature-toys' }}">{{ section.settings.nav2_label }}</a>{%- endif -%}
-      {%- if section.settings.nav3_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav3_url | default: '/collections/glowing-products' }}">{{ section.settings.nav3_label }}</a>{%- endif -%}
-      {%- if section.settings.nav4_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav4_url | default: '/collections/bundles' }}">{{ section.settings.nav4_label }}</a>{%- endif -%}
-      {%- if section.settings.nav5_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav5_url | default: '/pages/byob-builder' }}">{{ section.settings.nav5_label }}</a>{%- endif -%}
-    </nav>
   </header>
 </{{ header_tag }}>
 
@@ -565,6 +576,23 @@
         if (!sPanel.hasAttribute('hidden') && !sPanel.contains(e.target) && !sToggle.contains(e.target)) {
           sPanel.setAttribute('hidden', '');
           sToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    var navToggle = document.querySelector('[data-nav-toggle]');
+    var navEl = document.querySelector('[data-nav]');
+    if (navToggle && navEl) {
+      navToggle.addEventListener('click', function () {
+        var open = navEl.classList.toggle('is-open');
+        navToggle.classList.toggle('is-open', open);
+        navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      navEl.addEventListener('click', function (e) {
+        if (e.target.closest('a')) {
+          navEl.classList.remove('is-open');
+          navToggle.classList.remove('is-open');
+          navToggle.setAttribute('aria-expanded', 'false');
         }
       });
     }

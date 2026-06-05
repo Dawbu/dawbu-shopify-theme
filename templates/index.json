@@ -190,16 +190,24 @@
       }
     },
     "byob_builder_home": {
-      "type": "byob-builder",
+      "type": "byob-cta",
       "name": "Build Your Own Collection",
       "settings": {
-        "eyebrow": "Build Your Own",
+        "emoji": "🧩",
         "heading": "Build Your Own Collection",
-        "lede": "Pick any {N} minis — pay just Rs. {P}. Mix and match whatever you love.",
-        "slots_title": "Add Any {N} Products In The Box",
-        "collection": "byob-block-69",
-        "quantity": 6,
-        "price": 390
+        "subheading": "Pick any 6 minis for ₹390 — mix & match your way.",
+        "button_label": "START BUILDING",
+        "link": "/pages/byob-builder",
+        "bg_1": "#fff0f6",
+        "bg_2": "#eaf2ff",
+        "border_color": "#ffd1e3",
+        "text_color": "#241c2e",
+        "muted_color": "#7c7587",
+        "btn_bg": "#ff5c8a",
+        "btn_text": "#ffffff",
+        "max_width": 1100,
+        "padding_top": 24,
+        "padding_bottom": 24
       }
     },
     "fan_favourites_YxtPg4": {
@@ -327,23 +335,21 @@
       "type": "newsletter-offer",
       "name": "Newsletter Offer",
       "settings": {
-        "eyebrow": "LIMITED-TIME WELCOME GIFT",
-        "heading": "Get 5% | OFF",
-        "subheading": "Drop your email and we'll send your first-order discount code.",
+        "heading": "Get | 5% OFF your first order",
         "input_placeholder": "Enter your email",
-        "button_label": "GET MY CODE",
-        "fine_print": "No spam, just blocks. Unsubscribe anytime.",
-        "success_text": "You're in! Here's your 5% off code:",
+        "button_label": "GET CODE",
+        "success_text": "You're in! Use code",
         "discount_code": "WELCOME5",
         "bg_top": "#fff0f6",
         "bg_bottom": "#eaf2ff",
+        "headline_color": "#d6336c",
         "accent_color": "#ff5c8a",
         "accent_text_color": "#ffffff",
-        "text_color": "#241c2e",
-        "muted_color": "#7c7587",
+        "input_text_color": "#5a4a5e",
         "input_border": "#e3d9e4",
-        "padding_top": 56,
-        "padding_bottom": 56
+        "max_width": 1000,
+        "padding_top": 22,
+        "padding_bottom": 22
       }
     },
     "brand_gallery_home": {

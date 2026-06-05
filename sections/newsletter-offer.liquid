@@ -1,105 +1,82 @@
 {% comment %}
-  Section: Newsletter Offer (5% off)
-  Email capture with a discount-code reward. Uses Shopify's customer form to
-  collect the email; on success it reveals the offer code.
-  NOTE: create the actual code in Shopify Admin → Discounts (e.g. WELCOME5 = 5% off).
+  Section: Newsletter Offer (5% off) — compact horizontal bar
+  Small one-line email capture with a 5% off reward. Uses Shopify's customer
+  form. Create the actual code in Shopify Admin → Discounts (e.g. WELCOME5).
   Theme editor → Add section → Newsletter Offer.
-  v1.0.0
+  v2.0.0
 {% endcomment %}
 
 {%- style -%}
   #nlo-{{ section.id }} {
-    background: linear-gradient(180deg, {{ section.settings.bg_top }} 0%, {{ section.settings.bg_bottom }} 100%);
+    background: linear-gradient(120deg, {{ section.settings.bg_top }} 0%, {{ section.settings.bg_bottom }} 100%);
     padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
-    --nlo-accent: {{ section.settings.accent_color }};
-    --nlo-accent-text: {{ section.settings.accent_text_color }};
-    --nlo-text: {{ section.settings.text_color }};
-    --nlo-muted: {{ section.settings.muted_color }};
   }
-  #nlo-{{ section.id }} .nlo-inner { max-width: 640px; margin: 0 auto; padding: 0 20px; text-align: center; }
-  #nlo-{{ section.id }} .nlo-eyebrow {
-    display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--nlo-accent-text); background: var(--nlo-accent); border-radius: 50px; padding: 7px 16px; margin-bottom: 14px;
+  #nlo-{{ section.id }} .nlo-bar {
+    max-width: {{ section.settings.max_width }}px; margin: 0 auto; padding: 0 16px;
+    display: flex; align-items: center; justify-content: center; gap: 12px 22px; flex-wrap: wrap;
   }
-  #nlo-{{ section.id }} .nlo-title { font-size: clamp(26px, 5vw, 44px); font-weight: 900; line-height: 1.05; margin: 0 0 10px; color: var(--nlo-text); letter-spacing: -0.01em; }
-  #nlo-{{ section.id }} .nlo-title .nlo-em { color: var(--nlo-accent); }
-  #nlo-{{ section.id }} .nlo-sub { margin: 0 auto 22px; color: var(--nlo-muted); font-size: 16px; max-width: 480px; }
-
-  #nlo-{{ section.id }} .nlo-field { display: flex; gap: 10px; max-width: 480px; margin: 0 auto; }
-  #nlo-{{ section.id }} .nlo-field input {
-    flex: 1 1 auto; min-width: 0; height: 52px; border: 1.5px solid {{ section.settings.input_border }};
-    border-radius: 50px; padding: 0 20px; font-size: 15px; background: #fff; color: var(--nlo-text);
+  #nlo-{{ section.id }} .nlo-headline {
+    margin: 0; font-size: clamp(15px, 2vw, 20px); font-weight: 800; letter-spacing: -0.01em;
+    color: {{ section.settings.headline_color }}; white-space: nowrap;
   }
-  #nlo-{{ section.id }} .nlo-field input:focus { outline: none; border-color: var(--nlo-accent); }
+  #nlo-{{ section.id }} .nlo-headline b { color: {{ section.settings.accent_color }}; }
+  #nlo-{{ section.id }} .nlo-form { display: flex; gap: 8px; margin: 0; }
+  #nlo-{{ section.id }} .nlo-input {
+    height: 46px; min-width: 220px; max-width: 320px; flex: 1 1 220px;
+    border: 1.5px solid {{ section.settings.input_border }}; border-radius: 50px; padding: 0 18px;
+    font-size: 14px; background: #fff; color: {{ section.settings.input_text_color }};
+  }
+  #nlo-{{ section.id }} .nlo-input::placeholder { color: {{ section.settings.input_text_color }}; opacity: .55; }
+  #nlo-{{ section.id }} .nlo-input:focus { outline: none; border-color: {{ section.settings.accent_color }}; }
   #nlo-{{ section.id }} .nlo-btn {
-    flex: 0 0 auto; height: 52px; border: 0; cursor: pointer; border-radius: 50px;
-    background: var(--nlo-accent); color: var(--nlo-accent-text); font-weight: 800; font-size: 15px; padding: 0 26px;
-    transition: transform .15s ease, filter .2s ease;
+    height: 46px; border: 0; cursor: pointer; border-radius: 50px; white-space: nowrap;
+    background: {{ section.settings.accent_color }}; color: {{ section.settings.accent_text_color }};
+    font-weight: 800; font-size: 14px; padding: 0 22px; transition: transform .15s ease, filter .2s ease;
   }
-  #nlo-{{ section.id }} .nlo-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
-  #nlo-{{ section.id }} .nlo-fine { display: block; margin-top: 12px; font-size: 12px; color: var(--nlo-muted); }
-  #nlo-{{ section.id }} .nlo-error { display: block; margin-top: 10px; color: #c0392b; font-size: 13px; }
+  #nlo-{{ section.id }} .nlo-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  #nlo-{{ section.id }} .nlo-success { margin: 0; font-size: 15px; font-weight: 700; color: {{ section.settings.headline_color }}; }
+  #nlo-{{ section.id }} .nlo-success b {
+    color: {{ section.settings.accent_color }}; letter-spacing: 1px;
+    background: #fff; border-radius: 8px; padding: 3px 12px; margin-left: 6px;
+  }
+  #nlo-{{ section.id }} .nlo-error { width: 100%; text-align: center; color: #c0392b; font-size: 13px; margin: 6px 0 0; }
 
-  #nlo-{{ section.id }} .nlo-success {
-    background: #fff; border: 2px dashed var(--nlo-accent); border-radius: 16px; padding: 20px; max-width: 480px; margin: 0 auto;
-  }
-  #nlo-{{ section.id }} .nlo-success p { margin: 0 0 8px; color: var(--nlo-text); font-weight: 600; }
-  #nlo-{{ section.id }} .nlo-code {
-    display: inline-block; font-size: 22px; font-weight: 900; letter-spacing: 2px; color: var(--nlo-accent);
-    background: {{ section.settings.bg_top }}; border-radius: 10px; padding: 8px 18px;
-  }
-
-  @media (max-width: 600px) {
-    #nlo-{{ section.id }} .nlo-field { flex-direction: column; }
-    #nlo-{{ section.id }} .nlo-field input, #nlo-{{ section.id }} .nlo-btn { width: 100%; }
+  @media (max-width: 599px) {
+    #nlo-{{ section.id }} .nlo-form { width: 100%; }
+    #nlo-{{ section.id }} .nlo-input { flex: 1 1 auto; max-width: none; }
   }
 {%- endstyle -%}
 
 <section id="nlo-{{ section.id }}" class="nlo-section" data-track-section="newsletter_offer">
-  <div class="nlo-inner">
-    {%- if section.settings.eyebrow != blank -%}
-      <span class="nlo-eyebrow">{{ section.settings.eyebrow }}</span>
-    {%- endif -%}
+  <div class="nlo-bar">
     {%- if section.settings.heading != blank -%}
-      <h2 class="nlo-title">
+      <p class="nlo-headline">
         {%- assign parts = section.settings.heading | split: '|' -%}
         {%- for part in parts -%}
-          {%- if forloop.last and parts.size > 1 -%}<span class="nlo-em">{{ part | strip }}</span>{%- else -%}{{ part | strip }}{%- endif -%}
+          {%- if parts.size > 1 and forloop.index == 2 -%}<b>{{ part | strip }}</b>{%- else -%}{{ part | strip }}{%- endif -%}
           {%- unless forloop.last %} {% endunless -%}
         {%- endfor -%}
-      </h2>
-    {%- endif -%}
-    {%- if section.settings.subheading != blank -%}
-      <p class="nlo-sub">{{ section.settings.subheading }}</p>
+      </p>
     {%- endif -%}
 
     {%- form 'customer', id: 'nlo-form-' | append: section.id, class: 'nlo-form' -%}
       <input type="hidden" name="contact[tags]" value="newsletter,offer-5off">
       {%- if form.posted_successfully? -%}
-        <div class="nlo-success">
-          <p>{{ section.settings.success_text }}</p>
-          {%- if section.settings.discount_code != blank -%}
-            <span class="nlo-code">{{ section.settings.discount_code }}</span>
-          {%- endif -%}
-        </div>
+        <p class="nlo-success">{{ section.settings.success_text }}{%- if section.settings.discount_code != blank %} <b>{{ section.settings.discount_code }}</b>{% endif -%}</p>
       {%- else -%}
-        <div class="nlo-field">
-          <input
-            type="email"
-            name="contact[email]"
-            placeholder="{{ section.settings.input_placeholder }}"
-            aria-label="{{ section.settings.input_placeholder }}"
-            autocorrect="off"
-            autocapitalize="off"
-            required
-          >
-          <button type="submit" class="nlo-btn">{{ section.settings.button_label }}</button>
-        </div>
+        <input
+          type="email"
+          name="contact[email]"
+          class="nlo-input"
+          placeholder="{{ section.settings.input_placeholder }}"
+          aria-label="{{ section.settings.input_placeholder }}"
+          autocorrect="off"
+          autocapitalize="off"
+          required
+        >
+        <button type="submit" class="nlo-btn">{{ section.settings.button_label }}</button>
         {%- if form.errors -%}
           <small class="nlo-error">{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}</small>
-        {%- endif -%}
-        {%- if section.settings.fine_print != blank -%}
-          <small class="nlo-fine">{{ section.settings.fine_print }}</small>
         {%- endif -%}
       {%- endif -%}
     {%- endform -%}
@@ -112,26 +89,24 @@
   "tag": "section",
   "class": "section-newsletter-offer",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "LIMITED-TIME WELCOME GIFT" },
-    { "type": "text", "id": "heading", "label": "Heading (use | for accent word)", "default": "Get 5% | OFF" },
-    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Drop your email and we'll send your first-order discount code." },
+    { "type": "text", "id": "heading", "label": "Headline (use | before the part to highlight)", "default": "Get | 5% OFF your first order" },
     { "type": "text", "id": "input_placeholder", "label": "Email placeholder", "default": "Enter your email" },
-    { "type": "text", "id": "button_label", "label": "Button label", "default": "GET MY CODE" },
-    { "type": "text", "id": "fine_print", "label": "Fine print", "default": "No spam, just blocks. Unsubscribe anytime." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "GET CODE" },
     { "type": "header", "content": "Reward shown after signup" },
-    { "type": "text", "id": "success_text", "label": "Success message", "default": "You're in! Here's your 5% off code:" },
+    { "type": "text", "id": "success_text", "label": "Success message", "default": "You're in! Use code" },
     { "type": "text", "id": "discount_code", "label": "Discount code", "default": "WELCOME5", "info": "Create this code in Shopify Admin → Discounts (e.g. WELCOME5 = 5% off)." },
     { "type": "header", "content": "Colours" },
-    { "type": "color", "id": "bg_top", "label": "Background top", "default": "#fff0f6" },
-    { "type": "color", "id": "bg_bottom", "label": "Background bottom", "default": "#eaf2ff" },
+    { "type": "color", "id": "bg_top", "label": "Background start", "default": "#fff0f6" },
+    { "type": "color", "id": "bg_bottom", "label": "Background end", "default": "#eaf2ff" },
+    { "type": "color", "id": "headline_color", "label": "Headline colour", "default": "#d6336c" },
     { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#ff5c8a" },
-    { "type": "color", "id": "accent_text_color", "label": "Accent text colour", "default": "#ffffff" },
-    { "type": "color", "id": "text_color", "label": "Text colour", "default": "#241c2e" },
-    { "type": "color", "id": "muted_color", "label": "Muted text colour", "default": "#7c7587" },
+    { "type": "color", "id": "accent_text_color", "label": "Button text colour", "default": "#ffffff" },
+    { "type": "color", "id": "input_text_color", "label": "Input text colour", "default": "#5a4a5e" },
     { "type": "color", "id": "input_border", "label": "Input border", "default": "#e3d9e4" },
     { "type": "header", "content": "Layout" },
-    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Padding top", "default": 56 },
-    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Padding bottom", "default": 56 }
+    { "type": "range", "id": "max_width", "min": 700, "max": 1400, "step": 20, "unit": "px", "label": "Max width", "default": 1000 },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 80, "step": 2, "unit": "px", "label": "Padding top", "default": 22 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 80, "step": 2, "unit": "px", "label": "Padding bottom", "default": 22 }
   ],
   "presets": [
     { "name": "Newsletter Offer" }
