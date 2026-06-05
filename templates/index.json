@@ -323,6 +323,58 @@
         "padding_bottom": 48
       }
     },
+    "newsletter_offer_home": {
+      "type": "newsletter-offer",
+      "name": "Newsletter Offer",
+      "settings": {
+        "eyebrow": "LIMITED-TIME WELCOME GIFT",
+        "heading": "Get 5% | OFF",
+        "subheading": "Drop your email and we'll send your first-order discount code.",
+        "input_placeholder": "Enter your email",
+        "button_label": "GET MY CODE",
+        "fine_print": "No spam, just blocks. Unsubscribe anytime.",
+        "success_text": "You're in! Here's your 5% off code:",
+        "discount_code": "WELCOME5",
+        "bg_top": "#fff0f6",
+        "bg_bottom": "#eaf2ff",
+        "accent_color": "#ff5c8a",
+        "accent_text_color": "#ffffff",
+        "text_color": "#241c2e",
+        "muted_color": "#7c7587",
+        "input_border": "#e3d9e4",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "brand_gallery_home": {
+      "type": "brand-gallery",
+      "blocks": {
+        "item_1": { "type": "item" },
+        "item_2": { "type": "item" },
+        "item_3": { "type": "item" },
+        "item_4": { "type": "item" },
+        "item_5": { "type": "item" },
+        "item_6": { "type": "item" }
+      },
+      "block_order": ["item_1", "item_2", "item_3", "item_4", "item_5", "item_6"],
+      "name": "Brand Gallery",
+      "settings": {
+        "heading": "See what else we're growing:",
+        "cta_label": "Visit our plant store",
+        "cta_link": "",
+        "open_new_tab": true,
+        "show_rules": true,
+        "rule_color": "#cdbfae",
+        "tile_width": 260,
+        "tile_ratio": "4/5",
+        "bg_color": "#f3e7d6",
+        "accent_color": "#3f7d4f",
+        "text_color": "#2b2b2b",
+        "max_width": 1500,
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
     "build_reels_mmqtbm": {
       "type": "build-reels",
       "blocks": {
@@ -817,6 +869,8 @@
     "byob_builder_home",
     "fan_favourites_YxtPg4",
     "glow_steps_home",
+    "newsletter_offer_home",
+    "brand_gallery_home",
     "build_reels_mmqtbm",
     "glow_mini_world_Gn9LaU",
     "perfect_for_every_occasion_zFfAMK",

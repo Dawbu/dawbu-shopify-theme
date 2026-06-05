@@ -1,0 +1,163 @@
+{% comment %}
+  Section: Brand Gallery (cross-promo)
+  Horizontal scrolling image strip with a heading + a "visit" link, used to
+  cross-promote a sister brand / plant store (GRAZA "see what else we're
+  cooking up" style). Each image is a block with its own link.
+  Theme editor → Add section → Brand Gallery.
+  v1.0.0
+{% endcomment %}
+
+{%- liquid
+  assign items = section.blocks | where: 'type', 'item'
+-%}
+
+{%- style -%}
+  #bg-{{ section.id }} {
+    background: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    --bg-accent: {{ section.settings.accent_color }};
+    --bg-text: {{ section.settings.text_color }};
+  }
+  #bg-{{ section.id }} .bg-top {
+    max-width: {{ section.settings.max_width }}px; margin: 0 auto; padding: 0 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  #bg-{{ section.id }} .bg-title {
+    font-size: clamp(20px, 3vw, 32px); font-weight: 800; margin: 0; color: var(--bg-text); letter-spacing: -0.01em;
+  }
+  #bg-{{ section.id }} .bg-cta {
+    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--bg-text); text-decoration: none;
+  }
+  #bg-{{ section.id }} .bg-cta__label { border-bottom: 2px dotted currentColor; padding-bottom: 2px; }
+  #bg-{{ section.id }} .bg-cta__arrow {
+    width: 34px; height: 34px; border-radius: 9px; background: var(--bg-accent);
+    display: inline-flex; align-items: center; justify-content: center; color: #fff;
+    transition: transform .15s ease;
+  }
+  #bg-{{ section.id }} .bg-cta:hover .bg-cta__arrow { transform: translate(2px, -2px); }
+
+  {%- if section.settings.show_rules -%}
+  #bg-{{ section.id }} .bg-rule { max-width: {{ section.settings.max_width }}px; margin: 14px auto; padding: 0 20px; }
+  #bg-{{ section.id }} .bg-rule::after { content: ""; display: block; border-top: 2px dotted {{ section.settings.rule_color }}; }
+  {%- endif -%}
+
+  #bg-{{ section.id }} .bg-scroll {
+    display: flex; gap: 16px; overflow-x: auto; padding: 6px 20px 10px;
+    scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  #bg-{{ section.id }} .bg-scroll::-webkit-scrollbar { display: none; }
+  #bg-{{ section.id }} .bg-item {
+    flex: 0 0 auto; width: {{ section.settings.tile_width }}px; max-width: 70vw;
+    aspect-ratio: {{ section.settings.tile_ratio }};
+    border-radius: 18px; overflow: hidden; scroll-snap-align: start; display: block;
+    background: rgba(0,0,0,.04); box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  #bg-{{ section.id }} .bg-item:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,.16); }
+  #bg-{{ section.id }} .bg-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #bg-{{ section.id }} .bg-empty { padding: 40px 20px; text-align: center; color: #888; }
+
+  @media (max-width: 749px) {
+    #bg-{{ section.id }} .bg-item { width: {{ section.settings.tile_width | times: 0.7 | round }}px; }
+  }
+{%- endstyle -%}
+
+<section id="bg-{{ section.id }}" class="bg-section" data-track-section="brand_gallery">
+  <div class="bg-top">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bg-title">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    {%- if section.settings.cta_label != blank -%}
+      <a class="bg-cta" href="{{ section.settings.cta_link | default: '#' }}" {% if section.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %}>
+        <span class="bg-cta__label">{{ section.settings.cta_label }}</span>
+        <span class="bg-cta__arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_rules -%}<div class="bg-rule" aria-hidden="true"></div>{%- endif -%}
+
+  {%- if items.size > 0 -%}
+    <div class="bg-scroll">
+      {%- for block in items -%}
+        {%- assign img = block.settings.image -%}
+        <a class="bg-item" href="{{ block.settings.link | default: section.settings.cta_link | default: '#' }}"
+           {% if section.settings.open_new_tab %}target="_blank" rel="noopener"{% endif %} {{ block.shopify_attributes }}>
+          {%- if img != blank -%}
+            <img
+              src="{{ img | image_url: width: 600 }}"
+              srcset="{{ img | image_url: width: 400 }} 400w, {{ img | image_url: width: 600 }} 600w, {{ img | image_url: width: 800 }} 800w"
+              sizes="{{ section.settings.tile_width }}px"
+              width="{{ img.width }}" height="{{ img.height }}"
+              alt="{{ img.alt | default: block.settings.alt | default: section.settings.heading | escape }}"
+              loading="lazy"
+            >
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+        </a>
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <div class="bg-empty">Add image blocks in the theme editor.</div>
+  {%- endif -%}
+
+  {%- if section.settings.show_rules -%}<div class="bg-rule" aria-hidden="true"></div>{%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Brand Gallery",
+  "tag": "section",
+  "class": "section-brand-gallery",
+  "max_blocks": 16,
+  "settings": [
+    { "type": "header", "content": "Heading & link" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "See what else we're growing:" },
+    { "type": "text", "id": "cta_label", "label": "Link label", "default": "Visit our plant store" },
+    { "type": "url", "id": "cta_link", "label": "Link URL", "info": "Your plant store / sister-brand website." },
+    { "type": "checkbox", "id": "open_new_tab", "label": "Open links in a new tab", "default": true },
+    { "type": "checkbox", "id": "show_rules", "label": "Show dotted divider lines", "default": true },
+    { "type": "color", "id": "rule_color", "label": "Divider colour", "default": "#cdbfae" },
+    { "type": "header", "content": "Tiles" },
+    { "type": "range", "id": "tile_width", "min": 180, "max": 420, "step": 10, "unit": "px", "label": "Tile width (desktop)", "default": 260 },
+    {
+      "type": "select", "id": "tile_ratio", "label": "Tile shape",
+      "options": [ { "value": "1/1", "label": "Square" }, { "value": "4/5", "label": "Portrait" }, { "value": "3/4", "label": "Tall" }, { "value": "4/3", "label": "Landscape" } ],
+      "default": "4/5"
+    },
+    { "type": "header", "content": "Section" },
+    { "type": "color", "id": "bg_color", "label": "Background", "default": "#f3e7d6" },
+    { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#3f7d4f" },
+    { "type": "color", "id": "text_color", "label": "Text colour", "default": "#2b2b2b" },
+    { "type": "range", "id": "max_width", "min": 900, "max": 1800, "step": 20, "unit": "px", "label": "Max width", "default": 1500 },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Padding top", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Padding bottom", "default": 48 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Leave blank to use the section link." },
+        { "type": "text", "id": "alt", "label": "Alt text" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Gallery",
+      "blocks": [
+        { "type": "item" }, { "type": "item" }, { "type": "item" },
+        { "type": "item" }, { "type": "item" }, { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
