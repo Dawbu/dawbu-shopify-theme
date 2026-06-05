@@ -13,7 +13,7 @@
   }
   #nlo-{{ section.id }} .nlo-bar {
     max-width: {{ section.settings.max_width }}px; margin: 0 auto; padding: 0 16px;
-    display: flex; align-items: center; justify-content: center; gap: 12px 22px; flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px 22px; flex-wrap: wrap;
   }
   #nlo-{{ section.id }} .nlo-headline {
     margin: 0; font-size: clamp(15px, 2vw, 20px); font-weight: 800; letter-spacing: -0.01em;
@@ -41,6 +41,10 @@
   }
   #nlo-{{ section.id }} .nlo-error { width: 100%; text-align: center; color: #c0392b; font-size: 13px; margin: 6px 0 0; }
 
+  @media (max-width: 749px) {
+    #nlo-{{ section.id }} .nlo-bar { justify-content: center; text-align: center; }
+    #nlo-{{ section.id }} .nlo-headline { white-space: normal; width: 100%; }
+  }
   @media (max-width: 599px) {
     #nlo-{{ section.id }} .nlo-form { width: 100%; }
     #nlo-{{ section.id }} .nlo-input { flex: 1 1 auto; max-width: none; }
@@ -59,7 +63,8 @@
       </p>
     {%- endif -%}
 
-    {%- form 'customer', id: 'nlo-form-' | append: section.id, class: 'nlo-form' -%}
+    {%- assign nlo_form_id = 'nlo-form-' | append: section.id -%}
+    {%- form 'customer', id: nlo_form_id, class: 'nlo-form' -%}
       <input type="hidden" name="contact[tags]" value="newsletter,offer-5off">
       {%- if form.posted_successfully? -%}
         <p class="nlo-success">{{ section.settings.success_text }}{%- if section.settings.discount_code != blank %} <b>{{ section.settings.discount_code }}</b>{% endif -%}</p>
