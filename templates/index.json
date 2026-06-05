@@ -222,6 +222,29 @@
         "section_padding_bottom": 60
       }
     },
+    "glow_steps_home": {
+      "type": "glow-steps",
+      "blocks": {
+        "step_1": { "type": "step", "settings": { "lead": "Charge it.", "body": "Leave the mini in light for 10–15 minutes — daylight or a lamp both work." } },
+        "step_2": { "type": "step", "settings": { "lead": "Lights off.", "body": "Switch off the room and watch it glow a soft green for hours." } },
+        "step_3": { "type": "step", "settings": { "lead": "Recharge anytime.", "body": "The glow is reusable forever — no batteries, no fuss." } }
+      },
+      "block_order": ["step_1", "step_2", "step_3"],
+      "name": "Glow Steps",
+      "settings": {
+        "heading": "How the glow works",
+        "bg_color": "#fdf4e7",
+        "heading_color": "#1b2545",
+        "accent_color": "#16a06a",
+        "lead_color": "#1b2545",
+        "text_color": "#3a4256",
+        "card_bg": "#ffffff",
+        "card_border": "#efe7d6",
+        "max_width": 1200,
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
     "collection_grid_ByLdQT": {
       "type": "collection-grid",
       "name": "Collection Grid",
@@ -821,6 +844,7 @@
     "tiny_show_pieces_main",
     "byob_builder_home",
     "bundle_deals_home",
+    "glow_steps_home",
     "collection_grid_ByLdQT",
     "fan_favourites_YxtPg4",
     "grab_and_go_aFNKW8",
