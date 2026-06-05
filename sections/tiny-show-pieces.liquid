@@ -1,0 +1,591 @@
+{% comment %}
+  Section: Tiny Show Pieces
+  Headline + horizontal filter buttons (tabs) + a cute Pinterest-style
+  responsive product grid (2 per row on mobile) with a View All button.
+  Theme editor → Add section → Tiny Show Pieces.
+  v1.0.0
+{% endcomment %}
+
+{%- liquid
+  assign tab_blocks = section.blocks | where: 'type', 'tab'
+  assign per_tab = section.settings.products_per_tab
+-%}
+
+{%- style -%}
+  #tsp-{{ section.id }} {
+    background: linear-gradient(180deg, {{ section.settings.bg_color }} 0%, {{ section.settings.bg_color_2 }} 100%);
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    --tsp-accent: {{ section.settings.accent_color }};
+    --tsp-accent-text: {{ section.settings.accent_text_color }};
+    --tsp-card-bg: {{ section.settings.card_bg }};
+    --tsp-text: {{ section.settings.text_color }};
+    --tsp-cols-d: {{ section.settings.columns_desktop }};
+  }
+
+  #tsp-{{ section.id }} .tsp-inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  #tsp-{{ section.id }} .tsp-head {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  #tsp-{{ section.id }} .tsp-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--tsp-accent);
+    background: #fff;
+    border: 1.5px solid var(--tsp-accent);
+    border-radius: 50px;
+    padding: 6px 14px;
+    margin-bottom: 12px;
+  }
+  #tsp-{{ section.id }} .tsp-title {
+    font-size: clamp(26px, 5vw, 46px);
+    line-height: 1.05;
+    margin: 0;
+    color: var(--tsp-text);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  #tsp-{{ section.id }} .tsp-title .tsp-em { color: var(--tsp-accent); }
+  #tsp-{{ section.id }} .tsp-sub {
+    margin: 10px auto 0;
+    max-width: 560px;
+    color: {{ section.settings.muted_color }};
+    font-size: 15px;
+  }
+
+  /* ── Filter buttons ── */
+  #tsp-{{ section.id }} .tsp-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 0 26px;
+  }
+  #tsp-{{ section.id }} .tsp-tab {
+    appearance: none;
+    cursor: pointer;
+    border: 2px solid var(--tsp-accent);
+    background: #fff;
+    color: var(--tsp-accent);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 9px 20px;
+    border-radius: 50px;
+    transition: transform .12s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+    box-shadow: 0 2px 0 rgba(0,0,0,.04);
+    white-space: nowrap;
+  }
+  #tsp-{{ section.id }} .tsp-tab:hover { transform: translateY(-2px); }
+  #tsp-{{ section.id }} .tsp-tab.is-active {
+    background: var(--tsp-accent);
+    color: var(--tsp-accent-text);
+    box-shadow: 0 6px 16px rgba(0,0,0,.14);
+  }
+
+  /* ── Panels & grid ── */
+  #tsp-{{ section.id }} .tsp-panel { display: none; }
+  #tsp-{{ section.id }} .tsp-panel.is-active { display: block; animation: tspFade .3s ease; }
+  @keyframes tspFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  #tsp-{{ section.id }} .tsp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  /* ── Card ── */
+  #tsp-{{ section.id }} .tsp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--tsp-card-bg);
+    border-radius: 18px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--tsp-text);
+    box-shadow: 0 4px 14px rgba(17,17,17,.06);
+    border: 1px solid rgba(17,17,17,.05);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  #tsp-{{ section.id }} .tsp-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(17,17,17,.14);
+  }
+  #tsp-{{ section.id }} .tsp-media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    overflow: hidden;
+  }
+  #tsp-{{ section.id }} .tsp-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s ease, opacity .3s ease;
+  }
+  #tsp-{{ section.id }} .tsp-card:hover .tsp-media img { transform: scale(1.05); }
+  #tsp-{{ section.id }} .tsp-media .tsp-img--2 {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  #tsp-{{ section.id }} .tsp-card:hover .tsp-media .tsp-img--2 { opacity: 1; }
+
+  #tsp-{{ section.id }} .tsp-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--tsp-accent);
+    color: var(--tsp-accent-text);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .5px;
+    padding: 4px 9px;
+    border-radius: 50px;
+    z-index: 2;
+  }
+
+  #tsp-{{ section.id }} .tsp-info { padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  #tsp-{{ section.id }} .tsp-name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  #tsp-{{ section.id }} .tsp-price-row { margin-top: auto; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  #tsp-{{ section.id }} .tsp-price { font-size: 16px; font-weight: 800; color: var(--tsp-text); }
+  #tsp-{{ section.id }} .tsp-compare { font-size: 13px; color: #9aa0a6; text-decoration: line-through; }
+  #tsp-{{ section.id }} .tsp-cta {
+    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tsp-accent);
+    color: var(--tsp-accent-text);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  /* ── View all ── */
+  #tsp-{{ section.id }} .tsp-viewall-wrap { text-align: center; margin-top: 30px; }
+  #tsp-{{ section.id }} .tsp-viewall {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--tsp-accent);
+    color: var(--tsp-accent-text);
+    font-weight: 800;
+    font-size: 15px;
+    padding: 13px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
+    transition: transform .15s ease;
+  }
+  #tsp-{{ section.id }} .tsp-viewall:hover { transform: translateY(-2px); }
+
+  #tsp-{{ section.id }} .tsp-empty { text-align: center; padding: 30px; color: {{ section.settings.muted_color }}; }
+
+  /* ── Desktop ── */
+  @media (min-width: 750px) {
+    #tsp-{{ section.id }} .tsp-grid { grid-template-columns: repeat(var(--tsp-cols-d), 1fr); gap: 22px; }
+    #tsp-{{ section.id }} .tsp-name { font-size: 15px; }
+    #tsp-{{ section.id }} .tsp-info { padding: 14px 14px 16px; }
+  }
+{%- endstyle -%}
+
+<section id="tsp-{{ section.id }}" class="tsp-section" data-track-section="tiny_show_pieces">
+  <div class="tsp-inner">
+    <div class="tsp-head">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="tsp-eyebrow">{{ section.settings.eyebrow }}</span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="tsp-title">
+          {%- assign parts = section.settings.heading | split: '|' -%}
+          {%- for part in parts -%}
+            {%- if forloop.last and parts.size > 1 -%}
+              <span class="tsp-em">{{ part | strip }}</span>
+            {%- else -%}
+              {{ part | strip }}
+            {%- endif -%}
+            {%- unless forloop.last %} {% endunless -%}
+          {%- endfor -%}
+        </h2>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="tsp-sub">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if tab_blocks.size > 0 -%}
+      <div class="tsp-tabs" role="tablist" aria-label="{{ section.settings.heading | escape }}">
+        {%- for block in tab_blocks -%}
+          <button
+            type="button"
+            class="tsp-tab{% if forloop.first %} is-active{% endif %}"
+            data-tsp-tab="{{ section.id }}-{{ forloop.index0 }}"
+            role="tab"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {{ block.settings.tab_label | default: block.settings.collection.title | default: 'All' }}
+          </button>
+        {%- endfor -%}
+      </div>
+
+      {%- for block in tab_blocks -%}
+        {%- assign col = block.settings.collection -%}
+        <div
+          class="tsp-panel{% if forloop.first %} is-active{% endif %}"
+          id="tsp-panel-{{ section.id }}-{{ forloop.index0 }}"
+          data-tsp-panel="{{ section.id }}-{{ forloop.index0 }}"
+          role="tabpanel"
+        >
+          {%- if col != blank and col.products_count > 0 -%}
+            <div class="tsp-grid">
+              {%- assign shown = 0 -%}
+              {%- for product in col.products -%}
+                {%- if shown >= per_tab -%}{%- break -%}{%- endif -%}
+                {%- assign shown = shown | plus: 1 -%}
+                {%- assign on_sale = false -%}
+                {%- if product.compare_at_price > product.price -%}{%- assign on_sale = true -%}{%- endif -%}
+                <a class="tsp-card" href="{{ product.url }}">
+                  <div class="tsp-media">
+                    {%- if on_sale and section.settings.show_sale_badge -%}
+                      <span class="tsp-badge">{{ section.settings.sale_badge_text }}</span>
+                    {%- elsif product.available == false -%}
+                      <span class="tsp-badge" style="background:#7a7a7a;">Sold out</span>
+                    {%- endif -%}
+
+                    {%- if product.featured_media -%}
+                      <img
+                        class="tsp-img--1"
+                        src="{{ product.featured_media | image_url: width: 500 }}"
+                        srcset="{{ product.featured_media | image_url: width: 300 }} 300w, {{ product.featured_media | image_url: width: 500 }} 500w, {{ product.featured_media | image_url: width: 700 }} 700w"
+                        sizes="(min-width: 750px) 22vw, 45vw"
+                        width="{{ product.featured_media.width }}"
+                        height="{{ product.featured_media.height }}"
+                        alt="{{ product.featured_media.alt | default: product.title | escape }}"
+                        loading="lazy"
+                      >
+                      {%- if section.settings.show_secondary_image and product.media[1] != blank -%}
+                        <img
+                          class="tsp-img--2"
+                          src="{{ product.media[1] | image_url: width: 500 }}"
+                          srcset="{{ product.media[1] | image_url: width: 300 }} 300w, {{ product.media[1] | image_url: width: 500 }} 500w"
+                          sizes="(min-width: 750px) 22vw, 45vw"
+                          width="{{ product.media[1].width }}"
+                          height="{{ product.media[1].height }}"
+                          alt=""
+                          loading="lazy"
+                        >
+                      {%- endif -%}
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag: 'tsp-img--1' }}
+                    {%- endif -%}
+                  </div>
+
+                  <div class="tsp-info">
+                    <h3 class="tsp-name">{{ product.title }}</h3>
+                    <div class="tsp-price-row">
+                      {%- if product.price_varies -%}
+                        <span class="tsp-price">From {{ product.price_min | money }}</span>
+                      {%- else -%}
+                        <span class="tsp-price">{{ product.price | money }}</span>
+                      {%- endif -%}
+                      {%- if on_sale -%}
+                        <s class="tsp-compare">{{ product.compare_at_price | money }}</s>
+                      {%- endif -%}
+                    </div>
+                    {%- if section.settings.show_card_button -%}
+                      <span class="tsp-cta">{{ section.settings.card_button_label }}</span>
+                    {%- endif -%}
+                  </div>
+                </a>
+              {%- endfor -%}
+            </div>
+
+            {%- if section.settings.show_view_all -%}
+              <div class="tsp-viewall-wrap">
+                <a class="tsp-viewall" href="{{ col.url }}">
+                  {{ section.settings.view_all_label }}
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              </div>
+            {%- endif -%}
+          {%- else -%}
+            <div class="tsp-empty">
+              {%- if col == blank -%}
+                Pick a collection for this tab in the theme editor.
+              {%- else -%}
+                No products in “{{ col.title }}” yet.
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="tsp-empty">Add tab blocks (filter buttons) in the theme editor.</div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  (function () {
+    function initTSP(id) {
+      var root = document.getElementById('tsp-' + id);
+      if (!root) return;
+      var tabs = root.querySelectorAll('.tsp-tab');
+      var panels = root.querySelectorAll('.tsp-panel');
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var key = btn.getAttribute('data-tsp-tab');
+          tabs.forEach(function (t) {
+            var on = t === btn;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+          panels.forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-tsp-panel') === key);
+          });
+        });
+      });
+    }
+    document.addEventListener('DOMContentLoaded', function () { initTSP('{{ section.id }}'); });
+    document.addEventListener('shopify:section:load', function (e) {
+      if (e.detail && e.detail.sectionId === '{{ section.id }}') { initTSP('{{ section.id }}'); }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Tiny Show Pieces",
+  "tag": "section",
+  "class": "section-tiny-show-pieces",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow / badge",
+      "default": "HANDPICKED"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (use | for accent word)",
+      "default": "Tiny Show | Pieces",
+      "info": "Text after | is shown in the accent color."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Cute little builds to show off on your shelf."
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "range",
+      "id": "products_per_tab",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "label": "Products per tab",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Columns on desktop",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ],
+      "default": "4",
+      "info": "Mobile always shows 2 per row."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show 2nd image on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_badge",
+      "label": "Show sale badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sale_badge_text",
+      "label": "Sale badge text",
+      "default": "SALE"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_card_button",
+      "label": "Show button on each card",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "card_button_label",
+      "label": "Card button label",
+      "default": "View"
+    },
+    {
+      "type": "header",
+      "content": "View all button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View All label",
+      "default": "View All"
+    },
+    {
+      "type": "header",
+      "content": "Colors & layout"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background top",
+      "default": "#e9f5ff"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_2",
+      "label": "Background bottom",
+      "default": "#fff7e6"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#0b3a6f"
+    },
+    {
+      "type": "color",
+      "id": "accent_text_color",
+      "label": "Accent text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted text color",
+      "default": "#6b7280"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 900,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "label": "Max width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Filter button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "Button label",
+          "default": "All"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tiny Show Pieces",
+      "blocks": [
+        { "type": "tab", "settings": { "tab_label": "All" } },
+        { "type": "tab", "settings": { "tab_label": "Glow" } },
+        { "type": "tab", "settings": { "tab_label": "Sea" } },
+        { "type": "tab", "settings": { "tab_label": "Farm" } },
+        { "type": "tab", "settings": { "tab_label": "Bird" } },
+        { "type": "tab", "settings": { "tab_label": "Space" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

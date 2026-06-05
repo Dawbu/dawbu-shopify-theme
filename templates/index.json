@@ -123,6 +123,61 @@
         "autoplay_seconds": 4
       }
     },
+    "tiny_show_pieces_main": {
+      "type": "tiny-show-pieces",
+      "blocks": {
+        "tab_all": {
+          "type": "tab",
+          "settings": { "tab_label": "All", "collection": "all-building-blocks" }
+        },
+        "tab_glow": {
+          "type": "tab",
+          "settings": { "tab_label": "Glow", "collection": "glowing-products" }
+        },
+        "tab_sea": {
+          "type": "tab",
+          "settings": { "tab_label": "Sea", "collection": "ocean-friends" }
+        },
+        "tab_farm": {
+          "type": "tab",
+          "settings": { "tab_label": "Farm", "collection": "animal-building-blocks" }
+        },
+        "tab_bird": {
+          "type": "tab",
+          "settings": { "tab_label": "Bird", "collection": "safari-animals" }
+        },
+        "tab_space": {
+          "type": "tab",
+          "settings": { "tab_label": "Space", "collection": "space-products" }
+        }
+      },
+      "block_order": ["tab_all", "tab_glow", "tab_sea", "tab_farm", "tab_bird", "tab_space"],
+      "name": "Tiny Show Pieces",
+      "settings": {
+        "eyebrow": "HANDPICKED",
+        "heading": "Tiny Show | Pieces",
+        "subheading": "Cute little builds to show off on your shelf.",
+        "products_per_tab": 8,
+        "columns_desktop": "4",
+        "show_secondary_image": true,
+        "show_sale_badge": true,
+        "sale_badge_text": "SALE",
+        "show_card_button": true,
+        "card_button_label": "View",
+        "show_view_all": true,
+        "view_all_label": "View All",
+        "bg_color": "#e9f5ff",
+        "bg_color_2": "#fff7e6",
+        "card_bg": "#ffffff",
+        "accent_color": "#0b3a6f",
+        "accent_text_color": "#ffffff",
+        "text_color": "#121212",
+        "muted_color": "#6b7280",
+        "max_width": 1200,
+        "padding_top": 56,
+        "padding_bottom": 64
+      }
+    },
     "collection_grid_ByLdQT": {
       "type": "collection-grid",
       "name": "Collection Grid",
@@ -706,6 +761,7 @@
   "order": [
     "summer_hero_main",
     "grab_and_go_aFNKW8",
+    "tiny_show_pieces_main",
     "collection_grid_ByLdQT",
     "fan_favourites_YxtPg4",
     "build_reels_mmqtbm",
