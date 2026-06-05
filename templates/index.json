@@ -191,8 +191,6 @@
     },
     "byob_builder_home": {
       "type": "byob-builder",
-      "blocks": {},
-      "block_order": [],
       "name": "Build Your Own Collection",
       "settings": {
         "eyebrow": "Build Your Own",
@@ -202,63 +200,6 @@
         "collection": "byob-block-69",
         "quantity": 6,
         "price": 390
-      }
-    },
-    "bundle_deals_home": {
-      "type": "bundle-deals",
-      "name": "Bundle Deals",
-      "settings": {
-        "badge_text": "MIX, MATCH & SAVE",
-        "heading_black": "BLOCK PARTY",
-        "heading_red": "BUNDLES",
-        "collection": "bundles",
-        "products_to_show": 12,
-        "columns_desktop": "5",
-        "show_secondary_image": false,
-        "button_text": "EXPLORE MORE BUNDLES",
-        "button_link": "",
-        "bg_color": "#f2f0eb",
-        "section_padding_top": 60,
-        "section_padding_bottom": 60
-      }
-    },
-    "glow_steps_home": {
-      "type": "glow-steps",
-      "blocks": {
-        "step_1": { "type": "step", "settings": { "lead": "Charge it.", "body": "Leave the mini in light for 10–15 minutes — daylight or a lamp both work." } },
-        "step_2": { "type": "step", "settings": { "lead": "Lights off.", "body": "Switch off the room and watch it glow a soft green for hours." } },
-        "step_3": { "type": "step", "settings": { "lead": "Recharge anytime.", "body": "The glow is reusable forever — no batteries, no fuss." } }
-      },
-      "block_order": ["step_1", "step_2", "step_3"],
-      "name": "Glow Steps",
-      "settings": {
-        "heading": "How the glow works",
-        "bg_color": "#fdf4e7",
-        "heading_color": "#1b2545",
-        "accent_color": "#16a06a",
-        "lead_color": "#1b2545",
-        "text_color": "#3a4256",
-        "card_bg": "#ffffff",
-        "card_border": "#efe7d6",
-        "max_width": 1200,
-        "padding_top": 48,
-        "padding_bottom": 48
-      }
-    },
-    "collection_grid_ByLdQT": {
-      "type": "collection-grid",
-      "name": "Collection Grid",
-      "settings": {
-        "collection": "featured-products",
-        "products_to_show": 24,
-        "label": "Bestseller Collection",
-        "title": "Fan <strong>Favourites</strong>",
-        "description": "The builds everyone keeps adding to cart.",
-        "button_label": "VIEW mORE →",
-        "button_link": "#",
-        "bg_color": "#ed1c24",
-        "bg_wave_color": "#ffffff",
-        "show_secondary_image": true
       }
     },
     "fan_favourites_YxtPg4": {
@@ -337,18 +278,49 @@
         "section_padding_bottom": 0
       }
     },
-    "grab_and_go_aFNKW8": {
-      "type": "grab-and-go",
-      "name": "Grab & Go",
+    "glow_steps_home": {
+      "type": "glow-steps",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "lead": "Charge it.",
+            "body": "Leave the mini in light for 10–15 minutes — daylight or a lamp both work."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "lead": "Lights off.",
+            "body": "Switch off the room and watch it glow a soft green for hours."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "lead": "Recharge anytime.",
+            "body": "The glow is reusable forever — no batteries, no fuss."
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ],
+      "name": "Glow Steps",
       "settings": {
-        "eyebrow": "Quick Add-Ons",
-        "heading": "GRAB & |GO",
-        "collection": "miniature-toys",
-        "products_to_show": 23,
-        "slides_per_view_desktop": 6,
-        "show_secondary_image": true,
-        "show_arrows": true,
-        "autoplay_seconds": 4
+        "heading": "How the glow works",
+        "bg_color": "#fdf4e7",
+        "heading_color": "#1b2545",
+        "accent_color": "#16a06a",
+        "lead_color": "#1b2545",
+        "text_color": "#3a4256",
+        "card_bg": "#ffffff",
+        "card_border": "#efe7d6",
+        "max_width": 1200,
+        "padding_top": 48,
+        "padding_bottom": 48
       }
     },
     "build_reels_mmqtbm": {
@@ -843,11 +815,8 @@
     "summer_hero_main",
     "tiny_show_pieces_main",
     "byob_builder_home",
-    "bundle_deals_home",
-    "glow_steps_home",
-    "collection_grid_ByLdQT",
     "fan_favourites_YxtPg4",
-    "grab_and_go_aFNKW8",
+    "glow_steps_home",
     "build_reels_mmqtbm",
     "glow_mini_world_Gn9LaU",
     "perfect_for_every_occasion_zFfAMK",
