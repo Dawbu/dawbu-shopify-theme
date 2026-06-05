@@ -1,0 +1,453 @@
+{% comment %}
+  FAQ Section — "We've Got Answers"
+  Two-column accordion layout with dark theme, yellow badge, and red accent heading.
+{% endcomment %}
+
+<style>
+      #faq-section-{{ section.id }} {
+      background-color: {{ section.settings.background_color }};
+      padding: {{ section.settings.padding_top }}px 20px {{ section.settings.padding_bottom }}px;
+      font-family: {{ section.settings.font_family }}, 'Arial Black', Impact, sans-serif;
+      position: relative;
+    }
+    /* ── Header ── */
+    #faq-section-{{ section.id }} .faq-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+  .faq-bg-top{
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: -1px;}
+    #faq-section-{{ section.id }} .faq-badge {
+      display: inline-block;
+      background-color: #faed17;
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      font-family: 'Poppins';
+      text-transform: uppercase;
+      padding: 10px 16px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+    }
+
+    #faq-section-{{ section.id }} .faq-heading {
+      font-size: clamp(36px, 5.5vw, 74px);
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1;
+      margin: 0;
+      letter-spacing: 0;
+      font-family: 'Kopiku';
+    }
+
+    #faq-section-{{ section.id }} .faq-heading .highlight {
+      color: {{ section.settings.highlight_color }};
+    }
+
+    /* ── Grid ── */
+    #faq-section-{{ section.id }} .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: {{ section.settings.content_max_width }}px;
+      margin: 0 auto;
+      padding-inline: 50px;
+    }
+
+    @media (max-width: 768px) {
+      #faq-section-{{ section.id }} .faq-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Accordion Item ── */
+    #faq-section-{{ section.id }} .faq-item {
+      background-color: {{ section.settings.card_color }};
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+      height: fit-content;
+    }
+
+    #faq-section-{{ section.id }} .faq-item.is-open {
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    /* Question button */
+    #faq-section-{{ section.id }} .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: none;
+      border: none;
+      padding: 22px 24px;
+      cursor: pointer;
+      text-align: left;
+      color: #fff;
+      font-family: 'Poppins';
+      font-size: clamp(13px, 1.3vw, 16px);
+      font-weight: 500;
+      letter-spacing: 0;
+      line-height: 1.4;
+      transition: color 0.2s ease;
+    }
+
+    #faq-section-{{ section.id }} .faq-question:hover {
+      color: {{ section.settings.accent_color }};
+    }
+    #faq-section-{{ section.id }} .faq-item.is-open .faq-icon svg {
+      transform: rotate(45deg);
+    }
+
+    /* Answer panel */
+    #faq-section-{{ section.id }} .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+
+    #faq-section-{{ section.id }} .faq-item.is-open .faq-answer {
+      max-height: 400px;
+    }
+
+    #faq-section-{{ section.id }} .faq-answer-inner {
+      padding: 0 24px 22px;
+      color: rgba(255,255,255,0.65);
+      font-size: clamp(12px, 1.1vw, 15px);
+      font-weight: 400;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+    }
+      #faq-section-{{ section.id }} .faq-answer-inner p{
+          margin: 0;
+      }
+    #faq-section-{{ section.id }} .faq-answer-inner a {
+      color: {{ section.settings.accent_color }};
+      text-decoration: underline;
+    }
+    @media (max-width: 768px){
+      #faq-section-{{ section.id }} {
+        padding: 30px 16px 40px;
+      }
+      #faq-section-{{ section.id }}::before{
+        top: -25px;
+        height: 38px;
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+      #faq-section-{{ section.id }} .faq-badge{
+        font-size: 12px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+      }
+      #faq-section-{{ section.id }} .faq-header{
+        margin-bottom: 20px;
+      }
+      #faq-section-{{ section.id }} .faq-grid{
+        padding-inline: 0;
+        gap: 12px;
+      }
+      #faq-section-{{ section.id }} .faq-question{
+        padding: 16px;
+      }
+      #faq-section-{{ section.id }} .faq-answer-inner{
+        padding: 0 16px 16px;
+      }
+    }
+</style>
+
+<svg class="faq-bg-top" width="1921" height="168" viewBox="0 0 1921 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M74.298 86.4799C44 74.7496 12 76.5594 0 76.5594L1 167.479H1921V99.773C1839.56 90.6578 1741 96.1459 1711.29 99.773C1639.27 108.564 1515.89 128.258 1479.18 128.258C1371.27 128.258 1295.11 146.99 1220.6 54.9376C1148 -34.7419 1073 2.25802 1031.24 47.1197C939.69 145.482 841 107.258 764.521 67.8839C679.206 23.9612 600 45.0401 556.843 67.8839C506.5 94.5313 380.385 125.093 328.805 126.359C205.013 135.474 107.554 103.571 74.298 86.4799Z" fill="{{ section.settings.background_color }}"/>
+</svg>
+
+<section id="faq-section-{{ section.id }}" aria-labelledby="faq-heading-{{ section.id }}" data-track-section="faq">
+  {%- comment -%} ── Header ── {%- endcomment -%}
+  <div class="faq-header">
+    {%- if section.settings.badge_text != blank -%}
+      <div class="faq-badge">{{ section.settings.badge_text }}</div>
+    {%- endif -%}
+
+    <h2 class="faq-heading" id="faq-heading-{{ section.id }}">
+      {{ section.settings.heading_before }}
+      {%- if section.settings.heading_highlight != blank -%}
+        <span class="highlight">{{ section.settings.heading_highlight }}</span>
+      {%- endif -%}
+      {{ section.settings.heading_after }}
+    </h2>
+  </div>
+
+  {%- comment -%} ── FAQ Grid ── {%- endcomment -%}
+  {%- if section.blocks.size > 0 -%}
+    <div class="faq-grid" role="list">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'faq_item' -%}
+          <div
+            class="faq-item"
+            role="listitem"
+            {{ block.shopify_attributes }}
+          >
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-answer-{{ section.id }}-{{ forloop.index }}"
+              id="faq-btn-{{ section.id }}-{{ forloop.index }}"
+            >
+              <span>{{ block.settings.question }}</span>
+              <span class="faq-icon" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.19814 6.42596H6.51614V9.17996H2.68214V6.42596H0.000136744V2.77196H2.68214V-3.95775e-05H6.51614V2.77196H9.19814V6.42596Z" fill="#FAED17"/>
+                </svg>
+              </span>
+            </button>
+
+            <div
+              class="faq-answer"
+              id="faq-answer-{{ section.id }}-{{ forloop.index }}"
+              role="region"
+              aria-labelledby="faq-btn-{{ section.id }}-{{ forloop.index }}"
+              hidden
+            >
+              <div class="faq-answer-inner">
+                {{ block.settings.answer }}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+<script>
+  (function () {
+    var section = document.getElementById('faq-section-{{ section.id }}');
+    if (!section) return;
+
+    section.querySelectorAll('.faq-question').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var item = btn.closest('.faq-item');
+        var answer = item.querySelector('.faq-answer');
+        var isOpen = item.classList.contains('is-open');
+
+        // Close all siblings
+        section.querySelectorAll('.faq-item.is-open').forEach(function (openItem) {
+          openItem.classList.remove('is-open');
+          openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+          var a = openItem.querySelector('.faq-answer');
+          a.setAttribute('hidden', '');
+        });
+
+        // Toggle clicked
+        if (!isOpen) {
+          item.classList.add('is-open');
+          btn.setAttribute('aria-expanded', 'true');
+          answer.removeAttribute('hidden');
+        }
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FAQ — Got Answers",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Label",
+      "default": "GOT QUESTIONS?"
+    },
+    {
+      "type": "text",
+      "id": "heading_before",
+      "label": "Heading — Part 1 (white)",
+      "default": "WE'VE GOT "
+    },
+    {
+      "type": "text",
+      "id": "heading_highlight",
+      "label": "Heading — Highlight Word (colored)",
+      "default": "ANSWERS"
+    },
+    {
+      "type": "text",
+      "id": "heading_after",
+      "label": "Heading — Part 3 (white, optional)"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content Max Width",
+      "min": 800,
+      "max": 1600,
+      "step": 40,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#0d0d0d"
+    },
+    {
+      "type": "color",
+      "id": "card_color",
+      "label": "Card Background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (badge, icon, links)",
+      "default": "#FAED17"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Heading Highlight Color",
+      "default": "#CC0000"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Heading Font",
+      "options": [
+        { "value": "Impact", "label": "Impact" },
+        { "value": "'Arial Black'", "label": "Arial Black" },
+        { "value": "Anton", "label": "Anton (Google)" },
+        { "value": "'Bebas Neue'", "label": "Bebas Neue (Google)" }
+      ],
+      "default": "Impact"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 20,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 20,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Are all LEGO® sets on your store genuine and official?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes! Every product we sell is 100% official and sourced directly from authorised LEGO® distributors. You'll always receive genuine, sealed sets.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ — Got Answers",
+      "settings": {
+        "badge_text": "GOT QUESTIONS?",
+        "heading_before": "WE'VE GOT ",
+        "heading_highlight": "ANSWERS",
+        "heading_after": "",
+        "background_color": "#0d0d0d",
+        "card_color": "#1a1a1a",
+        "accent_color": "#FAED17",
+        "highlight_color": "#CC0000",
+        "padding_top": 80,
+        "padding_bottom": 80
+      },
+      "blocks": [
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Are all LEGO® sets on your store genuine and official?",
+            "answer": "<p>Yes! Every product we sell is 100% official and sourced directly from authorised LEGO® distributors. You'll always receive genuine, sealed sets.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How fast will my order be delivered?",
+            "answer": "<p>Most orders ship within 1–2 business days. Standard delivery takes 3–5 days, and express options are available at checkout.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What payment methods are accepted?",
+            "answer": "<p>We accept all major credit cards, PayPal, Apple Pay, Google Pay, and Shop Pay. All transactions are secured with SSL encryption.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can I return a LEGO® set if I change my mind?",
+            "answer": "<p>Absolutely. We offer a 30-day hassle-free return policy on all unopened items. Just contact our support team to start the process.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you offer gift wrapping services?",
+            "answer": "<p>Yes! Gift wrapping is available at checkout for a small fee. You can also include a personalised message card with your order.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What if a piece is missing from my set?",
+            "answer": "<p>LEGO® has an official piece replacement programme. We can also help you contact their support team to get any missing parts sent directly to you, free of charge.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

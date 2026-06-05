@@ -1,0 +1,124 @@
+{% comment %}
+  Back to Top Button
+  
+  Usage:
+  {% render 'back-to-top' %}
+{% endcomment %}
+
+<button 
+  id="back-to-top" 
+  class="back-to-top-button" 
+  aria-label="Back to top"
+  title="Back to top"
+>
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M10 15L5 10L6.41 8.59L10 12.17L13.59 8.59L15 10L10 15ZM10 0L0 10L1.41 11.41L10 2.83L18.59 11.41L20 10L10 0Z" fill="currentColor"/>
+  </svg>
+</button>
+
+<style>
+  .back-to-top-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    padding: 0;
+  }
+
+  .back-to-top-button.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .back-to-top-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    background: rgb(var(--color-button));
+  }
+
+  .back-to-top-button:active {
+    transform: translateY(-2px);
+  }
+
+  .back-to-top-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .back-to-top-button {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+    }
+
+    .back-to-top-button svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back-to-top-button {
+      transition: opacity 0.2s ease;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    const backToTopButton = document.getElementById('back-to-top');
+    if (!backToTopButton) return;
+
+    let ticking = false;
+
+    function updateButtonVisibility() {
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollY > 400) {
+        backToTopButton.classList.add('visible');
+      } else {
+        backToTopButton.classList.remove('visible');
+      }
+      
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateButtonVisibility);
+        ticking = true;
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    
+    backToTopButton.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Initial check
+    updateButtonVisibility();
+  })();
+</script>
+

@@ -1,0 +1,144 @@
+{%- comment -%}
+  sections/bundle-banner.liquid
+  Promo banner for BYOB pages. Image + eyebrow + heading + subheading + CTA.
+  Editable from theme editor; falls back to clean DAWBU styling if no image.
+{%- endcomment -%}
+
+{%- liquid
+  assign img = section.settings.image
+  assign eyebrow = section.settings.eyebrow
+  assign heading = section.settings.heading
+  assign sub = section.settings.subheading
+  assign cta_label = section.settings.cta_label
+  assign cta_link = section.settings.cta_link
+  assign bg = section.settings.background_color | default: '#e52227'
+  assign ink = section.settings.text_color | default: '#ffffff'
+  assign accent = section.settings.accent_color | default: '#faed17'
+-%}
+
+<section class="dawbu-banner" style="--db-bg:{{ bg }};--db-ink:{{ ink }};--db-accent:{{ accent }};">
+  <div class="dawbu-banner__wrap">
+    {%- if img != blank -%}
+      <div class="dawbu-banner__media">
+        {{ img | image_url: width: 1400 | image_tag:
+            loading: 'lazy',
+            sizes: '(min-width:990px) 600px, 100vw',
+            widths: '480,720,960,1200,1400',
+            class: 'dawbu-banner__img',
+            alt: heading | default: 'Bundle promo' }}
+      </div>
+    {%- endif -%}
+
+    <div class="dawbu-banner__copy">
+      {%- if eyebrow != blank -%}
+        <span class="dawbu-banner__eyebrow">{{ eyebrow }}</span>
+      {%- endif -%}
+      {%- if heading != blank -%}
+        <h2 class="dawbu-banner__heading">{{ heading }}</h2>
+      {%- endif -%}
+      {%- if sub != blank -%}
+        <p class="dawbu-banner__sub">{{ sub }}</p>
+      {%- endif -%}
+      {%- if cta_label != blank and cta_link != blank -%}
+        <a class="dawbu-banner__cta" href="{{ cta_link }}">{{ cta_label }} →</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .dawbu-banner {
+    background: var(--db-bg);
+    color: var(--db-ink);
+    padding: 28px 16px;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+  .dawbu-banner__wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    gap: 22px;
+    align-items: center;
+  }
+  .dawbu-banner__wrap:has(.dawbu-banner__media) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 750px) {
+    .dawbu-banner__wrap:has(.dawbu-banner__media) {
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+    }
+  }
+  .dawbu-banner__media {
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: rgba(255,255,255,.08);
+  }
+  .dawbu-banner__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .dawbu-banner__copy { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .dawbu-banner__eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--db-accent);
+  }
+  .dawbu-banner__heading {
+    margin: 0;
+    font-size: clamp(22px, 3.4vw, 36px);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -.014em;
+    color: inherit;
+  }
+  .dawbu-banner__sub {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: .92;
+    max-width: 540px;
+  }
+  .dawbu-banner__cta {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 6px;
+    padding: 11px 22px;
+    border-radius: 999px;
+    background: var(--db-accent);
+    color: var(--db-bg);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid var(--db-accent);
+    transition: background .18s ease, color .18s ease, transform .12s ease;
+  }
+  .dawbu-banner__cta:hover { background: transparent; color: var(--db-accent); transform: translateY(-1px); }
+</style>
+
+{% schema %}
+{
+  "name": "Bundle Banner",
+  "tag": "section",
+  "class": "section-bundle-banner",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text",     "id": "eyebrow",    "label": "Eyebrow",    "default": "Hurry — limited stock" },
+    { "type": "text",     "id": "heading",    "label": "Heading",    "default": "Build your own bundle, your way" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Mix any items across packs. The more you build, the more you save." },
+    { "type": "text",     "id": "cta_label",  "label": "Button label", "default": "Start building" },
+    { "type": "url",      "id": "cta_link",   "label": "Button link" },
+    { "type": "header", "content": "Colors" },
+    { "type": "color",    "id": "background_color", "label": "Background", "default": "#e52227" },
+    { "type": "color",    "id": "text_color",       "label": "Text",       "default": "#ffffff" },
+    { "type": "color",    "id": "accent_color",     "label": "Accent (button + eyebrow)", "default": "#faed17" }
+  ],
+  "presets": [
+    { "name": "Bundle Banner" }
+  ]
+}
+{% endschema %}

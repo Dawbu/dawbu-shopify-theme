@@ -1,0 +1,74 @@
+<style type="text/css">
+  .template-404 {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1.5rem;
+  }
+
+  .template-404 .title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, rgb(var(--color-button)), rgb(var(--color-foreground)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .template-404__subtext {
+    font-size: 1.25rem;
+    color: rgba(var(--color-foreground), 0.7);
+    margin-bottom: 2rem;
+    max-width: 600px;
+  }
+
+  .template-404__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .template-404__search {
+    margin-top: 2rem;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 750px) {
+    .template-404 .title {
+      font-size: 6rem;
+    }
+
+    .template-404__subtext {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="template-404 page-width page-margin center">
+  <h1 class="title">{{ 'templates.404.title' | t }}</h1>
+  <p class="template-404__subtext">
+    {{ 'templates.404.subtext' | t | default: "Oops! The page you're looking for doesn't exist." }}
+  </p>
+  
+  <div class="template-404__actions">
+    <a href="{{ routes.root_url }}" class="button">
+      Go Home
+    </a>
+    <a href="{{ routes.all_products_collection_url }}" class="button button--secondary">
+      {{ 'general.continue_shopping' | t }}
+    </a>
+  </div>
+
+  {%- if settings.predictive_search_enabled -%}
+    <div class="template-404__search">
+      {% render 'search-form', predictive_search_enabled: true %}
+    </div>
+  {%- endif -%}
+</div>

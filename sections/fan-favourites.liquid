@@ -1,0 +1,433 @@
+{{ 'fan-favourites.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign first_block = section.blocks | where: 'type', 'collection_tab' | first
+  assign default_collection = first_block.settings.collection
+-%}
+
+<section class="ff-section" id="section-{{ section.id }}" data-track-section="fan_favourites">
+  <div class="ff-wrapper">
+
+    <!-- Header -->
+    <div class="ff-header">
+      <div class="ff-badge">
+        <span>{{ section.settings.badge_text }}</span>
+      </div>
+      <h2 class="ff-title">
+        {{ section.settings.heading_black }}
+        <span class="ff-title--red">{{ section.settings.heading_red }}</span>
+      </h2>
+    </div>
+
+    <!-- Collection Tabs -->
+    {%- assign tab_blocks = section.blocks | where: 'type', 'collection_tab' -%}
+    {%- if tab_blocks.size > 0 -%}
+      <div class="ff-tabs" role="tablist">
+        {%- for block in tab_blocks -%}
+          <button
+            class="ff-tab{% if forloop.first %} ff-tab--active{% endif %}"
+            data-tab-index="{{ forloop.index0 }}"
+            data-collection="{{ block.settings.collection.handle }}"
+            role="tab"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {{ block.settings.tab_label | default: block.settings.collection.title }}
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <!-- Product Grids (one per tab) -->
+    <div class="ff-grids">
+      {%- for block in tab_blocks -%}
+        {%- assign col = block.settings.collection -%}
+        {%- assign products_per_tab = section.settings.products_to_show | default: 12 -%}
+        <div
+          class="ff-grid{% if forloop.first %} ff-grid--active{% endif %}"
+          data-grid-index="{{ forloop.index0 }}"
+          data-collection-handle="{{ col.handle }}"
+          id="ff-grid-{{ section.id }}-{{ forloop.index0 }}"
+        >
+          {%- if col != blank and col.products.size > 0 -%}
+            <!-- Swiper wrapper (mobile only) -->
+            <div class="ff-swiper swiper">
+              <div class="swiper-wrapper">
+                {%- assign shown_count = 0 -%}
+                {%- for product in col.products -%}
+                  {%- if product.available == false -%}{%- continue -%}{%- endif -%}
+                  {%- if shown_count >= products_per_tab -%}{%- break -%}{%- endif -%}
+                  {%- assign shown_count = shown_count | plus: 1 -%}
+                  <div class="swiper-slide">
+                    <div
+                      class="ff-product-item ff-product-item--selected"
+                      data-product-id="{{ product.id }}"
+                      data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                      data-product-title="{{ product.title | escape }}"
+                      data-price="{{ product.selected_or_first_available_variant.price }}"
+                    >
+                      <div class="ff-tick" aria-label="Selected" role="checkbox" aria-checked="true" tabindex="0">
+                        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="10" cy="10" r="10" fill="#22c55e"/>
+                          <path d="M5.5 10.5L8.5 13.5L14.5 7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                      {%- render 'card-product',
+                        card_product: product,
+                        media_aspect_ratio: 'square',
+                        show_secondary_image: section.settings.show_secondary_image,
+                        lazy_load: true,
+                        quick_add: 'quantity',
+                        section_id: section.id,
+                        show_tags: false,
+                        skip_styles: true
+                      -%}
+                    </div>
+                  </div>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- else -%}
+            <p class="ff-empty">No products found in this collection.</p>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <!-- CTA Button -->
+    <div class="ff-cta-wrap">
+      <button
+        class="ff-cta-btn"
+        id="ff-add-to-cart-{{ section.id }}"
+        data-section-id="{{ section.id }}"
+      >
+        <span class="ff-cta-text">{{ section.settings.cta_text }}</span>
+        <span class="ff-cta-loading" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="40 20" stroke-linecap="round">
+              <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+  </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+(function () {
+  var sectionId = '{{ section.id }}';
+  var section = document.getElementById('section-' + sectionId);
+  if (!section) return;
+// ---- Mobile Swiper ----
+var swiperInstances = [];
+
+function initSwipers() {
+  var isMobile = window.innerWidth <= 749;
+
+  if (isMobile) {
+    // Initialize only on swiper elements not yet initialized
+    section.querySelectorAll('.ff-swiper').forEach(function (el) {
+      if (!el.classList.contains('swiper-initialized')) {
+        var swiper = new Swiper(el, {
+          slidesPerView: 2.2,
+          spaceBetween: 10,
+        });
+        swiperInstances.push(swiper);
+      }
+    });
+  } else {
+    // Destroy all swipers on desktop so grid takes over
+    if (swiperInstances.length > 0) {
+      swiperInstances.forEach(function (s) {
+        s.destroy(true, true);
+      });
+      swiperInstances = [];
+    }
+  }
+}
+
+// Run on load and on resize
+initSwipers();
+
+var resizeTimer;
+window.addEventListener('resize', function () {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function () {
+    initSwipers();
+    updateCtaLabel();
+  }, 150);
+});
+  // ---- Tab Switching ----
+  var tabs = section.querySelectorAll('.ff-tab');
+  var grids = section.querySelectorAll('.ff-grid');
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var idx = this.getAttribute('data-tab-index');
+
+      tabs.forEach(function (t) {
+        t.classList.remove('ff-tab--active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      grids.forEach(function (g) {
+        g.classList.remove('ff-grid--active');
+      });
+
+      this.classList.add('ff-tab--active');
+      this.setAttribute('aria-selected', 'true');
+
+      var activeGrid = section.querySelector('.ff-grid[data-grid-index="' + idx + '"]');
+      if (activeGrid) activeGrid.classList.add('ff-grid--active');
+      updateCtaLabel();
+    });
+  });
+
+// ---- Price Formatter ----
+  function formatPrice(paise) {
+    var amount = paise / 100;
+    return 'Rs. ' + amount.toLocaleString('en-IN', {
+      minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  // ---- Update Button Label ----
+  function updateCtaLabel() {
+    var selected = getSelectedItems();
+    var total = selected.reduce(function (sum, item) {
+      return sum + (parseInt(item.getAttribute('data-price'), 10) || 0);
+    }, 0);
+    var textEl = btn && btn.querySelector('.ff-cta-text');
+    if (!textEl) return;
+    var baseText = {{ section.settings.cta_text | json }};
+    textEl.textContent = selected.length > 0
+      ? baseText + ' \u2013 ' + formatPrice(total)
+      : baseText;
+  }
+
+  // ---- Tick Toggle ----
+  section.addEventListener('click', function (e) {
+    var tick = e.target.closest('.ff-tick');
+    if (!tick) return;
+    var item = tick.closest('.ff-product-item');
+    if (!item) return;
+
+    item.classList.toggle('ff-product-item--selected');
+    var isSelected = item.classList.contains('ff-product-item--selected');
+    tick.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+    updateCtaLabel();
+  });
+
+  section.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var tick = e.target.closest('.ff-tick');
+    if (!tick) return;
+    e.preventDefault();
+    tick.click();
+  });
+
+  function getActiveGrid() {
+    return section.querySelector('.ff-grid.ff-grid--active');
+  }
+
+  function getSelectedItems() {
+    var grid = getActiveGrid();
+    if (!grid) return [];
+    return Array.from(grid.querySelectorAll('.ff-product-item.ff-product-item--selected'));
+  }
+  // ---- Add to Cart ----
+  var btn = document.getElementById('ff-add-to-cart-' + sectionId);
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var selected = getSelectedItems();
+      if (selected.length === 0) return;
+
+      var items = selected.map(function (item) {
+        return {
+          id: parseInt(item.getAttribute('data-variant-id'), 10),
+          quantity: 1
+        };
+      }).filter(function (i) { return i.id; });
+
+      if (items.length === 0) return;
+
+      btn.classList.add('ff-cta-btn--loading');
+      btn.disabled = true;
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ items: items })
+      })
+      .then(function (res) { return res.json(); })
+.then(function (data) {
+  btn.classList.remove('ff-cta-btn--loading');
+  btn.disabled = false;
+
+  if (data.status && data.status !== 200) {
+    alert(data.description || 'Error adding to cart.');
+    return;
+  }
+
+  // Re-render cart drawer with fresh data before opening
+  fetch('/?sections=cart-drawer')
+    .then(function (res) { return res.json(); })
+    .then(function (sections) {
+      var cartDrawerEl = document.querySelector('cart-drawer');
+      if (cartDrawerEl && sections['cart-drawer']) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(sections['cart-drawer'], 'text/html');
+        var newDrawer = doc.querySelector('cart-drawer');
+        if (newDrawer) {
+          cartDrawerEl.innerHTML = newDrawer.innerHTML;
+        }
+        // Update cart count bubble if theme uses it
+        document.querySelectorAll('[data-cart-count], .cart-count-bubble').forEach(function (el) {
+          var countEl = doc.querySelector('[data-cart-count], .cart-count-bubble');
+          if (countEl) el.innerHTML = countEl.innerHTML;
+        });
+        document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+        if (typeof cartDrawerEl.open === 'function') {
+          cartDrawerEl.open();
+        }
+      }
+    })
+    .catch(function (err) {
+      console.error('Cart drawer refresh error:', err);
+      // Fallback: just open the drawer
+      var cartDrawerEl = document.querySelector('cart-drawer');
+      if (cartDrawerEl && typeof cartDrawerEl.open === 'function') cartDrawerEl.open();
+    });
+})
+      .catch(function (err) {
+        btn.classList.remove('ff-cta-btn--loading');
+        btn.disabled = false;
+        console.error('Add to cart error:', err);
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    updateCtaLabel();
+  });
+})();
+
+</script>
+
+{% schema %}
+{
+  "name": "Fan Favourites",
+  "tag": "section",
+  "class": "ff-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "BESTSELLER COLLECTION"
+    },
+    {
+      "type": "text",
+      "id": "heading_black",
+      "label": "Heading (Black Part)",
+      "default": "FAN"
+    },
+    {
+      "type": "text",
+      "id": "heading_red",
+      "label": "Heading (Red Part)",
+      "default": "FAVOURITES"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Max Products Per Collection",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Columns on Desktop",
+      "options": [
+        { "value": "4", "label": "4 Columns" },
+        { "value": "5", "label": "5 Columns" },
+        { "value": "6", "label": "6 Columns" }
+      ],
+      "default": "6"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show Secondary Image on Hover",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Button Text",
+      "default": "BUY ENTIRE COLLECTION"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f2f0eb"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding Top (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding Bottom (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_tab",
+      "name": "Collection Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "Tab Label",
+          "default": "All Themes"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Fan Favourites",
+      "blocks": [
+        { "type": "collection_tab", "settings": { "tab_label": "All Themes" } },
+        { "type": "collection_tab", "settings": { "tab_label": "Animals" } },
+        { "type": "collection_tab", "settings": { "tab_label": "Nature" } },
+        { "type": "collection_tab", "settings": { "tab_label": "Space" } },
+        { "type": "collection_tab", "settings": { "tab_label": "Buildings" } },
+        { "type": "collection_tab", "settings": { "tab_label": "Vehicles" } }
+      ]
+    }
+  ],
+  "max_blocks": 10
+}
+{% endschema %}

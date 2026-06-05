@@ -1,0 +1,198 @@
+{%- comment -%}
+  sections/byob-builder.liquid
+  Generic BYOB builder with tier-switch pills, a "slots" panel that fills as
+  products are picked, and an inline Bundle Price + Add to Cart row.
+  Mirrors the live /pages/buy-4-299 layout. Every label / tier link is editable
+  from the theme editor (tier pills are blocks).
+{%- endcomment -%}
+
+{{ 'byob.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign pack_coll = section.settings.collection
+  assign N = section.settings.quantity | default: 6
+  assign P = section.settings.price    | default: 199
+  assign heading = section.settings.heading | default: 'Build Your Own Bundle'
+  assign eyebrow = section.settings.eyebrow
+  assign lede_template = section.settings.lede
+  assign slots_title = section.settings.slots_title | default: 'Add Any {N} Products In The Box'
+  assign slots_title = slots_title | replace: '{N}', N | replace: '{P}', P
+
+  if lede_template == blank
+    assign lede_text = ''
+  else
+    assign lede_text = lede_template | replace: '{N}', N | replace: '{P}', P
+  endif
+-%}
+
+{%- if pack_coll == blank -%}
+  <div class="byob byob-build">
+    <div class="byob__empty" style="margin:48px auto 80px;">
+      <h3>Pick a collection in the sidebar</h3>
+      <p>Open the theme editor, click this section, and choose a <strong>Source collection</strong> in the right sidebar.
+        Then set the quantity and bundle price. Save and you're done.</p>
+    </div>
+  </div>
+{%- elsif pack_coll.products.size == 0 -%}
+  <div class="byob byob-build">
+    <div class="byob__empty" style="margin:48px auto 80px;">
+      <h3>{{ heading }} &mdash; no products yet</h3>
+      <p>The collection <strong>{{ pack_coll.handle }}</strong> has no products. Add items in Shopify Admin → Products → Collections, then refresh this page.</p>
+    </div>
+  </div>
+{%- else -%}
+  <div class="byob byob-build byob-build--v2"
+       data-byob-builder
+       data-qty="{{ N }}"
+       data-price="{{ P }}"
+       data-pack="{{ pack_coll.handle }}"
+       {{ section.shopify_attributes }}>
+
+    <div class="byob-build__head">
+      {%- if eyebrow != blank -%}
+        <span class="byob-build__crumb">{{ eyebrow }}</span>
+      {%- endif -%}
+      <h1 class="byob-build__title">{{ heading }}</h1>
+      {%- if lede_text != blank -%}
+        <p class="byob-build__lede">{{ lede_text }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- assign tier_count = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'tier' -%}{%- assign tier_count = tier_count | plus: 1 -%}{%- endif -%}
+    {%- endfor -%}
+    {%- if tier_count > 0 -%}
+      <nav class="byob-tiers" aria-label="Bundle tiers">
+        {%- for block in section.blocks -%}
+          {%- if block.type != 'tier' -%}{%- continue -%}{%- endif -%}
+          {%- assign is_active = block.settings.is_active -%}
+          {%- assign tlink = block.settings.link | default: '#' -%}
+          <a class="byob-tier{% if is_active %} is-active{% endif %}"
+             href="{{ tlink }}"
+             {%- if is_active %} aria-current="page"{% endif %}
+             {{ block.shopify_attributes }}>
+            {{ block.settings.label | default: 'Bundle tier' }}
+          </a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    <section class="byob-panel" data-sum aria-live="polite">
+      <div class="byob-panel__head">
+        <h2 class="byob-panel__title">{{ slots_title }}</h2>
+        <span class="byob-panel__chip"><span data-count>0</span> OF {{ N }} PICKED</span>
+      </div>
+
+      <ol class="byob-panel__slots" role="list">
+        {%- for i in (1..N) -%}
+          <li class="byob-slot" data-slot="{{ forloop.index0 }}">
+            <button type="button" class="byob-slot__remove" data-slot-remove aria-label="Remove from this slot" hidden>&times;</button>
+            <span class="byob-slot__plus" aria-hidden="true">+</span>
+            <img class="byob-slot__img" alt="" data-slot-img hidden />
+          </li>
+        {%- endfor -%}
+      </ol>
+
+      <div class="byob-panel__cta-row">
+        <div class="byob-panel__price">
+          <span class="byob-panel__price-label">Bundle Price:</span>
+          <span class="byob-panel__price-vals">
+            <span class="byob-panel__was" data-was hidden></span>
+            <strong class="byob-panel__price-now">Rs. {{ P }}.00</strong>
+          </span>
+        </div>
+        <button class="byob-panel__cta" type="button" data-cta disabled>
+          Add to Cart
+        </button>
+      </div>
+      <div class="byob-panel__save" data-save hidden></div>
+
+      {%- comment -%} progress dots kept for back-compat with existing JS render(); visually hidden {%- endcomment -%}
+      <div class="byob-sum__track" data-sum-track hidden>
+        {%- for i in (1..N) -%}<span class="byob-sum__dot" data-dot></span>{%- endfor -%}
+      </div>
+      <p class="byob-panel__hint" data-hint></p>
+    </section>
+
+    <ul class="byob-build__grid" role="list">
+      {%- for product in pack_coll.products -%}
+        {%- assign v = product.selected_or_first_available_variant -%}
+        {%- if v.available -%}
+          {%- assign img_src = product.featured_image | image_url: width: 200 -%}
+          <li class="byob-prod"
+              data-id="{{ v.id }}"
+              data-price="{{ v.price | divided_by: 100 }}"
+              data-title="{{ product.title | escape }}"
+              data-img="{{ img_src }}">
+            <div class="byob-prod__media">
+              {{ product.featured_image | image_url: width: 400 | image_tag:
+                  loading: 'lazy',
+                  sizes: '(min-width:990px) 25vw, 45vw',
+                  widths: '200,300,400',
+                  class: 'byob-prod__img',
+                  alt: product.title }}
+              <span class="byob-prod__check" aria-hidden="true">&check;</span>
+            </div>
+            <div class="byob-prod__info">
+              <span class="byob-prod__name">{{ product.title | truncate: 46 }}</span>
+              <span class="byob-prod__price">Rs. {{ v.price | money_without_currency | times: 1 | round }}</span>
+            </div>
+            <div class="byob-prod__actions">
+              <button class="byob-prod__add" type="button" data-add>Add</button>
+              <div class="byob-prod__step" data-step hidden>
+                <button type="button" data-dec aria-label="Remove one">&minus;</button>
+                <span data-qn>0</span>
+                <button type="button" data-inc aria-label="Add one">+</button>
+              </div>
+            </div>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <script src="{{ 'byob-builder.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "BYOB Builder",
+  "tag": "section",
+  "class": "section-byob-builder",
+  "settings": [
+    { "type": "header", "content": "Hero" },
+    { "type": "text",     "id": "eyebrow", "label": "Eyebrow",    "info": "Optional small uppercase line above the heading." },
+    { "type": "text",     "id": "heading", "label": "Heading",    "default": "Build Your Own Bundle" },
+    { "type": "textarea", "id": "lede",    "label": "Subheading", "info": "Use {N} for quantity and {P} for price. Leave blank to hide." },
+    { "type": "header", "content": "Panel" },
+    { "type": "text",     "id": "slots_title", "label": "Slots heading", "default": "Add Any {N} Products In The Box", "info": "Use {N} for quantity, {P} for price." },
+    { "type": "header", "content": "Bundle" },
+    { "type": "collection", "id": "collection", "label": "Source collection", "info": "Customers pick products from this collection." },
+    { "type": "number",     "id": "quantity",   "label": "Quantity (Any N)", "default": 6 },
+    { "type": "number",     "id": "price",      "label": "Bundle price (Rs.)", "default": 199 }
+  ],
+  "blocks": [
+    {
+      "type": "tier",
+      "name": "Tier pill",
+      "settings": [
+        { "type": "text",     "id": "label",     "label": "Label", "default": "At ₹199 get bundle of 3" },
+        { "type": "url",      "id": "link",      "label": "Link",  "info": "Pick the bundle page for this tier." },
+        { "type": "checkbox", "id": "is_active", "label": "Active tier", "default": false, "info": "Highlight this pill (matches the current page)." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "BYOB Builder",
+      "settings": {
+        "eyebrow": "",
+        "heading": "Build Your Own Bundle",
+        "quantity": 6,
+        "price": 199
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,375 @@
+/* ============================================
+   Fan Favourites — Section Styles
+   File: assets/fan-favourites.css
+   ============================================ */
+
+/* ---- Section ---- */
+.ff-section {
+  background-color: var(--ff-bg, #f2f0eb);
+  padding-top: var(--ff-pt, 60px);
+  padding-bottom: var(--ff-pb, 60px);
+}
+
+.ff-wrapper {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ---- Header ---- */
+.ff-header {
+  margin-bottom: 28px;
+}
+
+.ff-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #faed17;
+  border-radius: 100px;
+  padding: 4px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #111;
+  margin-bottom: 20px;
+  font-family: poppins;
+  box-shadow: 3px 4px #040202;
+  border: 1px solid #040202;
+  margin-top: 0;
+}
+
+.ff-title {
+  font-size: clamp(36px, 6vw, 74px);
+  font-weight: 400;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: #040202;
+  margin: 0;
+  font-family: 'Kopiku';
+}
+
+.ff-title--red {
+  color: #E52227;
+}
+
+/* ---- Tabs ---- */
+.ff-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  margin-bottom: 36px;
+  white-space: nowrap;
+  overflow: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+}
+
+.ff-tabs::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+.ff-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 22px;
+  border-radius: 14px;
+  font-size: 18px;
+  box-shadow: 3px 3px 0 0 #B8181C;
+  font-weight: 500;
+  font-family: 'Poppins';
+  cursor: pointer;
+  border: 2px solid #040202;
+  background: rgba(0, 0, 0, 0);
+  color: #040202;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ff-tab:hover {
+  transform: translateY(-1px);
+}
+
+.ff-tab--active {
+  background: #040202;
+  color: #ffffff;
+  border-color: #040202;
+}
+
+.ff-tab--active:hover {
+  background: #333;
+}
+
+/* ---- Grids ---- */
+.ff-grids {
+  position: relative;
+}
+
+.ff-grid {
+  display: none;
+  grid-template-columns: repeat(var(--ff-cols, 6), 1fr);
+  gap: 20px 16px;
+}
+
+.ff-grid--active {
+  display: grid;
+}
+
+/* ---- Product Item (wrapper around card-product snippet) ---- */
+.ff-product-item {
+  position: relative;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+/* Deselected state */
+.ff-product-item:not(.ff-product-item--selected) {
+  opacity: 0.45;
+}
+
+.ff-product-item:not(.ff-product-item--selected) .ff-tick circle {
+  fill: #ccc;
+}
+
+.ff-product-item:not(.ff-product-item--selected) .ff-tick path {
+  stroke: #999;
+}
+
+/* ---- Tick Overlay ---- */
+.ff-tick {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform .18s;
+}
+
+.ff-tick:hover {
+  transform: scale(1.15);
+}
+
+.ff-tick svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---- Empty state ---- */
+.ff-empty {
+  color: #888;
+  font-size: 15px;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* ---- CTA ---- */
+.ff-cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 48px;
+}
+
+.ff-cta-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  background: #e8192c;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 52px;
+  font-family: 'Kopiku';
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background .18s, transform .15s, box-shadow .18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 4px 4px 0 0 #00000033;
+  min-width: 280px;
+  justify-content: center;
+}
+
+.ff-cta-btn:hover:not(:disabled) {
+  background: #e8192c;
+  transform: translateY(-2px);
+}
+
+.ff-cta-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ff-cta-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ff-cta-loading {
+  display: none;
+  width: 20px;
+  height: 20px;
+}
+
+.ff-cta-btn--loading .ff-cta-text {
+  opacity: 0.6;
+}
+
+.ff-cta-btn--loading .ff-cta-loading {
+  display: block;
+}
+
+.ff-selection-info {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  min-height: 18px;
+  transition: color 0.3s;
+}
+/* On desktop, hide swiper structure — grid handles layout */
+/* Desktop: swiper wrappers are invisible to layout */
+.ff-swiper,
+.ff-swiper .swiper-wrapper,
+.ff-swiper .swiper-slide {
+  display: contents !important;
+}
+
+/* Mobile: restore Swiper layout when initialized */
+@media (max-width: 749px) {
+  .ff-swiper {
+    display: block !important;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .ff-swiper .swiper-wrapper {
+    display: flex !important;
+  }
+
+  .ff-swiper .swiper-slide {
+    display: block !important;
+    flex-shrink: 0;
+  }
+}
+/* ---- Responsive ---- */
+@media (max-width: 1439px) {
+  .ff-grid {
+    --ff-cols: 5;
+  }
+}
+
+@media (max-width: 1279px) {
+  .ff-grid {
+    --ff-cols: 4;
+  }
+}
+
+@media (max-width: 1199px) {
+  .ff-wrapper {
+    padding: 0 24px;
+  }
+
+  .ff-grid {
+    --ff-cols: 3;
+    gap: 16px 12px;
+  }
+}
+
+@media (max-width: 749px) {
+  .ff-grid {
+    display: none;
+  }
+
+  .ff-grid--active {
+    display: block;
+  }
+
+  /* Clip overflow so the 0.2 peek doesn't break page width */
+  .ff-grids {
+    overflow: hidden;
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+
+  .ff-swiper {
+    width: 100%;
+    overflow: visible; /* allow peek */
+  }
+
+  /* Force each slide to be ~42% of viewport so 2.2 cards + peek fits */
+  .ff-swiper .swiper-slide {
+    width: calc((100vw - 16px) / 2.2);
+    flex-shrink: 0;
+  }
+
+  .ff-tabs {
+    gap: 8px;
+    margin: 0 -16px 24px;
+    padding-left: 16px;
+  }
+
+  .ff-tab {
+    font-size: 12px;
+    padding: 7px 16px;
+  }
+
+  .ff-cta-btn {
+    padding: 14px 36px;
+    font-size: 13px;
+    min-width: 240px;
+  }
+}
+
+.ff-section .card-wrapper {
+  background: transparent;
+}
+
+.ff-section .card__media,
+.ff-section .card__inner {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.ff-section .card {
+  box-shadow: none;
+  background: #fff;
+}
+
+@media (max-width:749px) {
+  .ff-badge {
+    margin-bottom: 15px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .ff-title {
+    font-size: 32px;
+  }
+  .ff-wrapper {
+    padding: 0 16px;
+}
+.ff-wrapper .ff-swiper{
+         padding: 0 16px 0 0;
+}
+.ff-grid{
+       margin-right: -16px;
+}
+.ff-cta-wrap{
+  margin-top: 30px;
+}
+}

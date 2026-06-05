@@ -1,0 +1,717 @@
+{%- comment -%} Before/After Slider Section {%- endcomment -%}
+{%- assign unique_id = 'ba_slider_' | append: section.id -%}
+
+<main class="ba_main {{ unique_id }}">
+
+  <div class="ba_container before_after">
+
+    <div class="ba_image-container">
+
+      <div class="before_img">
+
+        {%- if section.settings.bf_image != blank -%}
+
+          <img
+
+            class="image-before slider-image"
+
+            src="{{ section.settings.bf_image | image_url: width: 1200 }}"
+
+            alt="{{ section.settings.bf_image.alt | default: 'Before image' }}"
+
+            loading="lazy"
+
+            width="{{ section.settings.bf_image.width }}"
+
+            height="{{ section.settings.bf_image.height }}"
+
+          >
+
+        {%- else -%}
+
+          <div class="ba_placeholder" style="background: #f0f0f0; padding-top: 56.25%; width: 100%;"></div>
+
+        {%- endif -%}
+
+        <span
+
+          class="before_badge ba_badge"
+
+          style="{% unless section.settings.show_badge %}display: none;{% endunless %}"
+
+          >Before</span
+
+        >
+
+      </div>
+
+      <div class="after_img">
+
+        {%- if section.settings.af_image != blank -%}
+
+          <img
+
+            class="image-after slider-image"
+
+            src="{{ section.settings.af_image | image_url: width: 1200 }}"
+
+            alt="{{ section.settings.af_image.alt | default: 'After image' }}"
+
+            loading="lazy"
+
+            width="{{ section.settings.af_image.width }}"
+
+            height="{{ section.settings.af_image.height }}"
+
+          >
+
+        {%- else -%}
+
+          <div class="ba_placeholder" style="background: #f0f0f0; padding-top: 56.25%; width: 100%;"></div>
+
+        {%- endif -%}
+
+        <span class="after_badge ba_badge" style="{% unless section.settings.show_badge %}display: none;{% endunless %}"
+
+          >After</span
+
+        >
+
+      </div>
+
+    </div>
+
+    <input
+
+      type="range"
+
+      min="0"
+
+      max="100"
+
+      value="50"
+
+      aria-label="Percentage of before photo shown"
+
+      class="ba-slider"
+
+      id="ba-slider-{{ section.id }}"
+
+    >
+
+    <div class="slider-line" aria-hidden="true"></div>
+
+    <div class="slider-button" aria-hidden="true">
+
+      <svg
+
+        xmlns="http://www.w3.org/2000/svg"
+
+        width="30"
+
+        height="30"
+
+        fill="currentColor"
+
+        viewBox="0 0 256 256"
+
+        aria-hidden="true"
+
+      >
+
+        <rect width="256" height="256" fill="none"></rect>
+
+        <line
+
+          x1="128"
+
+          y1="40"
+
+          x2="128"
+
+          y2="216"
+
+          fill="none"
+
+          stroke="currentColor"
+
+          stroke-linecap="round"
+
+          stroke-linejoin="round"
+
+          stroke-width="16"
+
+        ></line>
+
+        <line
+
+          x1="96"
+
+          y1="128"
+
+          x2="16"
+
+          y2="128"
+
+          fill="none"
+
+          stroke="currentColor"
+
+          stroke-linecap="round"
+
+          stroke-linejoin="round"
+
+          stroke-width="16"
+
+        ></line>
+
+        <polyline class="before_arrow"
+
+          points="48 160 16 128 48 96"
+
+          fill="none"
+
+          stroke="currentColor"
+
+          stroke-linecap="round"
+
+          stroke-linejoin="round"
+
+          stroke-width="16"
+
+        ></polyline>
+
+        <line
+
+          x1="160"
+
+          y1="128"
+
+          x2="240"
+
+          y2="128"
+
+          fill="none"
+
+          stroke="currentColor"
+
+          stroke-linecap="round"
+
+          stroke-linejoin="round"
+
+          stroke-width="16"
+
+        ></line>
+
+        <polyline  class="after_arrow"
+
+          points="208 96 240 128 208 160"
+
+          fill="none"
+
+          stroke="currentColor"
+
+          stroke-linecap="round"
+
+          stroke-linejoin="round"
+
+          stroke-width="16"
+
+        ></polyline>
+
+      </svg>
+
+    </div>
+
+  </div>
+
+  {%- if section.settings.show_content -%}
+
+    <div class="ba_container before_after-content">
+
+      {%- if section.settings.ba_heading != blank -%}
+
+        <div class="before_after-heading">
+
+          <h3>{{ section.settings.ba_heading }}</h3>
+
+        </div>
+
+      {%- endif -%}
+
+      {%- if section.settings.ba_content != blank -%}
+
+        <div class="before_after-paragraph">
+
+          {{ section.settings.ba_content }}
+
+        </div>
+
+      {%- endif -%}
+
+    </div>
+
+  {%- endif -%}
+
+</main>
+
+{%- style -%}
+
+  {%- if section.settings.show_content == true -%}
+
+    .ba_main.{{ unique_id }} .ba_container.before_after {
+
+      width: calc(50% - 20px);
+
+    }
+
+  {%- else -%}
+
+    .ba_main.{{ unique_id }} .ba_container.before_after {
+
+      width: 50%;
+
+      margin: 0 auto;
+
+    }
+
+  {%- endif -%}
+
+  .ba_main.{{ unique_id }} {
+
+    display: flex;
+
+    place-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 30px;
+
+    padding: 0 5rem;
+
+    max-width: 1200px;
+
+    width: 100%;
+
+    margin: 50px auto;
+
+  }
+
+  .ba_main.{{ unique_id }} img {
+
+    display: block;
+
+    max-width: 100%;
+
+  }
+
+  .ba_main.{{ unique_id }} .ba_container {
+
+    display: grid;
+
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 1rem;
+
+    --position: 50%;
+
+  }
+
+  .ba_main.{{ unique_id }} .ba_image-container {
+
+    max-width: 1200px;
+
+  }
+
+  .ba_main.{{ unique_id }} .before_badge {
+
+    z-index: 99 !important;
+
+    position: absolute;
+
+    bottom: 15px;
+
+    left: 15px;
+
+    background: #fff;
+
+    padding: 0 5px;
+
+    border-radius: 5px;
+
+    color: #000;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+  }
+
+  .ba_main.{{ unique_id }} .after_badge {
+
+    z-index: 99 !important;
+
+    position: absolute;
+
+    bottom: 15px;
+
+    right: 15px;
+
+    background: #fff;
+
+    padding: 0 5px;
+
+    border-radius: 5px;
+
+    color: #000;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+  }
+
+  .ba_main.{{ unique_id }} .slider-image {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: left;
+
+    max-height: 500px;
+
+  }
+
+  .ba_main.{{ unique_id }} .image-before {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: var(--position);
+
+    {%- if section.settings.grayscale_before -%}
+
+      filter: grayscale(100%);
+
+    {%- endif -%}
+
+  }
+
+  .ba_main.{{ unique_id }} .ba-slider {
+
+    position: absolute;
+
+    inset: 0;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    z-index: 10;
+
+    margin: 0;
+
+  }
+
+  .ba_main.{{ unique_id }} .ba-slider:focus-visible ~ .slider-button {
+
+    outline: 5px solid black;
+
+    outline-offset: 3px;
+
+  }
+
+  .ba_main.{{ unique_id }} .slider-line {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: .2rem;
+
+    height: 100%;
+
+    background-color: #fff;
+
+    left: var(--position);
+
+    transform: translateX(-50%);
+
+    pointer-events: none;
+
+    z-index: 5;
+
+  }
+
+  .ba_main.{{ unique_id }} .slider-button {
+
+    position: absolute;
+
+    background-color: #fff !important;
+
+    color: black;
+
+    padding: .5rem;
+
+    border-radius: 100vw;
+
+    display: grid;
+
+    place-items: center;
+
+    top: 50%;
+
+    left: var(--position);
+
+    transform: translate(-50%, -50%);
+
+    pointer-events: none;
+
+    box-shadow: 1px 1px 1px hsl(0, 50%, 2%, .5);
+
+    z-index: 6;
+
+  }
+
+  .ba_main.{{ unique_id }} .before_after-content {
+
+    width: 100%;
+
+    padding: 20px 0;
+
+  }
+
+  .ba_main.{{ unique_id }} .before_after-heading h3 {
+
+    margin: 0 0 15px 0;
+
+    font-size: 24px;
+
+    font-weight: 600;
+
+  }
+
+  .ba_main.{{ unique_id }} .before_after-paragraph p {
+
+    margin: 0;
+
+    line-height: 1.6;
+
+  }
+
+  @media only screen and (max-width: 768px) {
+
+    .ba_main.{{ unique_id }} .ba_container {
+
+      width: 100%;
+
+    }
+
+    .ba_main.{{ unique_id }} {
+
+      padding: 0 20px;
+
+      margin: 30px auto;
+
+    }
+
+    .ba_main.{{ unique_id }} .before_after-content {
+
+      width: 100%;
+
+    }
+
+  }
+
+{%- endstyle -%}
+
+<script>
+
+(function() {
+
+  'use strict';
+
+  function initializeBeforeAfterSlider(uniqueId) {
+
+    const container = document.querySelector('.' + uniqueId + ' .before_after');
+
+    const slider = document.querySelector('.' + uniqueId + ' .ba-slider');
+
+    
+
+    if (!container || !slider) return;
+
+    
+
+    function updatePosition(value) {
+
+      container.style.setProperty('--position', value + '%');
+
+    }
+
+    
+
+    slider.addEventListener('input', function(e) {
+
+      updatePosition(e.target.value);
+
+    });
+
+    
+
+    // Initialize position
+
+    updatePosition(slider.value || 50);
+
+  }
+
+  
+
+  // Wait for DOM to be ready
+
+  if (document.readyState === 'loading') {
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      initializeBeforeAfterSlider('{{ unique_id }}');
+
+    });
+
+  } else {
+
+    initializeBeforeAfterSlider('{{ unique_id }}');
+
+  }
+
+  
+
+  // Handle Shopify theme editor
+
+  if (typeof Shopify !== 'undefined' && Shopify.designMode) {
+
+    document.addEventListener('shopify:section:load', function(event) {
+
+      if (event.detail.sectionId === '{{ section.id }}') {
+
+        initializeBeforeAfterSlider('{{ unique_id }}');
+
+      }
+
+    });
+
+  }
+
+})();
+
+</script>
+
+{% schema %}
+
+{
+
+  "name": "Before / After Slider",
+
+  "settings": [
+
+    {
+
+      "id":"bf_image",
+
+      "type":"image_picker",
+
+      "label":"Before Image"
+
+    },
+
+    {
+
+      "id":"af_image",
+
+      "type":"image_picker",
+
+      "label":"After Image"
+
+    },
+
+    {
+
+      "type": "checkbox",
+
+      "id": "show_badge",
+
+      "label": "Show Badges",
+
+      "default": false
+
+    },
+
+    {
+
+      "type": "checkbox",
+
+      "id": "grayscale_before",
+
+      "label": "Grayscale for Before Image",
+
+      "default": false
+
+    },
+
+    {
+
+      "type": "checkbox",
+
+      "id": "show_content",
+
+      "label": "Show content",
+
+      "default": false
+
+    },
+
+    {
+
+      "id":"ba_heading",
+
+      "type":"text",
+
+      "label":"Heading"
+
+    },
+
+    {
+
+      "id":"ba_content",
+
+      "type":"richtext",
+
+      "label":"Content"
+
+    }
+
+  ],
+
+  "presets":[
+
+    {
+
+      "name":"Before / After Slider"
+
+    }
+
+  ]
+
+}
+
+{% endschema %}
+

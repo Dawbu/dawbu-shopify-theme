@@ -1,0 +1,82 @@
+{% comment %}
+  Renders product USPs (Unique Selling Points)
+  
+  Accepts:
+  - product: {Object} Product Liquid object
+  - block: {Object} Block settings object
+  
+  Usage:
+  {% render 'product-usps', product: product, block: block %}
+{% endcomment %}
+
+{%- liquid
+  assign usps = ''
+  assign has_usps = false
+  
+  # Check if custom USPs are set in block settings
+  if block.settings.usp_1_text != blank
+    assign has_usps = true
+    assign usps = usps | append: block.settings.usp_1_text | append: '|'
+    if block.settings.usp_1_icon != blank
+      assign usps = usps | append: block.settings.usp_1_icon | append: ','
+    endif
+  endif
+  
+  if block.settings.usp_2_text != blank
+    assign has_usps = true
+    assign usps = usps | append: block.settings.usp_2_text | append: '|'
+    if block.settings.usp_2_icon != blank
+      assign usps = usps | append: block.settings.usp_2_icon | append: ','
+    endif
+  endif
+  
+  if block.settings.usp_3_text != blank
+    assign has_usps = true
+    assign usps = usps | append: block.settings.usp_3_text | append: '|'
+    if block.settings.usp_3_icon != blank
+      assign usps = usps | append: block.settings.usp_3_icon | append: ','
+    endif
+  endif
+  
+  if block.settings.usp_4_text != blank
+    assign has_usps = true
+    assign usps = usps | append: block.settings.usp_4_text | append: '|'
+    if block.settings.usp_4_icon != blank
+      assign usps = usps | append: block.settings.usp_4_icon | append: ','
+    endif
+  endif
+  
+  # Check product metafields for USPs
+  if product.metafields.custom.product_usps != blank
+    assign has_usps = true
+    assign usps = usps | append: product.metafields.custom.product_usps
+  endif
+  
+  # Default USPs if none set
+  unless has_usps
+    if block.settings.show_default_usps
+      assign has_usps = true
+      assign usps = 'Free Shipping|🚚,Organic Certified|🌿,30-Day Guarantee|✓,Beginner Friendly|🌱'
+    endif
+  endunless
+-%}
+
+{%- if has_usps -%}
+  <div class="product-usps" {{ block.shopify_attributes }}>
+    <div class="product-usps__container">
+      {%- assign usp_items = usps | split: ',' -%}
+      {%- for usp_item in usp_items -%}
+        {%- if usp_item != blank -%}
+          {%- assign usp_parts = usp_item | split: '|' -%}
+          {%- assign usp_text = usp_parts[0] | strip -%}
+          {%- assign usp_icon = usp_parts[1] | default: '✓' | strip -%}
+          <div class="product-usps__item">
+            <span class="product-usps__icon">{{ usp_icon }}</span>
+            <span class="product-usps__text">{{ usp_text }}</span>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+

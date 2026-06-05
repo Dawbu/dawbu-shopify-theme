@@ -1,0 +1,112 @@
+/* Custom styles to fix Shiprocket text display issues */
+
+/* Fix COD text display */
+.shiprocket-headless .sr-cod-text,
+.shiprocket-headless [data-cod],
+.shiprocket-headless .cod-label {
+  font-size: 14px !important;
+  text-transform: capitalize !important;
+}
+
+.shiprocket-headless .sr-cod-text::before {
+  content: "Cash on Delivery" !important;
+  font-size: 14px !important;
+}
+
+.shiprocket-headless .sr-cod-text {
+  font-size: 0 !important;
+}
+
+/* Fix Free shipping text display */
+.shiprocket-headless .sr-free-text,
+.shiprocket-headless [data-free],
+.shiprocket-headless .free-label {
+  font-size: 14px !important;
+  text-transform: capitalize !important;
+}
+
+.shiprocket-headless .sr-free-text::before {
+  content: "Free Shipping" !important;
+  font-size: 14px !important;
+}
+
+.shiprocket-headless .sr-free-text {
+  font-size: 0 !important;
+}
+
+/* General Shiprocket button improvements */
+.shiprocket-headless button {
+  font-family: inherit !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Fix any text containing 'cod', 'free', or 'express' in Shiprocket elements */
+.shiprocket-headless *[class*="cod"]::before {
+  content: "Cash on Delivery" !important;
+}
+
+.shiprocket-headless *[class*="cod"] {
+  font-size: 0 !important;
+}
+
+.shiprocket-headless *[class*="free"]::before {
+  content: "Free Shipping" !important;
+}
+
+.shiprocket-headless *[class*="free"] {
+  font-size: 0 !important;
+}
+
+/* Fix Express shipping text display */
+.shiprocket-headless .sr-express-text,
+.shiprocket-headless [data-express],
+.shiprocket-headless .express-label {
+  font-size: 14px !important;
+  text-transform: capitalize !important;
+}
+
+.shiprocket-headless .sr-express-text::before {
+  content: "Express Delivery" !important;
+  font-size: 14px !important;
+}
+
+.shiprocket-headless .sr-express-text {
+  font-size: 0 !important;
+}
+
+.shiprocket-headless *[class*="express"]::before {
+  content: "Express Delivery" !important;
+}
+
+.shiprocket-headless *[class*="express"] {
+  font-size: 0 !important;
+}
+
+/* Ensure proper spacing and alignment */
+.shiprocket-headless {
+  margin-top: 10px !important;
+}
+
+/* Hide any raw 'cod' or 'free' text */
+.shiprocket-headless *:contains("cod"):not(:contains("Cash on Delivery")) {
+  font-size: 0 !important;
+}
+
+.shiprocket-headless *:contains("free"):not(:contains("Free")) {
+  font-size: 0 !important;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 749px) {
+  .shiprocket-headless button {
+    font-size: 14px !important;
+  }
+  
+  .shiprocket-headless .sr-cod-text::before,
+  .shiprocket-headless .sr-free-text::before {
+    font-size: 13px !important;
+  }
+}

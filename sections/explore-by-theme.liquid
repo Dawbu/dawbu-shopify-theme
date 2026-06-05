@@ -1,0 +1,315 @@
+{{ 'section-explore-by-theme.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient explore-by-theme-section section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.title != blank -%}
+      <div class="explore-by-theme__header{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <h2 class="explore-by-theme__title {{ section.settings.heading_size }}">
+          {{ section.settings.title }}
+        </h2>
+        {%- if section.settings.description != blank -%}
+          <div class="explore-by-theme__description rte">
+            {{ section.settings.description }}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="explore-by-theme__grid" id="ExploreByTheme-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        {%- assign collection = block.settings.collection -%}
+        {%- assign page = block.settings.page -%}
+        {%- assign category_title = block.settings.title | default: collection.title | default: page.title | default: 'Category' -%}
+        {%- assign category_image = block.settings.image | default: collection.featured_image -%}
+        {%- assign category_color = block.settings.color | default: '#FF6B6B' -%}
+        {%- assign category_icon = block.settings.icon -%}
+        {%- assign category_url = page.url | default: collection.url | default: '#' -%}
+        
+        <div
+          class="explore-by-theme__card lego-card{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+          {{ block.shopify_attributes }}
+          {% if settings.animations_reveal_on_scroll %}
+            data-cascade
+            style="--animation-order: {{ forloop.index }}; --lego-color: {{ category_color }};"
+          {% else %}
+            style="--lego-color: {{ category_color }};"
+          {% endif %}
+          data-card-index="{{ forloop.index0 }}"
+        >
+          <a
+            href="{{ category_url }}"
+            class="lego-card__link"
+            {% if collection == blank and page == blank %}role="link" aria-disabled="true"{% endif %}
+          >
+            <div class="lego-card__inner">
+              {%- if category_image -%}
+                <div class="lego-card__image-wrapper">
+                  {%- if category_icon != blank -%}
+                    <div class="lego-card__icon-wrapper">
+                      <div class="lego-card__icon">
+                        {{ category_icon }}
+                      </div>
+                    </div>
+                  {%- endif -%}
+                  <div class="lego-card__image-container">
+                    <img
+                      srcset="
+                        {%- if category_image.width >= 165 -%}{{ category_image | image_url: width: 165 }} 165w,{%- endif -%}
+                        {%- if category_image.width >= 330 -%}{{ category_image | image_url: width: 330 }} 330w,{%- endif -%}
+                        {%- if category_image.width >= 535 -%}{{ category_image | image_url: width: 535 }} 535w,{%- endif -%}
+                        {%- if category_image.width >= 750 -%}{{ category_image | image_url: width: 750 }} 750w,{%- endif -%}
+                        {%- if category_image.width >= 1000 -%}{{ category_image | image_url: width: 1000 }} 1000w,{%- endif -%}
+                        {{ category_image | image_url }} {{ category_image.width }}w
+                      "
+                      src="{{ category_image | image_url: width: 750 }}"
+                      sizes="(min-width: 990px) calc((100vw - 10rem) / 3), (min-width: 750px) calc((100vw - 10rem) / 2), calc(100vw - 3rem)"
+                      alt="{{ category_image.alt | default: category_title | escape }}"
+                      loading="lazy"
+                      width="{{ category_image.width }}"
+                      height="{{ category_image.height }}"
+                      class="lego-card__image"
+                    >
+                    <div class="lego-card__image-overlay"></div>
+                  </div>
+                </div>
+              {%- endif -%}
+
+              <div class="lego-card__content">
+                <h3 class="lego-card__title">
+                  {{ category_title }}
+                </h3>
+
+                <div class="lego-card__brick-pattern">
+                  <span class="brick"></span>
+                  <span class="brick"></span>
+                  <span class="brick"></span>
+                </div>
+              </div>
+
+              <div class="lego-card__shine"></div>
+            </div>
+          </a>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_cta_button and section.settings.cta_link != blank -%}
+      <div class="explore-by-theme__cta{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <a
+          href="{{ section.settings.cta_link }}"
+          class="button explore-by-theme__cta-button"
+        >
+          {{ section.settings.cta_text | default: 'Shop All Building Block Sets' }}
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script src="{{ 'explore-by-theme.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Explore by Theme",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "default": "Explore by Theme",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        },
+        {
+          "value": "hxl",
+          "label": "Extra Large"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "content": "CTA Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta_button",
+      "default": true,
+      "label": "Show CTA button"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "default": "Shop All Building Block Sets",
+      "label": "CTA button text"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA button link"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "info": "Leave blank to use collection title"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page",
+          "info": "Optional: Link to a page instead of collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Leave blank to use collection featured image"
+        },
+        {
+          "type": "html",
+          "id": "icon",
+          "label": "Icon (SVG)",
+          "info": "Paste SVG code for the icon"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Card color",
+          "default": "#FF6B6B"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Explore by Theme",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "title": "Animals",
+            "color": "#FF6B6B"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Space",
+            "color": "#4ECDC4"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Cars",
+            "color": "#45B7D1"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Fantasy",
+            "color": "#FFA07A"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Robots",
+            "color": "#98D8C8"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Houses",
+            "color": "#F7DC6F"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

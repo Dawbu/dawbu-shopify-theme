@@ -1,0 +1,114 @@
+/* Collection Educational Banner */
+.collection-educational-banner {
+  padding: 2.4rem 0;
+  margin-bottom: 2.4rem;
+}
+
+.collection-educational-banner__container {
+  max-width: 120rem;
+  margin: 0 auto;
+}
+
+.collection-educational-banner__title {
+  margin-bottom: 1.6rem;
+  text-align: center;
+}
+
+.collection-educational-banner__content {
+  margin-bottom: 2.4rem;
+  text-align: center;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.collection-educational-banner__benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2.4rem;
+}
+
+.collection-educational-banner__benefit {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1.6rem;
+  background-color: rgba(var(--color-foreground), 0.03);
+  border-radius: 0.8rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.collection-educational-banner__benefit:hover {
+  transform: translateY(-0.2rem);
+  box-shadow: 0 0.4rem 1.2rem rgba(var(--color-foreground), 0.1);
+}
+
+.collection-educational-banner__icon {
+  font-size: 3.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.collection-educational-banner__benefit-content {
+  flex: 1;
+}
+
+.collection-educational-banner__benefit-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: rgb(var(--color-foreground));
+}
+
+.collection-educational-banner__benefit-text {
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: rgba(var(--color-foreground), 0.7);
+  margin: 0;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 749px) {
+  .collection-educational-banner {
+    padding: 1.6rem 0;
+    margin-bottom: 1.6rem;
+  }
+  
+  .collection-educational-banner__title {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .collection-educational-banner__content {
+    font-size: 1.4rem;
+    margin-bottom: 1.6rem;
+    padding: 0 1.6rem;
+  }
+  
+  .collection-educational-banner__benefits {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    margin-top: 1.6rem;
+    padding: 0 1.6rem;
+  }
+  
+  .collection-educational-banner__benefit {
+    padding: 1.2rem;
+  }
+  
+  .collection-educational-banner__icon {
+    font-size: 2.4rem;
+  }
+  
+  .collection-educational-banner__benefit-title {
+    font-size: 1.4rem;
+  }
+  
+  .collection-educational-banner__benefit-text {
+    font-size: 1.3rem;
+  }
+}
+

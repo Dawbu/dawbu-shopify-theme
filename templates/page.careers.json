@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 0,
+        "padding_bottom": 0
+      },
+      "disabled": true
+    },
+    "dawbu_careers": {
+      "type": "custom-liquid",
+      "settings": {
+        "color_scheme": "scheme-1",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "custom_liquid": "{%- assign apply_url = 'https://forms.gle/9T5ESRrYn8jqP2C56' -%}{%- assign apply_email = 'info@dawbu.com' -%}{% render 'dawbu-careers-page', apply_url: apply_url, apply_email: apply_email %}"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "dawbu_careers"
+  ]
+}

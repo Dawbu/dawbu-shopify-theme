@@ -1,0 +1,263 @@
+{% comment %}
+  Renders product recommendations for cart page
+  
+  Accepts:
+  - section: {Object} Section settings
+{% endcomment %}
+
+{%- if section.settings.heading != blank -%}
+  <h2 class="cart-recommendations__heading {{ section.settings.heading_size }}">
+    {{ section.settings.heading | escape }}
+  </h2>
+{%- endif -%}
+
+<div class="cart-recommendations">
+  <div class="cart-recommendations__slider js-cart-recommendations-slider">
+    {%- liquid
+      # Start with empty recommendations array
+      assign recommendations = '' | split: ','
+      
+      # Add fixed product first if configured
+      if section.settings.fixed_product != blank
+        assign fixed_product = section.settings.fixed_product
+        assign recommendations = recommendations | concat: fixed_product | uniq
+      endif
+      
+      # Get regular recommendations
+      assign regular_recommendations = cart.items.first.product.recommendations
+      
+      # Calculate how many more products we need
+      assign remaining_slots = section.settings.products_to_show
+      if section.settings.fixed_product != blank
+        assign remaining_slots = remaining_slots | minus: 1
+      endif
+      
+      # Add regular recommendations (excluding the fixed product if it's in there)
+      for product in regular_recommendations
+        if remaining_slots <= 0
+          break
+        endif
+        unless product.id == section.settings.fixed_product.id
+          assign recommendations = recommendations | concat: product | uniq
+          assign remaining_slots = remaining_slots | minus: 1
+        endunless
+      endfor
+      
+      # If we still need more products, get from collection
+      if remaining_slots > 0 and regular_recommendations.first.collections.first != blank
+        assign additional_recommendations = regular_recommendations.first.collections.first.products | limit: remaining_slots
+        for product in additional_recommendations
+          unless product.id == section.settings.fixed_product.id or recommendations contains product
+            assign recommendations = recommendations | concat: product | uniq
+            assign remaining_slots = remaining_slots | minus: 1
+            if remaining_slots <= 0
+              break
+            endif
+          endunless
+        endfor
+      endif
+    -%}
+
+    {%- if recommendations.size > 0 -%}
+      <div class="cart-recommendations__slider-wrapper">
+        <ul class="cart-recommendations__grid grid grid--1-col grid--2-col-tablet grid--{{ section.settings.columns_desktop }}-col-desktop">
+          {%- for product in recommendations -%}
+            <li class="cart-recommendations__grid-item grid__item{% if forloop.first and section.settings.fixed_product != blank and product.id == section.settings.fixed_product.id %} cart-recommendations__grid-item--featured{% endif %}">
+              {% if forloop.first and section.settings.fixed_product != blank and product.id == section.settings.fixed_product.id and section.settings.show_fixed_badge %}
+                <div class="cart-recommendations__badge">{{ section.settings.fixed_badge_text }}</div>
+              {% endif %}
+              {% render 'card-product',
+                card_product: product,
+                media_aspect_ratio: section.settings.image_ratio,
+                image_shape: section.settings.image_shape,
+                show_secondary_image: section.settings.show_secondary_image,
+                show_vendor: section.settings.show_vendor,
+                show_rating: section.settings.show_rating,
+                show_quick_add: section.settings.show_quick_add
+              %}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+      
+      {%- if section.settings.show_view_all and recommendations.first.collections.first.all_products_count > section.settings.products_to_show -%}
+        <div class="center cart-recommendations__view-all">
+          <a href="{{ recommendations.first.collections.first.url }}" class="button button--secondary">
+            {{ 'sections.featured_collection.view_all' | t }}
+          </a>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  .cart-recommendations {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .cart-recommendations__heading {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .cart-recommendations__slider-wrapper {
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  .cart-recommendations__grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .cart-recommendations__grid-item {
+    flex: 0 0 auto;
+    width: calc(100% / {{ section.settings.columns_desktop }});
+    padding: 0 0.5rem;
+    scroll-snap-align: start;
+  }
+  
+  @media screen and (max-width: 749px) {
+    .cart-recommendations__grid-item {
+      width: calc(100% / {{ section.settings.columns_mobile }});
+    }
+  }
+  
+  .cart-recommendations__view-all {
+    margin-top: 1rem;
+  }
+  
+  .cart-recommendations__grid-item--featured {
+    position: relative;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    background: linear-gradient(to bottom, #eff6ff, transparent);
+  }
+  
+  .cart-recommendations__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    background: #3b82f6;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+</style>
+
+<script>
+  class CartRecommendationsSlider {
+    constructor() {
+      this.container = document.querySelector('.js-cart-recommendations-slider');
+      if (!this.container) return;
+      
+      this.init();
+    }
+    
+    init() {
+      // Add navigation arrows if needed
+      if (this.container.querySelectorAll('.cart-recommendations__grid-item').length > {{ section.settings.columns_desktop }}) {
+        this.addNavigation();
+      }
+    }
+    
+    addNavigation() {
+      const sliderWrapper = this.container.querySelector('.cart-recommendations__slider-wrapper');
+      const prevButton = document.createElement('button');
+      const nextButton = document.createElement('button');
+      
+      prevButton.className = 'cart-recommendations__nav cart-recommendations__nav--prev';
+      nextButton.className = 'cart-recommendations__nav cart-recommendations__nav--next';
+      
+      prevButton.innerHTML = '<span class="visually-hidden">{{ "general.slider.previous" | t }}</span>‹';
+      nextButton.innerHTML = '<span class="visually-hidden">{{ "general.slider.next" | t }}</span>›';
+      
+      prevButton.addEventListener('click', () => this.navigate('prev'));
+      nextButton.addEventListener('click', () => this.navigate('next'));
+      
+      sliderWrapper.appendChild(prevButton);
+      sliderWrapper.appendChild(nextButton);
+      
+      // Add styles for navigation buttons
+      const style = document.createElement('style');
+      style.textContent = `
+        .cart-recommendations__slider-wrapper {
+          position: relative;
+        }
+        
+        .cart-recommendations__nav {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: rgba(var(--color-foreground), 0.1);
+          border: none;
+          font-size: 1.8rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 1;
+        }
+        
+        .cart-recommendations__nav:hover {
+          background: rgba(var(--color-foreground), 0.2);
+        }
+        
+        .cart-recommendations__nav--prev {
+          left: 10px;
+        }
+        
+        .cart-recommendations__nav--next {
+          right: 10px;
+        }
+        
+        .visually-hidden {
+          position: absolute !important;
+          overflow: hidden;
+          width: 1px;
+          height: 1px;
+          margin: -1px;
+          padding: 0;
+          border: 0;
+          clip: rect(0 0 0 0);
+          word-wrap: normal !important;
+        }
+      `;
+      
+      document.head.appendChild(style);
+    }
+    
+    navigate(direction) {
+      const slider = this.container.querySelector('.cart-recommendations__grid');
+      const sliderItems = this.container.querySelectorAll('.cart-recommendations__grid-item');
+      const itemWidth = sliderItems[0].offsetWidth;
+      
+      if (direction === 'prev') {
+        slider.scrollBy({ left: -itemWidth, behavior: 'smooth' });
+      } else {
+        slider.scrollBy({ left: itemWidth, behavior: 'smooth' });
+      }
+    }
+  }
+  
+  // Initialize when DOM is fully loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new CartRecommendationsSlider();
+  });
+</script>

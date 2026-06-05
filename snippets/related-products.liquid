@@ -1,0 +1,44 @@
+{% comment %}
+  Renders related products based on current product's collection and tags
+  
+  Accepts:
+  - product: {Object} Current product
+  - section: {Object} Section settings
+{% endcomment %}
+
+{%- if section.settings.heading != blank -%}
+  <h2 class="related-products__heading {{ section.settings.heading_size }}">
+    {{ section.settings.heading | escape }}
+  </h2>
+{%- endif -%}
+
+{%- liquid
+  assign related_products = ''
+  assign related_limit = section.settings.products_to_show
+  
+  if product.metafields.custom.related_products.value != blank
+    assign related_products = product.metafields.custom.related_products.value
+  else
+    if product.collections.size > 0
+      assign primary_collection = product.collections[0]
+      assign related_products = primary_collection.products | where: "id", "!=" , product.id | limit: related_limit
+    endif
+  endif
+-%}
+
+{%- if related_products != blank -%}
+  <ul class="grid product-grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down">
+    {%- for related_product in related_products -%}
+      <li class="grid__item">
+        {% render 'card-product',
+          card_product: related_product,
+          media_aspect_ratio: section.settings.image_ratio,
+          image_shape: section.settings.image_shape,
+          show_secondary_image: section.settings.show_secondary_image,
+          show_vendor: section.settings.show_vendor,
+          show_rating: section.settings.show_rating
+        %}
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

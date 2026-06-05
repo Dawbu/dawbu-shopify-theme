@@ -1,0 +1,294 @@
+{%- comment -%}
+  Dawbu careers page body. Rendered from templates/page.careers.json.
+  Accepts:
+    apply_url   - Google Form URL (defaults to a placeholder)
+    apply_email - contact email   (defaults to info@dawbu.com)
+{%- endcomment -%}
+
+{%- assign apply_url = apply_url | default: 'https://docs.google.com/forms/d/e/REPLACE_WITH_YOUR_FORM_ID/viewform' -%}
+{%- assign apply_email = apply_email | default: 'info@dawbu.com' -%}
+
+<style>
+  .dawbu-careers * { box-sizing: border-box; }
+  .dawbu-careers { font-family: inherit; color: #121212; -webkit-font-smoothing: antialiased; }
+  .dawbu-careers .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .dawbu-careers .narrow { max-width: 760px; }
+  .dawbu-careers .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #ed1c24; margin: 0 0 18px; display: block; }
+  .dawbu-careers h1 { font-size: clamp(36px, 6vw, 60px); font-weight: 800; line-height: 1.04; letter-spacing: -.024em; margin: 0 0 22px; color: #121212; }
+  .dawbu-careers h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 700; line-height: 1.1; letter-spacing: -.018em; margin: 0 0 16px; color: #121212; }
+  .dawbu-careers h3 { font-size: 19px; font-weight: 700; line-height: 1.3; letter-spacing: -.01em; margin: 0 0 10px; color: #121212; }
+  .dawbu-careers p { font-size: 16px; line-height: 1.65; color: #444; margin: 0 0 14px; }
+  .dawbu-careers p:last-child { margin-bottom: 0; }
+  .dawbu-careers .lede { font-size: clamp(17px, 1.6vw, 20px); line-height: 1.55; color: #1f1f1f; font-weight: 400; }
+  .dawbu-careers .lede strong { font-weight: 700; color: #121212; }
+  .dawbu-careers .rule { border: 0; height: 1px; background: #ebebeb; margin: 0; }
+  .dawbu-careers .sec { padding: 72px 0; }
+  .dawbu-careers .hero { padding: 96px 0 48px; }
+  .dawbu-careers .hero .lede { max-width: 640px; margin-top: 4px; }
+  @media (max-width: 720px) {
+    .dawbu-careers .sec { padding: 48px 0; }
+    .dawbu-careers .hero { padding: 56px 0 24px; }
+  }
+
+  .dawbu-careers .btn { display: inline-flex; align-items: center; gap: 10px; padding: 15px 28px; border-radius: 0; font-weight: 700; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; transition: background .18s, color .18s, transform .15s; line-height: 1; border: 1px solid #121212; cursor: pointer; }
+  .dawbu-careers .btn-primary { background: #121212; color: #fff; }
+  .dawbu-careers .btn-primary:hover { background: #ed1c24; border-color: #ed1c24; color: #fff; }
+  .dawbu-careers .btn-primary:active { transform: translateY(1px); }
+  .dawbu-careers .btn-ghost { color: #121212; background: transparent; padding: 0 0 5px; border: 0; border-bottom: 1.5px solid #121212; letter-spacing: .03em; text-transform: none; font-size: 15px; border-radius: 0; }
+  .dawbu-careers .btn-ghost:hover { color: #ed1c24; border-color: #ed1c24; }
+  .dawbu-careers .btn-row { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; margin-top: 32px; }
+
+  .dawbu-careers .vm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .dawbu-careers .vm-card h2 { font-size: clamp(24px, 3vw, 32px); margin-bottom: 12px; }
+  @media (max-width: 880px) { .dawbu-careers .vm-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+  .dawbu-careers .grid-6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 40px; }
+  .dawbu-careers .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 32px; }
+
+  .dawbu-careers .card { background: #fff; border: 1px solid #ebebeb; border-radius: 0; padding: 28px; transition: border-color .18s, transform .15s, box-shadow .18s; }
+  .dawbu-careers .card:hover { border-color: #ed1c24; box-shadow: 0 4px 24px rgba(237, 28, 36, .06); }
+  .dawbu-careers .card .num { font-size: 11px; font-weight: 700; letter-spacing: .18em; color: #ed1c24; display: block; margin-bottom: 14px; }
+  .dawbu-careers .card h3 { margin: 0 0 8px; font-size: 18px; }
+  .dawbu-careers .card p { font-size: 15px; line-height: 1.55; color: #4a4a4a; }
+
+  .dawbu-careers .deal { background: #121212; color: #fff; border-radius: 0; padding: 64px 56px; position: relative; overflow: hidden; }
+  .dawbu-careers .deal::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #ed1c24; }
+  .dawbu-careers .deal h2 { color: #fff; max-width: 680px; }
+  .dawbu-careers .deal p { color: #cfcdc8; font-size: 17px; line-height: 1.6; max-width: 660px; }
+  .dawbu-careers .deal .eyebrow { color: #ff7a80; }
+  .dawbu-careers .deal ul { list-style: none; padding: 0; margin: 32px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .dawbu-careers .deal li { display: flex; gap: 10px; padding: 16px 18px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); border-radius: 0; font-size: 14px; line-height: 1.4; color: #e4e2dd; align-items: flex-start; }
+  .dawbu-careers .deal li::before { content: "\2192"; color: #ff7a80; font-weight: 700; flex-shrink: 0; }
+  @media (max-width: 720px) { .dawbu-careers .deal { padding: 40px 28px; } }
+
+  .dawbu-careers .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .dawbu-careers .chip { padding: 11px 18px; background: #fff; border: 1px solid #ebebeb; border-radius: 0; font-size: 14px; color: #1f1f1f; font-weight: 500; transition: border-color .15s, background .15s; }
+  .dawbu-careers .chip:hover { border-color: #ed1c24; background: #fff5f5; }
+
+  .dawbu-careers .faqs { margin-top: 36px; border-top: 1px solid #ebebeb; }
+  .dawbu-careers details { border-bottom: 1px solid #ebebeb; padding: 0; }
+  .dawbu-careers summary { font-size: 17px; font-weight: 600; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; color: #121212; padding: 24px 0; line-height: 1.4; }
+  .dawbu-careers summary::-webkit-details-marker { display: none; }
+  .dawbu-careers summary::after { content: "+"; font-size: 24px; font-weight: 300; color: #ed1c24; transition: transform .25s; line-height: 1; flex-shrink: 0; }
+  .dawbu-careers details[open] summary::after { transform: rotate(45deg); }
+  .dawbu-careers details .ans { padding: 0 0 24px; font-size: 15px; line-height: 1.65; color: #4a4a4a; max-width: 780px; }
+
+  .dawbu-careers .apply-card { max-width: 620px; margin: 0 auto; padding: 56px 44px; background: #fff; border: 1px solid #ebebeb; border-radius: 0; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 32px rgba(0, 0, 0, .04); }
+  .dawbu-careers .apply-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #ed1c24; }
+  .dawbu-careers .apply-card h2 { margin: 14px 0 14px; }
+  .dawbu-careers .apply-card p { margin: 0 auto 28px; max-width: 480px; font-size: 16px; }
+  .dawbu-careers .apply-card .btn { margin-bottom: 24px; }
+  .dawbu-careers .apply-card .meta { display: flex; justify-content: center; gap: 20px; padding-top: 24px; border-top: 1px solid #ebebeb; font-size: 12px; color: #7a7a7a; flex-wrap: wrap; }
+  .dawbu-careers .apply-card .meta strong { color: #121212; font-weight: 700; }
+  @media (max-width: 600px) { .dawbu-careers .apply-card { padding: 40px 24px; } }
+
+  .dawbu-careers .anchor { display: block; height: 0; scroll-margin-top: 80px; }
+</style>
+
+<div class="dawbu-careers">
+
+  {%- comment -%} ===== 1. HERO ===== {%- endcomment -%}
+  <div class="wrap hero">
+    <span class="eyebrow">Careers @ Dawbu</span>
+    <h1>Build the brand redefining building blocks and creative play in India.</h1>
+    <p class="lede">We're not hiring r&eacute;sum&eacute;s. We're hiring builders. People who push past their comfort zone, punch above their weight, and want to make organisational impact, not just show up.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="{{ apply_url }}" target="_blank" rel="noopener">Apply now &rarr;</a>
+      <a class="btn btn-ghost" href="#process">How we hire</a>
+    </div>
+  </div>
+
+  {%- comment -%} ===== 2. VISION + MISSION ===== {%- endcomment -%}
+  <div class="wrap sec">
+    <div class="vm-grid">
+      <div class="vm-card">
+        <span class="eyebrow">01.&nbsp; Vision</span>
+        <h2>A set of blocks in every Indian home.</h2>
+        <p>An India where every child, every family, every gifting moment defaults to creative, hands-on play. Where building blocks and craft kits are as common in the living room as the television.</p>
+        <p>We're building the infrastructure to make that real, one household at a time.</p>
+      </div>
+      <div class="vm-card">
+        <span class="eyebrow">02.&nbsp; Mission</span>
+        <h2>Make creative play, accessible.</h2>
+        <p>Quality shouldn't be a luxury. Imagination shouldn't be imported. We bring premium building blocks, diamond painting kits, puzzles, and miniature toys under one roof, at prices ordinary Indian households can say yes to.</p>
+        <p>We do it with cost-efficient systems, sharper supply chains, and a brand people trust enough to recommend to their neighbour.</p>
+      </div>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 3. WHO WE HIRE ===== {%- endcomment -%}
+  <div class="wrap sec">
+    <div class="narrow">
+      <span class="eyebrow">03.&nbsp; Who we hire</span>
+      <h2>People who punch above their weight.</h2>
+      <p class="lede">We don't hire to fill seats. We hire people who change the trajectory of the company. If you're highly passionate, restless with the status quo, and here to build, read on.</p>
+    </div>
+    <div class="grid-6">
+      <div class="card"><span class="num">01</span><h3>Push past your comfort zone</h3><p>You don't stay in the lane drawn for you. You stretch into hard problems. If you're not uncomfortable a third of the time, you're not growing fast enough.</p></div>
+      <div class="card"><span class="num">02</span><h3>Punch above your weight</h3><p>Title is a lagging indicator. Output is the real one. You do work that looks two levels above your CV, and you're hungry to do more.</p></div>
+      <div class="card"><span class="num">03</span><h3>Build for impact, not attendance</h3><p>You're not here to clock hours. You're here to make organisational impact. The honest question every week: did this move the company forward?</p></div>
+      <div class="card"><span class="num">04</span><h3>Innovate cost-efficient</h3><p>Cheap is creative. Constraints force better thinking. We don't have a giant war chest. We have brains, customer obsession, and a willingness to ship lean.</p></div>
+      <div class="card"><span class="num">05</span><h3>Own end to end</h3><p>If you see it, it's yours. You don't escalate, you solve. Then you fix the system so the same problem doesn't burn the next person.</p></div>
+      <div class="card"><span class="num">06</span><h3>Think from first principles</h3><p>Don't copy a competitor's deck. Ask what the customer actually needs and build the smallest version of that, fast. Then iterate on real signal.</p></div>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 4. THE DEAL ===== {%- endcomment -%}
+  <div class="wrap sec">
+    <div class="deal">
+      <span class="eyebrow">04.&nbsp; The deal</span>
+      <h2>Full freedom. One filter: cost-efficient.</h2>
+      <p>Build any system. Run any experiment. Launch any product. We're bootstrapped, so every rupee compounds. Innovate cheap, ship fast, iterate on what customers actually do. No five-layer approval chains. Direct line to the people building this. Real ownership from week one.</p>
+      <ul>
+        <li>Ship without five approvals</li>
+        <li>Direct line to leadership</li>
+        <li>Real responsibility from week one</li>
+        <li>A team that backs your judgment</li>
+        <li>Out-of-the-box ideas welcomed</li>
+        <li>Cost-efficient innovation, always</li>
+      </ul>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 5. FOUR RULES ===== {%- endcomment -%}
+  <div class="wrap sec">
+    <div class="narrow">
+      <span class="eyebrow">05.&nbsp; The four rules</span>
+      <h2>What every person here lives by.</h2>
+    </div>
+    <div class="grid-4">
+      <div class="card"><span class="num">01</span><h3>Ownership</h3><p>If you see it, it's yours. We don't escalate problems. We solve them, then fix the system so they don't repeat.</p></div>
+      <div class="card"><span class="num">02</span><h3>Speed</h3><p>A B+ shipped today beats an A+ shipped next month. We launch, learn, and polish in the open. Speed compounds.</p></div>
+      <div class="card"><span class="num">03</span><h3>Customer obsession</h3><p>The customer is always the answer. Replies on WhatsApp at 11pm, replacements without arguments, refunds when in doubt. That's the bar.</p></div>
+      <div class="card"><span class="num">04</span><h3>Frugality</h3><p>We treat every rupee like it's our own, because it is. We optimise, test cheap, and reinvest where it matters.</p></div>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 6. PROCESS ===== {%- endcomment -%}
+  <span class="anchor" id="process"></span>
+  <div class="wrap sec">
+    <div class="narrow">
+      <span class="eyebrow">06.&nbsp; How hiring works</span>
+      <h2>Four steps. Straightforward.</h2>
+    </div>
+    <div class="grid-4">
+      <div class="card"><span class="num">01</span><h3>You apply</h3><p>Fill the form. About 10 minutes. Answer thoughtfully, we read every word.</p></div>
+      <div class="card"><span class="num">02</span><h3>We reply within 5 days</h3><p>Every applicant hears back, yes or no. We respect your time and don't leave you waiting.</p></div>
+      <div class="card"><span class="num">03</span><h3>Task or direct interview</h3><p>Some roles include a small task that mirrors the work. Others go straight to interview. Either way, no runaround.</p></div>
+      <div class="card"><span class="num">04</span><h3>30-min chat with your manager</h3><p>A direct conversation with the manager you'd be working with day to day. When it's a mutual fit, we move fast to an offer.</p></div>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 7. ROLES ===== {%- endcomment -%}
+  <div class="wrap sec">
+    <div class="narrow">
+      <span class="eyebrow">07.&nbsp; Where we're hiring</span>
+      <h2>We hire across the company.</h2>
+      <p class="lede">Tell us what you'd bring. If we see the fit, we'll create the role, whether you're a fresher, a student, or a working professional looking for a change.</p>
+    </div>
+    <div class="chips">
+      <span class="chip">Founder's office</span>
+      <span class="chip">Growth &amp; Marketing</span>
+      <span class="chip">Digital Marketing</span>
+      <span class="chip">Social Media &amp; Content</span>
+      <span class="chip">E-Commerce</span>
+      <span class="chip">Customer Support</span>
+      <span class="chip">Operations</span>
+      <span class="chip">Supply Chain</span>
+      <span class="chip">Procurement</span>
+      <span class="chip">Vendor Management</span>
+      <span class="chip">Sales</span>
+      <span class="chip">Product Design</span>
+      <span class="chip">Finance</span>
+      <span class="chip">Human Resources</span>
+      <span class="chip">AI / ML</span>
+      <span class="chip">Tech &amp; Design</span>
+      <span class="chip">Management Trainee</span>
+      <span class="chip">Data Entry</span>
+      <span class="chip">Internships</span>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 8. APPLY CARD ===== {%- endcomment -%}
+  <div class="wrap sec">
+    <div class="apply-card">
+      <span class="eyebrow">08.&nbsp; Apply</span>
+      <h2>Grow with us.</h2>
+      <p>Spend 10 honest minutes telling us who you are, what you've built, and what you want to build next. We read every word and reply within 5 days, yes or no, always.</p>
+      <a class="btn btn-primary" href="{{ apply_url }}" target="_blank" rel="noopener">Apply now &rarr;</a>
+      <div class="meta">
+        <span><strong>~10 min</strong> to apply</span>
+        <span><strong>5 days</strong> to respond</span>
+        <span><strong>Direct</strong> &amp; respectful</span>
+      </div>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 9. FAQ ===== {%- endcomment -%}
+  <div class="wrap sec">
+    <div class="narrow">
+      <span class="eyebrow">09.&nbsp; FAQ</span>
+      <h2>Real questions. Real answers.</h2>
+    </div>
+    <div class="faqs">
+      <details>
+        <summary>Does my college or background matter?</summary>
+        <div class="ans"><p>What you've done matters more than where you studied. About half of our team didn't come from tier-1 institutions. We hire on demonstrated thinking, ownership, and results, not pedigree.</p></div>
+      </details>
+      <details>
+        <summary>I'm just starting out. Should I still apply?</summary>
+        <div class="ans"><p>Absolutely. We've hired people with no prior work experience and given them more responsibility in six months than they'd get in five years elsewhere. Tell us about something you've owned, a project, a club, a side hustle, a family business. We're looking for the muscle, not the title.</p></div>
+      </details>
+      <details>
+        <summary>Are specific positions open?</summary>
+        <div class="ans"><p>We hire across the company. Founder's office, growth, content, customer experience, operations, vendor management, technology, design, sales, AI/ML, supply chain, finance, HR. Tell us in the form what you'd bring. If we see the fit, we'll create the role.</p></div>
+      </details>
+      <details>
+        <summary>Do you give paid tasks during hiring?</summary>
+        <div class="ans"><p>No. Some roles include a small task that mirrors the actual work. Others go straight to interview. We don't pay for assignments and we don't string anyone along with unpaid trial work either.</p></div>
+      </details>
+      <details>
+        <summary>How does compensation work?</summary>
+        <div class="ans"><p>Compensation is discussed at the offer stage and reflects the role, your experience, and the value you bring. We focus on fair pay and meaningful long-term growth, not flashy joining bonuses we can't sustain.</p></div>
+      </details>
+      <details>
+        <summary>Where is the team based? Is remote possible?</summary>
+        <div class="ans"><p>HQ runs the operation that touches physical inventory daily, so most roles are based at HQ. Technology, design, content, and growth roles can be hybrid or fully remote for the right person.</p></div>
+      </details>
+      <details>
+        <summary>How long is the hiring process?</summary>
+        <div class="ans"><p>Usually under two weeks. One reply within 5 days. Task or direct interview. One conversation with the manager you'd actually work with. We respect your time.</p></div>
+      </details>
+      <details>
+        <summary>Can I apply while I'm still in college?</summary>
+        <div class="ans"><p>Yes. Mention it in the form. We run three and six month internships year-round, and the strongest interns typically convert to full-time roles.</p></div>
+      </details>
+      <details>
+        <summary>What if I don't fit a traditional role?</summary>
+        <div class="ans"><p>Apply anyway. Some of our best hires came from unexpected backgrounds: family businesses, agriculture, sales, content, hospitality. If you punch above your weight and want to build, we want to talk.</p></div>
+      </details>
+    </div>
+  </div>
+  <hr class="rule">
+
+  {%- comment -%} ===== 10. FINAL CTA ===== {%- endcomment -%}
+  <div class="wrap sec" style="padding-bottom:96px">
+    <div class="narrow">
+      <span class="eyebrow">Team Dawbu</span>
+      <h2>If this resonates, we'd love to hear from you.</h2>
+      <p class="lede">We're building Dawbu for the long term. If you want to build alongside us, the door is open. Spend 10 honest minutes with the application and tell us who you are.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="{{ apply_url }}" target="_blank" rel="noopener">Apply now &rarr;</a>
+        <a class="btn btn-ghost" href="mailto:{{ apply_email }}">Or email us directly</a>
+      </div>
+    </div>
+  </div>
+
+</div>

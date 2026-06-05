@@ -1,0 +1,224 @@
+{%- comment -%}
+  Snippet: dawbu-qty-picker
+  ---------------------------------
+  Quantity picker with 4 preset chips + a custom number input.
+  Drops a hidden <input name="quantity"> that submits with the parent product form
+  via the HTML5 form="..." attribute.
+
+  Required params (passed from main-product.liquid block):
+    block             - the dawbu_qty_picker block (uses block.settings + block.id)
+    product_form_id   - e.g. 'product-form-{{ section.id }}', used to bind submit
+{%- endcomment -%}
+
+{%- liquid
+  assign heading     = block.settings.heading
+  assign chip_1      = block.settings.chip_1     | default: 1
+  assign chip_2      = block.settings.chip_2     | default: 2
+  assign chip_3      = block.settings.chip_3     | default: 4
+  assign chip_4      = block.settings.chip_4     | default: 8
+  assign allow_custom = block.settings.allow_custom
+  assign max_custom  = block.settings.max_custom | default: 20
+-%}
+
+<div class="dqp" data-dqp data-dqp-id="{{ block.id }}">
+  {%- if heading != blank -%}
+    <div class="dqp__label">{{ heading }}</div>
+  {%- endif -%}
+
+  <div class="dqp__row" role="radiogroup" aria-label="{{ heading | default: 'Quantity' }}">
+    <button type="button" class="dqp__chip is-active" data-qty="{{ chip_1 }}" role="radio" aria-checked="true" tabindex="0">{{ chip_1 }}</button>
+    <button type="button" class="dqp__chip" data-qty="{{ chip_2 }}" role="radio" aria-checked="false" tabindex="0">{{ chip_2 }}</button>
+    <button type="button" class="dqp__chip" data-qty="{{ chip_3 }}" role="radio" aria-checked="false" tabindex="0">{{ chip_3 }}</button>
+    <button type="button" class="dqp__chip" data-qty="{{ chip_4 }}" role="radio" aria-checked="false" tabindex="0">{{ chip_4 }}</button>
+    {%- if allow_custom -%}
+      <input
+        type="number"
+        class="dqp__custom"
+        min="1"
+        max="{{ max_custom }}"
+        step="1"
+        placeholder="Qty"
+        aria-label="Custom quantity (max {{ max_custom }})"
+        inputmode="numeric"
+      >
+    {%- endif -%}
+  </div>
+
+  <input
+    type="hidden"
+    name="quantity"
+    value="{{ chip_1 }}"
+    data-dqp-qty
+    form="{{ product_form_id }}"
+  >
+</div>
+
+<style>
+  .dqp { margin: 12px 0 20px; }
+  .dqp__label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #121212;
+    margin: 0 0 10px;
+  }
+  .dqp__row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    padding: 6px;
+    background: #f7f7f7;
+    border-radius: 16px;
+    border: 1px solid #ececec;
+  }
+  .dqp__chip {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 44px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    background: #ffffff;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    font-family: inherit;
+    color: #121212;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .dqp__chip:hover {
+    border-color: rgba(237,28,36,.5);
+    color: #ed1c24;
+  }
+  .dqp__chip:active { transform: translateY(1px); }
+  .dqp__chip.is-active {
+    background: #ed1c24;
+    color: #fff;
+    border-color: #ed1c24;
+    box-shadow: 0 3px 10px rgba(237,28,36,.28);
+  }
+  .dqp__chip.is-active:hover { color: #fff; }
+  .dqp__custom {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    height: 44px;
+    padding: 0 6px;
+    border: 1px solid transparent;
+    background: #ffffff;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    color: #121212;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    text-align: center;
+    box-sizing: border-box;
+    line-height: 1;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .dqp__custom::-webkit-outer-spin-button,
+  .dqp__custom::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .dqp__custom::placeholder { color: #9aa3af; font-weight: 500; }
+  .dqp__custom:focus {
+    outline: none;
+    border-color: #ed1c24;
+    box-shadow: 0 0 0 3px rgba(237,28,36,.18);
+  }
+  @media (max-width: 749px) {
+    .dqp__row { gap: 8px; padding: 5px; border-radius: 14px; }
+    .dqp__chip, .dqp__custom { height: 40px; font-size: 14px; border-radius: 10px; }
+    .dqp__label { font-size: 11px; margin-bottom: 8px; }
+  }
+</style>
+
+<script>
+  (function () {
+    if (window.__dawbuQpBound) return;
+    window.__dawbuQpBound = true;
+
+    function clamp(v, max) {
+      v = parseInt(v, 10);
+      if (isNaN(v) || v < 1) return 1;
+      if (v > max) return max;
+      return v;
+    }
+    function setActiveChip(root, qty) {
+      var matched = false;
+      root.querySelectorAll('.dqp__chip').forEach(function (c) {
+        var cQty = parseInt(c.dataset.qty, 10);
+        var on = cQty === qty;
+        if (on) matched = true;
+        c.classList.toggle('is-active', on);
+        c.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+      return matched;
+    }
+    function syncQty(root, qty) {
+      var hidden = root.querySelector('[data-dqp-qty]');
+      if (hidden) hidden.value = qty;
+    }
+    function getMax(root) {
+      var input = root.querySelector('.dqp__custom');
+      var m = input ? parseInt(input.max, 10) : 20;
+      return m || 20;
+    }
+
+    document.addEventListener('click', function (e) {
+      var chip = e.target.closest && e.target.closest('.dqp__chip');
+      if (!chip) return;
+      var root = chip.closest('[data-dqp]');
+      if (!root) return;
+      e.preventDefault();
+      var qty = parseInt(chip.dataset.qty, 10) || 1;
+      setActiveChip(root, qty);
+      syncQty(root, qty);
+      var custom = root.querySelector('.dqp__custom');
+      if (custom) custom.value = '';
+    });
+
+    document.addEventListener('input', function (e) {
+      var input = e.target.closest && e.target.closest('.dqp__custom');
+      if (!input) return;
+      var root = input.closest('[data-dqp]');
+      if (!root) return;
+      if (input.value === '') return;
+      var v = clamp(input.value, getMax(root));
+      if (String(v) !== input.value) input.value = v;
+      var matched = setActiveChip(root, v);
+      if (!matched) {
+        root.querySelectorAll('.dqp__chip').forEach(function (c) {
+          c.classList.remove('is-active');
+          c.setAttribute('aria-checked', 'false');
+        });
+      }
+      syncQty(root, v);
+    });
+
+    document.addEventListener('blur', function (e) {
+      var input = e.target.closest && e.target.closest('.dqp__custom');
+      if (!input) return;
+      if (input.value === '') {
+        var root = input.closest('[data-dqp]');
+        if (root) {
+          var firstChip = root.querySelector('.dqp__chip');
+          var qty = firstChip ? parseInt(firstChip.dataset.qty, 10) || 1 : 1;
+          setActiveChip(root, qty);
+          syncQty(root, qty);
+        }
+      }
+    }, true);
+  })();
+</script>

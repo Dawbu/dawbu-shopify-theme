@@ -1,0 +1,90 @@
+{% comment %}
+  Analytics Setup
+  Add your tracking IDs in theme settings or replace the placeholders below
+
+  Usage:
+  {% render 'analytics' %}
+{% endcomment %}
+
+{%- comment -%} Unified event tracker — defers (cart fetch patch only fires on first ATC, not page load) {%- endcomment -%}
+<script src="{{ 'event-tracking.js' | asset_url }}" defer></script>
+{%- comment -%} Dawbu qty chips controller {%- endcomment -%}
+<script src="{{ 'dawbu-qty-chips.js' | asset_url }}" defer></script>
+
+{%- comment -%} Google Analytics 4 {%- endcomment -%}
+{%- if settings.google_analytics_id != blank -%}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.google_analytics_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ settings.google_analytics_id }}', {
+      'send_page_view': true
+    });
+    
+    // Track add to cart events
+    document.addEventListener('cart:updated', function(event) {
+      if (event.detail && event.detail.cartData) {
+        gtag('event', 'add_to_cart', {
+          'currency': event.detail.cartData.currency || '{{ cart.currency.iso_code }}',
+          'value': event.detail.cartData.total_price / 100,
+          'items': event.detail.cartData.items.map(function(item) {
+            return {
+              'item_id': item.product_id,
+              'item_name': item.product_title,
+              'price': item.final_price / 100,
+              'quantity': item.quantity
+            };
+          })
+        });
+      }
+    });
+    
+    // Track checkout initiation
+    document.addEventListener('click', function(e) {
+      const checkoutBtn = e.target.closest('#checkout, #CartDrawer-Checkout, [href*="/checkout"]');
+      if (checkoutBtn) {
+        gtag('event', 'begin_checkout', {
+          'currency': '{{ cart.currency.iso_code }}',
+          'value': {{ cart.total_price | divided_by: 100.0 }},
+          'items': {{ cart.items | json }}
+        });
+      }
+    }, true);
+  </script>
+{%- endif -%}
+
+{%- comment -%} Facebook Pixel {%- endcomment -%}
+{%- if settings.facebook_pixel_id != blank -%}
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '{{ settings.facebook_pixel_id }}');
+    fbq('track', 'PageView');
+    
+    // Track add to cart
+    document.addEventListener('cart:updated', function(event) {
+      if (event.detail && event.detail.cartData) {
+        fbq('track', 'AddToCart', {
+          content_name: 'Cart',
+          content_ids: event.detail.cartData.items.map(function(item) { return item.product_id; }),
+          value: event.detail.cartData.total_price / 100,
+          currency: event.detail.cartData.currency || '{{ cart.currency.iso_code }}'
+        });
+      }
+    });
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none" 
+      src="https://www.facebook.com/tr?id={{ settings.facebook_pixel_id }}&ev=PageView&noscript=1"/>
+  </noscript>
+{%- endif -%}
+
+{%- comment -%} Shopify Analytics (built-in, no configuration needed) {%- endcomment -%}
+

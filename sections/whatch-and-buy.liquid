@@ -1,0 +1,922 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+>
+<style>
+  /* Generated CSS from Tailwind classes */
+  :root {
+      --tw-backdrop-blur: ;
+      --tw-border-spacing-x: 0;
+      --tw-border-spacing-y: 0;
+      --tw-translate-x: 0;
+      --tw-translate-y: 0;
+      --tw-rotate: 0;
+      --tw-skew-x: 0;
+      --tw-skew-y: 0;
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+  }
+
+  #shopify-section-{{ section.id }} .meet-no-scrollbar::-webkit-scrollbar { display: none; }
+  #shopify-section-{{ section.id }} .meet-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  #shopify-section-{{ section.id }} .meet-video-overlay-gradient { background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0) 40%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.6)); }
+
+  #shopify-section-{{ section.id }} .meet-hidden { display: none !important; }
+  #shopify-section-{{ section.id }} .meet-block { display: block; }
+  #shopify-section-{{ section.id }} .meet-flex { display: flex; }
+  #shopify-section-{{ section.id }} .meet-justify-between { justify-content: space-between; }
+  #shopify-section-{{ section.id }} .meet-grid { display: grid; }
+  #shopify-section-{{ section.id }} .meet-fixed { position: fixed; }
+  #shopify-section-{{ section.id }} .meet-absolute { position: absolute; }
+  #shopify-section-{{ section.id }} .meet-relative { position: relative; }
+  #shopify-section-{{ section.id }} .meet-inset-0 { inset: 0px; }
+  #shopify-section-{{ section.id }} .meet-top-0 { top: 0px; }
+  #shopify-section-{{ section.id }} .meet-bottom-0 { bottom: 0px; }
+  #shopify-section-{{ section.id }} .meet-left-0 { left: 0px; }
+  #shopify-section-{{ section.id }} .meet-right-2 { right: 0.5rem; }
+  #shopify-section-{{ section.id }} .meet-left-2 { left: 0.5rem; }
+  #shopify-section-{{ section.id }} .meet-right-4 { right: 1rem; }
+  #shopify-section-{{ section.id }} .meet-top-3 { top: 0.75rem; }
+  #shopify-section-{{ section.id }} .meet-left-3 { left: 0.75rem; }
+  #shopify-section-{{ section.id }} .meet-bottom-3 { bottom: 0.75rem; }
+  #shopify-section-{{ section.id }} .meet-right-3 { right: 0.75rem; }
+  #shopify-section-{{ section.id }} .meet-top-1\/2 { top: 50%; }
+  #shopify-section-{{ section.id }} .meet-z-10 { z-index: 10; }
+  #shopify-section-{{ section.id }} .meet-z-20 { z-index: 20; }
+  #shopify-section-{{ section.id }} .meet-z-30 { z-index: 30; }
+  #shopify-section-{{ section.id }} .meet-z-50 { z-index: 50; }
+  #shopify-section-{{ section.id }} .meet-m-auto { margin: auto; }
+  #shopify-section-{{ section.id }} .meet-mx-auto { margin-left: auto; margin-right: auto; }
+  #shopify-section-{{ section.id }} .meet-mt-1 { margin-top: 0.25rem; }
+  #shopify-section-{{ section.id }} .meet-mb-2 { margin-bottom: 0.5rem; }
+  #shopify-section-{{ section.id }} .meet-mt-2 { margin-top: 0.5rem; }
+  #shopify-section-{{ section.id }} .meet-mt-3 { margin-top: 0.75rem; }
+  #shopify-section-{{ section.id }} .meet-mt-4 { margin-top: 1rem; }
+  #shopify-section-{{ section.id }} .meet-mb-4 { margin-bottom: 1rem; }
+  #shopify-section-{{ section.id }} .meet-mb-8 { margin-bottom: 2rem; }
+  #shopify-section-{{ section.id }} .meet-mr-1\.5 { margin-right: 0.375rem; }
+  #shopify-section-{{ section.id }} .meet-h-4 { height: 1rem; }
+  #shopify-section-{{ section.id }} .meet-w-4 { width: 1rem; }
+  #shopify-section-{{ section.id }} .meet-h-5 { height: 1.25rem; }
+  #shopify-section-{{ section.id }} .meet-w-5 { width: 1.25rem; }
+  #shopify-section-{{ section.id }} .meet-h-6 { height: 1.5rem; }
+  #shopify-section-{{ section.id }} .meet-w-6 { width: 1.5rem; }
+  #shopify-section-{{ section.id }} .meet-h-7 { height: 1.75rem; }
+  #shopify-section-{{ section.id }} .meet-w-7 { width: 1.75rem; }
+  #shopify-section-{{ section.id }} .meet-h-8 { height: 2rem; }
+  #shopify-section-{{ section.id }} .meet-w-8 { width: 2.8rem; }
+  #shopify-section-{{ section.id }} .meet-h-12 { height: 3rem; }
+  #shopify-section-{{ section.id }} .meet-w-12 { width: 3rem; }
+  #shopify-section-{{ section.id }} .meet-h-32 { height: 8rem; }
+  #shopify-section-{{ section.id }} .meet-h-96 { height: 24rem; }
+  #shopify-section-{{ section.id }} .meet-h-full { height: 100%; }
+  #shopify-section-{{ section.id }} .meet-w-full { width: 100%; }
+  #shopify-section-{{ section.id }} .meet-w-48 { width: 12rem; }
+  #shopify-section-{{ section.id }} .meet-w-72 { width: 18rem; }
+  #shopify-section-{{ section.id }} .meet-min-h-screen { min-height: 100vh; }
+  #shopify-section-{{ section.id }} .meet-max-w-7xl { max-width: 80rem; }
+  #shopify-section-{{ section.id }} .meet-flex-none { flex: none; }
+  #shopify-section-{{ section.id }} .meet-flex-col { flex-direction: column; }
+  #shopify-section-{{ section.id }} .meet-flex-grow { flex-grow: 1; }
+  #shopify-section-{{ section.id }} .meet-transform { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+  #shopify-section-{{ section.id }} .-meet-translate-y-1\/2 { --tw-translate-y: -50%; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+  #shopify-section-{{ section.id }} .meet-translate-y-full { --tw-translate-y: 100%; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+  #shopify-section-{{ section.id }} .-meet-rotate-12 { --tw-rotate: 45deg; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+  #shopify-section-{{ section.id }} .meet-scale-95 { --tw-scale-x: .95; --tw-scale-y: .95; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+  #shopify-section-{{ section.id }} .meet-scale-100 { --tw-scale-x: 1; --tw-scale-y: 1; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+  #shopify-section-{{ section.id }} .meet-scroll-smooth { scroll-behavior: smooth; }
+  #shopify-section-{{ section.id }} .meet-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #shopify-section-{{ section.id }} .meet-cursor-not-allowed { cursor: not-allowed; }
+  #shopify-section-{{ section.id }} .meet-cursor-pointer { cursor: pointer; }
+  #shopify-section-{{ section.id }} .meet-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #shopify-section-{{ section.id }} .meet-items-start { align-items: flex-start; }
+  #shopify-section-{{ section.id }} .meet-items-center { align-items: center; gap: 10px }
+  #shopify-section-{{ section.id }} .meet-items-baseline { align-items: baseline; }
+  #shopify-section-{{ section.id }} .meet-justify-center { justify-content: center; }
+  #shopify-section-{{ section.id }} .meet-justify-between { justify-content: space-between; }
+  #shopify-section-{{ section.id }} .meet-gap-4 { gap: 1rem; }
+    #shopify-section-{{ section.id }} .meet-space-x-1\.5 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 0; margin-right: calc(0.375rem * var(--tw-space-x-reverse)); margin-left: calc(0.375rem * calc(1 - var(--tw-space-x-reverse))); }
+    #shopify-section-{{ section.id }} .meet-space-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 0; margin-right: calc(0.5rem * var(--tw-space-x-reverse)); margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse))); }
+    #shopify-section-{{ section.id }} .meet-space-x-3 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 0; margin-right: calc(0.75rem * var(--tw-space-x-reverse)); margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse))); }
+    #shopify-section-{{ section.id }} .meet-space-x-4 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 0; margin-right: calc(1rem * var(--tw-space-x-reverse)); margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse))); }
+    #shopify-section-{{ section.id }} .meet-space-y-3 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-bottom: calc(0.75rem * var(--tw-space-y-reverse)); }
+    #shopify-section-{{ section.id }} .meet-space-y-5 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(1.25rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(1.25rem * var(--tw-space-y-reverse)); }
+    #shopify-section-{{ section.id }} .meet-overflow-hidden { overflow: hidden; }
+    #shopify-section-{{ section.id }} .meet-overflow-x-auto { overflow-x: auto; }
+    #shopify-section-{{ section.id }} .meet-rounded-full { border-radius: 5px; }
+    #shopify-section-{{ section.id }} .meet-rounded-lg { border-radius: 0.5rem; }
+    #shopify-section-{{ section.id }} .meet-rounded-xl { border-radius: 0.75rem; }
+    #shopify-section-{{ section.id }} .meet-rounded-t-2xl { border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
+    #shopify-section-{{ section.id }} .meet-rounded-br-lg { border-bottom-right-radius: 0.5rem; }
+    #shopify-section-{{ section.id }} .meet-border { border-width: 1px; }
+    #shopify-section-{{ section.id }} .meet-border-2 { border-width: 2px; }
+    #shopify-section-{{ section.id }} .meet-border-gray-100 { border-color: #f3f4f6; }
+    #shopify-section-{{ section.id }} .meet-border-gray-200 { border-color: #e5e7eb; }
+    #shopify-section-{{ section.id }} .meet-border-white\/30 { border-color: rgb(255 255 255 / 0.3); }
+    #shopify-section-{{ section.id }} .meet-border-white\/50 { border-color: rgb(255 255 255 / 0.5); }
+    #shopify-section-{{ section.id }} .meet-bg-black { background-color: #000; }
+    #shopify-section-{{ section.id }} .meet-bg-black\/30 { background-color: rgb(0 0 0 / 0.3); }
+    #shopify-section-{{ section.id }} .meet-bg-gray-200 { background-color: #e5e7eb; }
+    #shopify-section-{{ section.id }} .meet-bg-gray-50 { background-color: #f9fafb; }
+    #shopify-section-{{ section.id }} .meet-bg-gray-700 { background-color: #374151; }
+    #shopify-section-{{ section.id }} .meet-bg-gray-900 { background-color: #111827; }
+    #shopify-section-{{ section.id }} .meet-bg-green-600 { background-color: #16a34a; }
+    #shopify-section-{{ section.id }} .meet-bg-white { background-color: #fff; }
+    #shopify-section-{{ section.id }} .meet-bg-white\/20 { background-color: rgb(255 255 255 / 0.2); }
+    #shopify-section-{{ section.id }} .meet-bg-white\/80 { background-color: rgb(255 255 255 / 0.8); }
+    #shopify-section-{{ section.id }} .meet-bg-opacity-85 { --tw-bg-opacity: 0.85; background-color: rgb(0 0 0 / 0.85); }
+    #shopify-section-{{ section.id }} .meet-p-1\.5 { padding: 0.375rem; }
+    #shopify-section-{{ section.id }} .meet-p-2 { padding: 0.5rem; }
+    #shopify-section-{{ section.id }} .meet-p-2\.5 { padding: 0.625rem; }
+    #shopify-section-{{ section.id }} .meet-p-3 { padding: 0.75rem; }
+    #shopify-section-{{ section.id }} .meet-p-4 { padding: 1rem; }
+    #shopify-section-{{ section.id }} .meet-p-5 { padding: 1.25rem; }
+    #shopify-section-{{ section.id }} .meet-px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    #shopify-section-{{ section.id }} .meet-py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    #shopify-section-{{ section.id }} .meet-px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    #shopify-section-{{ section.id }} .meet-py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    #shopify-section-{{ section.id }} .meet-py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+    #shopify-section-{{ section.id }} .meet-py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+    #shopify-section-{{ section.id }} .meet-text-center { text-align: center; }
+    #shopify-section-{{ section.id }} .meet-text-left { text-align: left; }
+    #shopify-section-{{ section.id }} .meet-text-xs { font-size: .75rem; line-height: 1rem; }
+    #shopify-section-{{ section.id }} .meet-text-sm { font-size: .875rem; line-height: 1.25rem; }
+    #shopify-section-{{ section.id }} .meet-text-base { font-size: 1rem; line-height: 1.5rem; }
+    #shopify-section-{{ section.id }} .meet-text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+    #shopify-section-{{ section.id }} .meet-text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+    #shopify-section-{{ section.id }} .meet-text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+    #shopify-section-{{ section.id }} .meet-font-bold { font-weight: 700; }
+    #shopify-section-{{ section.id }} .meet-font-semibold { font-weight: 600; }
+    #shopify-section-{{ section.id }} .meet-font-medium { font-weight: 500; }
+    #shopify-section-{{ section.id }} .meet-line-through { text-decoration-line: line-through; }
+    #shopify-section-{{ section.id }} .meet-text-green-400 { color: #4ade80; }
+    #shopify-section-{{ section.id }} .meet-text-green-600 { color: #16a34a; }
+    #shopify-section-{{ section.id }} .meet-text-gray-400 { color: #9ca3af; }
+    #shopify-section-{{ section.id }} .meet-text-gray-500 { color: #6b7280; }
+    #shopify-section-{{ section.id }} .meet-text-gray-600 { color: #4b5563; }
+    #shopify-section-{{ section.id }} .meet-text-gray-800 { color: #1f2937; }
+    #shopify-section-{{ section.id }} .meet-text-gray-900 { color: #111827; }
+    #shopify-section-{{ section.id }} .meet-text-white { color: #fff; }
+    #shopify-section-{{ section.id }} .meet-opacity-50 { opacity: 0.5; }
+    #shopify-section-{{ section.id }} .meet-opacity-70 { opacity: 0.7; }
+    #shopify-section-{{ section.id }} .meet-shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+    #shopify-section-{{ section.id }} .meet-backdrop-blur-sm { --tw-backdrop-blur: blur(4px); backdrop-filter: var(--tw-backdrop-filter); }
+    #shopify-section-{{ section.id }} .meet-transition { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter; transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter; transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    #shopify-section-{{ section.id }} .meet-transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    #shopify-section-{{ section.id }} .meet-transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    #shopify-section-{{ section.id }} .meet-transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    #shopify-section-{{ section.id }} .meet-transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    #shopify-section-{{ section.id }} .meet-duration-300 { transition-duration: 300ms; }
+    #shopify-section-{{ section.id }} .meet-ease-in-out { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+    #shopify-section-{{ section.id }} .pointer-events-none { pointer-events: none; }
+    #shopify-section-{{ section.id }} .hover\:meet-bg-black\/50:hover { background-color: rgb(0 0 0 / 0.5); }
+    #shopify-section-{{ section.id }} .hover\:meet-bg-gray-800:hover { background-color: #1f2937; }
+    #shopify-section-{{ section.id }} .hover\:meet-bg-gray-900:hover { background-color: #111827; }
+    #shopify-section-{{ section.id }} .hover\:meet-bg-white:hover { background-color: #fff; }
+    #shopify-section-{{ section.id }} .hover\:meet-bg-white\/30:hover { background-color: rgb(255 255 255 / 0.3); }
+    #shopify-section-{{ section.id }} .hover\:meet-text-gray-800:hover { color: #1f2937; }
+    #shopify-section-{{ section.id }} .hover\:meet-opacity-75:hover { opacity: 0.75; }
+    #shopify-section-{{ section.id }} .group:hover .group-hover\:meet-opacity-100 { opacity: 1; }
+    #shopify-section-{{ section.id }} .meet-object-contain { object-fit: contain; }
+    #shopify-section-{{ section.id }} .meet-object-cover { object-fit: cover; }
+    #shopify-section-{{ section.id }} .meet-portrait { aspect-ratio: 9/ 12; }
+    #shopify-section-{{ section.id }} .meet-landscape { aspect-ratio: 12 /9 ; }
+    #shopify-section-{{ section.id }} .meet-square { aspect-ratio: 1 / 1; }
+    #shopify-section-{{ section.id }} .meet-none { aspect-ratio: auto; }
+
+  /* Custom styles for transparent icon buttons */
+  #shopify-section-{{ section.id }} button.meet-text-white.hover\:meet-opacity-75,
+  #shopify-section-{{ section.id }} button.hover\:meet-opacity-75 {
+      background: transparent;
+      border: none;
+  }
+
+  @media (min-width: 768px) {
+        #shopify-section-{{ section.id }} .md\:meet-max-w-md { max-width: 28rem; }
+        #shopify-section-{{ section.id }} .md\:meet-rounded-2xl { border-radius: 1rem; }
+        #shopify-section-{{ section.id }} .md\:meet-h-\[90vh\] { height: 90vh; }
+        #shopify-section-{{ section.id }} .md\:meet-p-4 { padding: 1rem; }
+        #shopify-section-{{ section.id }} .md\:meet-p-8 { padding: 2rem; }
+        #shopify-section-{{ section.id }} .md\:meet-rounded-none { border-radius: 0px; }
+  }
+  #shopify-section-{{ section.id }}  .meet-background-transparent {
+      background: transparent;
+      border: none;
+  }
+  
+</style>
+
+{% comment %}  section setting css {% endcomment %}
+
+{% style %}
+  #shopify-section-{{ section.id }}.shopify-section {
+      width: 100%;
+      {% if section.settings.section_width_type == 'custom' %}
+          max-width: {{ section.settings.section_width }}%;
+      {% endif %}
+      margin: 0 auto;
+      display: block;
+      background-color: {{ section.settings.section_bg }};
+  }
+
+  #shopify-section-{{ section.id }} #carousel-{{ section.id }} {
+      padding: {{ section.settings.slider_padding_vertical_desktop }}px 0px;
+  }
+
+
+  #prevBtn-{{ section.id }}, #nextBtn-{{ section.id }} {
+          height: {{ section.settings.arrow_size_desktop }}px;
+          width: {{ section.settings.arrow_size_desktop }}px;
+      }
+
+
+      #shopify-section-{{ section.id }} .meet-bg-slide-btn {
+          background-color: {{ section.settings.arrow_bg }};
+          border-color: {{ section.settings.arrow_icon_color }};
+      }
+
+      #shopify-section-{{ section.id }} .meet-bg-slide-btn:hover {
+          background-color: {{ section.settings.arrow_bg_hover }};
+          border-color: {{ section.settings.arrow_icon_hover }};
+      }
+
+          #shopify-section-{{ section.id }} .meet-bg-slide-btn-svg {
+              color: {{ section.settings.arrow_icon_color }};
+          }
+
+
+      #shopify-section-{{ section.id }} .meet-bg-slide-btn-svg:hover {
+              color: {{ section.settings.arrow_icon_hover }};
+          }
+
+          #shopify-section-{{ section.id }} .meet-discount{
+          {% if section.settings.show_discount == false %}
+          display:none;
+          {% endif %}
+          color:{{ section.settings.discount_text_color }};
+          background-color:{{ section.settings.discount_bg_color }};
+          }
+
+
+          #shopify-section-{{ section.id }} .meeet-like-btn{
+              {% if section.settings.show_like == false %}
+          display:none;
+          {% endif %}
+          }
+
+
+          #shopify-section-{{ section.id }} .meeet-share-btn{
+              {% if section.settings.show_share == false %}
+          display:none;
+          {% endif %}
+          }
+
+          #shopify-section-{{ section.id }} .meet-whatch-and-buy-card{
+            background-color:{{ section.settings.card_bg }};
+          }
+
+          #shopify-section-{{ section.id }} .meet-product-title{
+            color:{{ section.settings.title_color }};
+          }
+
+          #shopify-section-{{ section.id }} .meet-product-price{
+            color:{{ section.settings.price_color }};
+          }
+
+          #shopify-section-{{ section.id }} .meet-product-discount{
+            color:{{ section.settings.off_color }};
+          }
+
+          #shopify-section-{{ section.id }} .meet-product-button{
+            background-color:{{ section.settings.btn_bg }};
+            color:{{ section.settings.btn_text }};
+            border-color:{{ section.settings.btn_border }};
+          }
+
+          #shopify-section-{{ section.id }} .meet-product-button:hover{
+            background-color:{{ section.settings.btn_bg_hover }};
+            color:{{ section.settings.btn_text_hover }};
+            border-color:{{ section.settings.btn_border_hover }};
+          }
+')
+
+  @media (max-width: 767px) {
+      #shopify-section-{{ section.id }} #carousel-{{ section.id }} {
+          padding:{{ section.settings.slider_padding_vertical_mobile }}px 0px;
+      }
+      #prevBtn-{{ section.id }}, #nextBtn-{{ section.id }} {
+          height: {{ section.settings.arrow_size_mobile }}px;
+          width: {{ section.settings.arrow_size_mobile }}px;
+      }
+  }
+
+  #shopify-section-{{ section.id }} .meet-items-center-views {
+    display: none;
+  }
+
+  /* class add product image 483 line */
+  #shopify-section-{{ section.id }} .meet-product-image-round {
+    border-radius: 100px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  }
+
+  #shopify-section-{{ section.id }} .meet-product-title {
+    margin: 0px;
+    font-weight: normal;
+  }
+  #shopify-section-{{ section.id }} .meet-product-price p {
+    margin: 0px;
+    font-size: 13.5px;
+  }
+  #shopify-section-{{ section.id }} .meet-product-discount {
+    margin-top: 5px;
+    margin-bottom: 0px;
+    font-weight: normal;
+  }
+  #shopify-section-{{ section.id }} .hover\:-meet-translate-y-1:hover {
+    scale: 1.02
+  }
+  #shopify-section-{{ section.id }} .meet-product-button {
+    width: 100%;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+  }
+  #shopify-section-{{ section.id }} .meeet-share-btn {
+    margin-top: -5px;
+  }
+  @media screen and (min-width: 768px) and (max-width: 1500px) {
+    #shopify-section-{{ section.id }}.shopify-section {
+      min-width: 95%;
+    }
+    #shopify-{{ section.id }} .md\:meet-p-8 {
+      padding: 2rem 0rem;
+    }
+  }
+  .prevBtn-{{ section.id }},
+  .nextBtn-{{ section.id }} {
+    border-radius: 100px;
+    border: none;
+    opacity: 0.8;
+  }
+
+   /*   #shopify-section-{{ section.id }} .hover\:meet-text-red-500:hover
+    #shopify-section-{{ section.id }} .hover\:meet-text-sky-400:hover */
+{% endstyle %}
+<div class="meet-w-full meet-mx-auto meet-p-4 md:meet-p-8">
+  <div class="meet-text-3xl meet-font-bold meet-text-gray-800 meet-mb-2 meet-text-center">
+    {{ section.settings.title }}
+  </div>
+  <div class="meet-text-gray-600 meet-mb-8 meet-text-center">{{ section.settings.subtitle }}</div>
+
+  <div class="meet-relative">
+    <div
+      id="carousel-{{ section.id }}"
+      class="meet-flex meet-overflow-x-auto meet-space-x-4  meet-no-scrollbar meet-scroll-smooth"
+    >
+      <div class="swiper-wrapper" id="swiper-wrapper-{{ section.id }}"></div>
+    </div>
+
+    <button
+      id="prevBtn-{{ section.id }}"
+      class="prevBtn-{{ section.id }} meet-absolute meet-top-1/2 meet-left-2 meet-transform -meet-translate-y-1/2 meet-bg-slide-btn meet-backdrop-blur-sm meet-p-2 meet-text-gray-800 meet-shadow-lg hover:meet-bg-white meet-transition meet-duration-300 meet-z-10"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="meet-bg-slide-btn-svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+    <button
+      id="nextBtn-{{ section.id }}"
+      class="nextBtn-{{ section.id }} meet-absolute meet-top-1/2 meet-right-2 meet-transform -meet-translate-y-1/2 meet-bg-slide-btn meet-backdrop-blur-sm meet-p-2 meet-text-gray-800 meet-shadow-lg hover:meet-bg-white meet-transition meet-duration-300 meet-z-10"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="meet-bg-slide-btn-svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  </div>
+</div>
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+  
+        const products = [
+          
+        {% for block in section.blocks %}
+            {% assign product = block.settings.product %}
+            {% assign compare_price = product.variants.first.compare_at_price %}
+            {% assign current_price = product.variants.first.price %}
+
+            {% if compare_price > current_price and compare_price > 0 %}
+                {% assign discount = compare_price | minus: current_price %}
+                {% assign discount_percentage = discount | times: 100 | divided_by: compare_price %}
+            {% else %}
+                {% assign discount_percentage = 0 %}
+            {% endif %}
+
+            {
+              "title": "{% if product.title != blank %}{{ product.title | escape }}{% else %} Product Name {% endif %}",
+              "id": "{% if product.id != blank %}{{ product.id }}{% else %} Product ID {% endif %}",
+              "handle": "{% if product.handle != blank %}{{ product.handle }}{% else %} Product Handle {% endif %}",
+              "url": "{% if product.url != blank %}{{ product.url }}{% else %} Product URL {% endif %}",
+              "image": "{% if product.images.first.src != blank %}{{ product.images.first.src | image_url }}{% else %} https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081 {% endif %}",
+              "variant_id": "{% if product.variants.first.id != blank %}{{ product.variants.first.id }}{% else %} 12345678 {% endif %}",
+              "available": "{% if product.variants.first.available != blank %}{{ product.variants.first.available }}{% else %} false {% endif %}",
+              "title": "{% if product.title != blank %}{{ product.title }} {{ product.variants.first.title }}{% else %} Product Title {% endif %}",
+              "compare_at_price": "{% if compare_price != blank %}{{ compare_price | money_with_currency }}{% else %}{{ '999' | money_with_currency }} {% endif %}",
+              "price": "{% if current_price != blank %}{{ current_price | money_with_currency }}{% else %} {{ '99' | money_with_currency }} {% endif %}",
+              "discount_percentage": "{% if discount_percentage != blank %}{{ discount_percentage }}{% else %} 90 {% endif %}",
+              "like_url": "{% if block.settings.like_url != blank %}{{ block.settings.like_url }}{% else %} # {% endif %}",
+              "share_url": "{% if block.settings.share_url != blank %}{{ block.settings.share_url }}{% else %}# {% endif %}",
+          },
+        {% endfor %}       
+    ];
+
+
+        
+        const videos = [
+        {% for block in section.blocks %}
+           {% if block.settings.video_source == 'youtube' %}
+            {
+            videoSrc:"{{ block.settings.youtube_url }}",
+            videoType:"youtube"
+            },
+           {% elsif block.settings.video_source == 'shopify' %}
+            {
+            videoSrc:"{{ block.settings.shopify_video }}",
+            videoType:"shopify"
+            },  
+           {% endif %}
+        {% endfor %}
+
+        ]   
+       
+
+        // Merge products + videos into one array
+        const combinedData = products.map((product, index) => {
+            return {
+                ...product,
+                ...(videos[index] || {})
+            };
+        });
+        
+
+
+        
+        function getYoutubeEmbedUrl(url) {
+            let videoId;
+            try {
+                const urlObj = new URL(url);
+                if (urlObj.hostname.includes('youtube.com') && urlObj.pathname.includes('/shorts/')) {
+                    videoId = urlObj.pathname.split('/shorts/')[1];
+                } else if (urlObj.hostname.includes('youtube.com') && urlObj.searchParams.has('v')) {
+                    videoId = urlObj.searchParams.get('v');
+                } else if (urlObj.hostname.includes('youtu.be')) {
+                    videoId = urlObj.pathname.split('/')[1];
+                } else {
+                    return null;
+                }
+                // Added allow='autoplay' for better compatibility
+                return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&playsinline=1&enablejsapi=1`;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function generateProductCards() {
+            carousel.innerHTML = '';
+            combinedData.forEach((product, index) => {
+                const discountPercentage = 20;
+                const youtubeEmbedUrl = getYoutubeEmbedUrl(product.videoSrc);
+                if(product.discount_percentage > 0){
+                var discount_percentage1 = `<div class="meet-discount meet-absolute meet-top-3 meet-left-3 meet-bg-black meet-text-white meet-text-xs meet-font-semibold meet-px-3 meet-py-1 meet-rounded-full">${product.discount_percentage}% discount</div>` 
+                var discount_percentage2 =`<p class="meet-product-discount meet-text-xs meet-font-semibold meet-text-green-600">${product.discount_percentage}%Off</p>`;
+                }
+                else{
+                var discount_percentage1 = '';
+                var discount_percentage2 ='';
+                }      
+                
+                
+                const videoPlayerHtml = youtubeEmbedUrl
+                    ? `<iframe class="meet-w-full {{ section.settings.video_size }}  meet-object-cover pointer-events-none" src="${youtubeEmbedUrl}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
+                    : `<video class="meet-w-full {{ section.settings.video_size }} meet-object-cover" src="${product.videoSrc }" autoplay loop muted playsinline></video>`;
+
+                const card = `
+                    <div class="swiper-slide meet-whatch-and-buy-card meet-flex-none meet-w-72 meet-bg-white meet-rounded-xl meet-shadow-lg meet-overflow-hidden meet-transform hover:-meet-translate-y-1 meet-transition-all meet-duration-300">
+                        <div class="meet-relative ">
+                        <div class="meet-video-container">
+                        <div class="meet-video-player"> 
+                           ${videoPlayerHtml}
+                            <div class="meet-absolute meet-top-0 meet-left-0 meet-w-full  meet-video-overlay-gradient"></div>                
+                         ${discount_percentage1}
+                        
+                            </div>
+                        </div>
+                            <div class="meet-absolute meet-bottom-3 meet-right-3 meet-flex  meet-items-center meet-space-y-3">
+                                <a href="${product.like_url }" class="meeet-like-btn meet-background-transparent meet-text-white hover:meet-text-red-500 meet-transition-colors meet-duration-300"><svg xmlns="http://www.w3.org/2000/svg" class="meet-h-6 meet-w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z" /></svg></a>
+                                <a href="${product.share_url }"  class="meeet-share-btn meet-background-transparent  meet-text-white hover:meet-text-sky-400 meet-transition-colors meet-duration-300"><svg xmlns="http://www.w3.org/2000/svg" class="meet-h-6 meet-w-6 -meet-rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></a>
+                            </div>
+                        </div>
+                        <div class="meet-p-4">
+                            <div class="meet-flex meet-items-center meet-space-x-3">
+                                <img src="${product.image}" alt="${product.title}" class="meet-w-12 meet-h-12 meet-rounded-full meet-object-cover meet-border-2 meet-border-gray-100 meet-product-image-round">
+                                <div>
+                                    <h3 class="meet-product-title meet-font-semibold meet-text-gray-800 meet-text-sm meet-truncate meet-w-48">${product.title}</h3>
+                                    <div class="meet-product-price meet-flex meet-items-baseline meet-space-x-1.5 meet-mt-1"><p class="meet-font-bold meet-text-gray-900"> ${product.price}</p><p class="meet-text-xs meet-text-gray-400 meet-line-through"> ${product.compare_at_price}</p></div>
+                                    ${discount_percentage2}
+                                </div>
+                            </div>
+                            ${product.available 
+                                ? `<a href="${ product.url }" class="meet-product-button meet-mt-3 meet-w-full meet-bg-gray-900 meet-text-white meet-py-2 meet-rounded-lg meet-font-semibold meet-text-sm hover:meet-bg-gray-800 meet-transition-colors meet-duration-300">Buy Now</a>`
+                                : `<a href="#" class="meet-product-button meet-mt-3 meet-w-full meet-bg-gray-200 meet-text-gray-500 meet-py-2 meet-rounded-lg meet-font-semibold meet-text-sm meet-cursor-not-allowed">Out Of Stock</a>`
+                            }
+                        </div>
+                    </div>
+                `;
+                carousel.innerHTML += card;
+            });
+        }
+        
+        generateProductCards();
+
+
+
+
+// SLIDER
+
+const swiper = new Swiper("#carousel-{{ section.id }}", {
+      slidesPerView: {{ section.settings.slides_desktop }},   // 👈 shows 4 slides
+      spaceBetween: 20,   // space between slides
+      loop: true,
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+      navigation: {
+        prevEl: "#prevBtn-{{ section.id }}",
+        nextEl: "#nextBtn-{{ section.id }}",
+      },
+      breakpoints: {
+        0: {        // mobile
+          slidesPerView: {{ section.settings.slides_mobile }},
+        },
+        767: {      // small tablets
+            slidesPerView: 3,
+        },
+        1250: {     // small tablets
+          {% if section.settings.slides_desktop == "5" %}
+            slidesPerView: 4,
+          {% else %}
+            slidesPerView: {{ section.settings.slides_desktop }},
+          {% endif %}
+        },
+        1551: {      // small tablets
+          slidesPerView: {{ section.settings.slides_desktop }},
+        }
+      }
+    });
+
+</script>
+
+{% schema %}
+{
+  "name": "Whatch and Buy",
+  "class": "page-width",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "title",
+      "label": "Title",
+      "default": "<h1>Title</h1>"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "<h3>Subtitle</h3>"
+    },
+    {
+      "type": "select",
+      "id": "section_width_type",
+      "label": "Section Width",
+      "options": [
+        { "value": "full", "label": "Full Width" },
+        { "value": "custom", "label": "Custom Width" }
+      ],
+      "default": "custom"
+    },
+    {
+      "type": "range",
+      "id": "section_width",
+      "label": "Custom Section Width",
+      "min": 80,
+      "max": 100,
+      "unit": "%",
+      "step": 1,
+      "default": 100
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section Background Color"
+    },
+
+    
+    {
+      "type": "header",
+      "content": "Slider Settings"
+    },
+    {
+      "type": "select",
+      "id": "slides_desktop",
+      "label": "Slides per Desktop",
+      "options": [
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ],
+      "default": "5"
+    },
+    {
+      "type": "select",
+      "id": "slides_mobile",
+      "label": "Slides per Mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    },
+
+    {
+      "type": "range",
+      "id": "slider_padding_vertical_desktop",
+      "label": "Slider Vertical Padding (Desktop)",
+      "min": 0,
+      "max": 100,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "slider_padding_vertical_mobile",
+      "label": "Slider Vertical Padding (Mobile)",
+      "min": 0,
+      "max": 50,
+      "unit": "px",
+      "default": 10
+    },
+
+    
+    {
+      "type": "header",
+      "content": "Slider Arrow Settings"
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_desktop",
+      "label": "Arrow Button Size (Desktop)",
+      "min": 40,
+      "max": 100,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_mobile",
+      "label": "Arrow Button Size (Mobile)",
+      "min": 40,
+      "max": 55,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "arrow_icon_color",
+      "label": "Arrow Icon Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_icon_hover",
+      "label": "Arrow Icon Hover Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg",
+      "label": "Arrow Background Color",
+      "default": "#121111"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_hover",
+      "label": "Arrow Background Hover Color",
+      "default": "#121111"
+    },
+
+    
+    {
+      "type": "header",
+      "content": "Discount Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_discount",
+      "label": "Show Discount",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "discount_text_color",
+      "label": "Discount Text Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color",
+      "id": "discount_bg_color",
+      "label": "Discount Background Color",
+      "default": "#000"
+    },
+
+    
+    {
+      "type": "header",
+      "content": "Like & Share Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_like",
+      "label": "Show Like Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "label": "Show Share Button",
+      "default": true
+    },
+
+    
+    {
+      "type": "header",
+      "content": "Card Settings"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card Background Color",
+      "default": "#fff"
+    },
+    {
+      "type": "select",
+      "id": "video_size",
+      "label": "Video Size",
+      "options": [
+        { "value": "meet-portrait", "label": "Portrait" },
+        { "value": "meet-landscape", "label": "Landscape" },
+        { "value": "meet-square", "label": "Square" },
+        { "value": "meet-none", "label": "None" }
+      ],
+      "default": "meet-none"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Product Title Color",
+      "default": "#000"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price Color",
+      "default": "#000"
+    },
+    {
+      "type": "color",
+      "id": "off_color",
+      "label": "Offer Color",
+      "default": "#000"
+    },
+    {
+      "type": "color",
+      "id": "btn_text",
+      "label": "Button Text Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_hover",
+      "label": "Button Text Hover Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button Background Color",
+      "default": "#000"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_hover",
+      "label": "Button Background Hover Color",
+      "default": "#000"
+    },
+    {
+      "type": "color",
+      "id": "btn_border",
+      "label": "Button Border Color",
+      "default": "#000"
+    },
+    {
+      "type": "color",
+      "id": "btn_border_hover",
+      "label": "Button Border Hover Color",
+      "default": "#000"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Slide",
+      "type": "slide",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select product"
+        },
+        {
+          "type": "url",
+          "id": "youtube_url",
+          "label": "YouTube Shorts URL"
+        },
+        {
+          "type": "select",
+          "id": "video_source",
+          "label": "Choose Video Source",
+          "options": [
+            {
+              "value": "youtube",
+              "label": "YouTube"
+            }
+          ],
+          "default": "youtube"
+        },
+
+        {
+          "type": "url",
+          "id": "like_url",
+          "label": "Like Button Link"
+        },
+        {
+          "type": "url",
+          "id": "share_url",
+          "label": "Share Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "category": "Content",
+      "name": "Whatch and Buy",
+      "blocks": [
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        },
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

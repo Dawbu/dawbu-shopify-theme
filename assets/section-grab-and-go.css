@@ -1,0 +1,135 @@
+/* ============================================================
+   GRAB & GO SECTION — section-grab-and-go.css
+   ============================================================ */
+
+/* ---------- Section wrapper ---------- */
+.grab-and-go {
+  padding: 48px 0 0;
+  overflow: hidden;
+}
+
+.grab-and-go__inner {
+  max-width: 1660px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---------- Header ---------- */
+.grab-and-go__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  background: #faed17;
+  border-radius: 100px;
+  padding: 4px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #111;
+  margin-bottom: 20px;
+  font-family: poppins;
+  box-shadow: 3px 4px #040202;
+  border: 1px solid #040202;
+  margin-top: 0;
+}
+
+.grab-and-go__title {
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: #111;
+  margin: 0 0 32px;
+  letter-spacing: -0.02em;
+}
+
+.grab-and-go__title-highlight {
+  color: #E8291C;
+  position: relative;
+}
+
+/* ---------- Swiper slider ---------- */
+.grab-and-go__slider-wrap {
+  position: relative;
+}
+
+.grab-and-go .swiper {
+  padding-bottom: 16px;
+  overflow: visible;
+}
+
+.grab-and-go .swiper-slide {
+  height: auto;
+  width: 256px;
+  margin-right: 16px;
+}
+
+/* Nav arrows — visible left/right overlay pointers so customers know there's more */
+.grab-and-go__slider-wrap { position: relative; }
+.grab-and-go__nav {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  z-index: 5;
+}
+
+.grab-and-go__arrow {
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+  color: #111;
+  padding: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.grab-and-go__arrow:hover {
+  background: #e52227;
+  color: #fff;
+  transform: scale(1.06);
+  box-shadow: 0 6px 20px rgba(229,34,39,0.28);
+}
+.grab-and-go__arrow:active { transform: scale(0.96); }
+.grab-and-go__arrow svg { display: block; }
+.grab-and-go__arrow.swiper-button-disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 749px) {
+  .grab-and-go__nav { padding: 0 2px; }
+  .grab-and-go__arrow { width: 36px; height: 36px; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 749px) {
+  .grab-and-go {
+    padding: 32px 0 20px;
+  }
+
+  .grab-and-go__title {
+    font-size: 32px;
+  }
+
+  .grab-and-go__eyebrow {
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+  }
+}

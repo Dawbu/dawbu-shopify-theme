@@ -1,0 +1,44 @@
+{%- comment -%}
+  snippet: dawbu-byob-card
+  One BYOB hub card. Called from sections/byob-hub.liquid for each pack_card block.
+  Reads everything from block.settings.
+{%- endcomment -%}
+
+{%- liquid
+  assign title = block.settings.title    | default: 'Pack name'
+  assign qty   = block.settings.quantity | default: 6
+  assign price = block.settings.price    | default: 199
+  assign link  = block.settings.link     | default: '#'
+  assign badge = block.settings.badge
+  assign image = block.settings.image
+-%}
+
+<li class="byob__cell" {{ block.shopify_attributes }}>
+  <a class="byob-card" href="{{ link }}"
+     aria-label="{{ title }} — buy any {{ qty }} for Rs. {{ price }}">
+    {%- if badge != blank -%}
+      <span class="byob-card__badge">{{ badge }}</span>
+    {%- endif -%}
+
+    <span class="byob-card__media">
+      {%- if image -%}
+        {{ image | image_url: width: 600 | image_tag:
+            loading: 'lazy',
+            sizes: '(min-width:1100px) 25vw, (min-width:750px) 33vw, 45vw',
+            widths: '300,450,600',
+            class: 'byob-card__img',
+            alt: title }}
+      {%- else -%}
+        <span class="byob-card__media-fallback" aria-hidden="true">
+          <span class="byob-card__media-mono">{{ title | slice: 0, 1 | upcase }}</span>
+        </span>
+      {%- endif -%}
+    </span>
+
+    <span class="byob-card__body">
+      <span class="byob-card__qty">Any {{ qty }} items</span>
+      <span class="byob-card__name">{{ title }}</span>
+      <span class="byob-card__price">Rs. {{ price }}</span>
+    </span>
+  </a>
+</li>

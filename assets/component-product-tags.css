@@ -1,0 +1,101 @@
+/* Product Tags Component */
+.product-tags {
+  margin-bottom: 1.6rem;
+}
+
+.product-tags__container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.product-tags__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.product-tags__badge--rating {
+  background-color: rgba(var(--color-foreground), 0.05);
+  color: rgb(var(--color-foreground));
+  border: 0.1rem solid rgba(var(--color-foreground), 0.1);
+}
+
+.product-tags__badge--beginner {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 0.1rem solid #81c784;
+}
+
+.product-tags__badge--indoor {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 0.1rem solid #64b5f6;
+}
+
+.product-tags__badge--outdoor {
+  background-color: #fff3e0;
+  color: #e65100;
+  border: 0.1rem solid #ffb74d;
+}
+
+.product-tags__badge--organic {
+  background-color: #f1f8e9;
+  color: #558b2f;
+  border: 0.1rem solid #9ccc65;
+}
+
+.product-tags__badge--new {
+  background-color: #fce4ec;
+  color: #c2185b;
+  border: 0.1rem solid #f48fb1;
+}
+
+.product-tags__badge--bestseller {
+  background-color: #fff9c4;
+  color: #f57f17;
+  border: 0.1rem solid #fdd835;
+}
+
+.product-tags__icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.product-tags__icon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  fill: currentColor;
+}
+
+.product-tags__text {
+  font-size: inherit;
+}
+
+.product-tags__count {
+  opacity: 0.7;
+  font-size: 0.9em;
+  margin-left: 0.2rem;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 749px) {
+  .product-tags__badge {
+    font-size: 1.1rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .product-tags__container {
+    gap: 0.6rem;
+  }
+}
+

@@ -1,0 +1,35 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": { "padding_top": 0, "padding_bottom": 0 }
+    },
+    "byob_hub": {
+      "type": "byob-hub",
+      "blocks": {
+        "b01": { "type": "pack_card", "settings": { "image": "shopify://shop_images/tower.webp", "title": "Build & Craft Crate", "quantity": 6, "price": 390, "link": "/pages/build-craft-crate", "badge": "", "family": "Building Blocks" } },
+        "b02": { "type": "pack_card", "settings": { "image": "shopify://shop_images/1_9ae03770-869a-4b93-aa99-d4b4cdbe2b39.webp", "title": "10-in-1 Mega Box", "quantity": 6, "price": 450, "link": "/pages/mega-box", "badge": "MOST POPULAR", "family": "Building Blocks" } },
+        "b03": { "type": "pack_card", "settings": { "image": "shopify://shop_images/IMG-20260204-WA0080.webp", "title": "Block Sets", "quantity": 6, "price": 735, "link": "/pages/block-sets", "badge": "", "family": "Building Blocks" } },
+        "b04": { "type": "pack_card", "settings": { "image": "shopify://shop_images/Portulaca_afra.webp", "title": "Master Builder Set", "quantity": 6, "price": 849, "link": "/pages/master-builder-set", "badge": "", "family": "Building Blocks" } },
+        "b05": { "type": "pack_card", "settings": { "image": "shopify://shop_images/space8.png", "title": "Collector's Vault", "quantity": 6, "price": 1419, "link": "/pages/collectors-vault", "badge": "PREMIUM", "family": "Building Blocks" } },
+        "b06": { "type": "pack_card", "settings": { "image": "shopify://shop_images/1767103390710.webp", "title": "Glow Grab Bag", "quantity": 25, "price": 199, "link": "/pages/glow-grab-bag", "badge": "BULK", "family": "Glow Minis" } },
+        "b07": { "type": "pack_card", "settings": { "image": "shopify://shop_images/2_1cc61f31-90f1-4f12-ad7e-e13aeb316013.webp", "title": "Glow Mini Pack", "quantity": 14, "price": 199, "link": "/pages/glow-mini-pack", "badge": "", "family": "Glow Minis" } },
+        "b08": { "type": "pack_card", "settings": { "image": "shopify://shop_images/WhatsAppImage2026-02-27at20.24.12.webp", "title": "Glow Squad Bag", "quantity": 11, "price": 209, "link": "/pages/glow-squad-bag", "badge": "VALUE", "family": "Glow Minis" } },
+        "b09": { "type": "pack_card", "settings": { "image": "shopify://shop_images/Gemini_Generated_Image_2n92w82n92w82n92.webp", "title": "Mini Starter Pack", "quantity": 9, "price": 210, "link": "/pages/mini-starter-pack", "badge": "", "family": "Glow Minis" } },
+        "b10": { "type": "pack_card", "settings": { "image": "shopify://shop_images/Gemini_Generated_Image_tna0hotna0hotna0.webp", "title": "Mini Mates Pack", "quantity": 7, "price": 199, "link": "/pages/mini-mates-pack", "badge": "TRENDING", "family": "Glow Minis" } },
+        "b11": { "type": "pack_card", "settings": { "image": "shopify://shop_images/H9033e746392d4da9a474d3e7b08d7fd4r.jpg", "title": "Mini Figures", "quantity": 6, "price": 199, "link": "/pages/mini-figures", "badge": "", "family": "Glow Minis" } },
+        "b12": { "type": "pack_card", "settings": { "image": "shopify://shop_images/IMG-20260221-WA0044_45d26c19-fa78-4152-ac2e-3c16445d1299.webp", "title": "Mini Heroes Pack", "quantity": 6, "price": 220, "link": "/pages/mini-heroes-pack", "badge": "", "family": "Glow Minis" } },
+        "b13": { "type": "pack_card", "settings": { "image": "shopify://shop_images/Miniature-Garden-Dolphin.jpg", "title": "Big Mini Figures", "quantity": 6, "price": 279, "link": "/pages/big-mini-figures", "badge": "", "family": "Glow Minis" } },
+        "b14": { "type": "pack_card", "settings": { "image": "shopify://shop_images/Gemini_Generated_Image_3agq9k3agq9k3agq-ezremove.webp", "title": "Premium Minis", "quantity": 6, "price": 310, "link": "/pages/premium-minis", "badge": "PREMIUM", "family": "Glow Minis" } }
+      },
+      "block_order": ["b01","b02","b03","b04","b05","b06","b07","b08","b09","b10","b11","b12","b13","b14"],
+      "settings": {
+        "eyebrow": "Build Your Own Bundle",
+        "heading": "Pick a pack. Fill it. Save more.",
+        "subheading": "Mix and match across categories. The more you build, the more you save. Always free shipping above Rs. 150."
+      }
+    }
+  },
+  "order": ["main", "byob_hub"]
+}

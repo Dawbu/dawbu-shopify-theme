@@ -1,0 +1,736 @@
+{%- comment -%}
+  sections/bundle-pick-and-pack.liquid
+
+  Standalone "Pick any N for Rs. P" bundle picker.
+  Drop below "Buy the Complete Collection" on a BYOB landing page (or anywhere)
+  to give shoppers an inline build-your-own option without leaving the page.
+
+  - N empty slots that fill in order from a tap on the product grid (or Surprise Me).
+  - Tap a filled slot's × to remove. Tap a tile already in the bundle to remove it.
+  - "Add bundle to cart" only enables when exactly N items are selected.
+  - Every cart-add carries the full _byob_* attribution shape used by the rest of
+    the chain (byob-builder.js / dawbu-byob-mini.liquid), so order detail reports
+    work across every surface.
+{%- endcomment -%}
+
+{%- liquid
+  assign pack_coll  = section.settings.collection
+  assign N          = section.settings.quantity | default: 6
+  assign P          = section.settings.price    | default: 199
+  assign pack_slug  = section.settings.pack_handle | default: pack_coll.handle
+  assign heading    = section.settings.heading  | default: 'Or build your own pack'
+  assign eyebrow    = section.settings.eyebrow  | default: 'Mix & match'
+  assign sub        = section.settings.subheading
+  assign cta_label  = section.settings.cta_label | default: 'Add bundle to cart'
+  assign sur_label  = section.settings.surprise_label | default: 'Surprise me'
+  assign pad_top    = section.settings.padding_top    | default: 32
+  assign pad_bottom = section.settings.padding_bottom | default: 32
+-%}
+
+{%- if pack_coll == blank or pack_coll.products.size == 0 -%}
+  <section class="bpp-empty"
+           style="padding:{{ pad_top }}px 1rem {{ pad_bottom }}px; max-width: 1100px; margin: 0 auto;">
+    <p style="text-align:center;color:#999;font-size:14px;">
+      Pick a source collection (with products) in the section settings to enable the bundle picker.
+    </p>
+  </section>
+{%- else -%}
+
+  <section class="bpp"
+           data-bpp
+           data-qty="{{ N }}"
+           data-price="{{ P }}"
+           data-price-cents="{{ P | times: 100 }}"
+           data-pack="{{ pack_slug }}"
+           style="padding-top:{{ pad_top }}px;padding-bottom:{{ pad_bottom }}px;"
+           {{ section.shopify_attributes }}>
+
+    <div class="bpp__inner">
+      <header class="bpp__head">
+        {%- if eyebrow != blank -%}
+          <span class="bpp__eyebrow">{{ eyebrow }}</span>
+        {%- endif -%}
+        <h2 class="bpp__heading">{{ heading }}</h2>
+        {%- if sub != blank -%}
+          <p class="bpp__sub">{{ sub }}</p>
+        {%- endif -%}
+        <p class="bpp__rule">
+          Pick any <strong>{{ N }}</strong> · Pay <strong>Rs. {{ P }}</strong>
+        </p>
+      </header>
+
+      <div class="bpp__slots" data-bpp-slots role="list" aria-label="Bundle slots">
+        {%- for i in (1..N) -%}
+          <div class="bpp__slot" data-slot="{{ forloop.index0 }}" role="listitem">
+            <span class="bpp__slot-plus" aria-hidden="true">+</span>
+            <img class="bpp__slot-img" alt="" hidden />
+            <button type="button" class="bpp__slot-x" aria-label="Remove from this slot" hidden>×</button>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <div class="bpp__actions">
+        <button type="button" class="bpp__surprise" data-bpp-surprise>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+            <circle cx="8"  cy="8"  r="1.2" fill="currentColor"/>
+            <circle cx="16" cy="8"  r="1.2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="8"  cy="16" r="1.2" fill="currentColor"/>
+            <circle cx="16" cy="16" r="1.2" fill="currentColor"/>
+          </svg>
+          <span>{{ sur_label }}</span>
+        </button>
+        <button type="button" class="bpp__reset" data-bpp-reset hidden>Clear</button>
+      </div>
+
+      <ul class="bpp__grid" role="list">
+        {%- for sp in pack_coll.products -%}
+          {%- assign sv = sp.selected_or_first_available_variant -%}
+          {%- if sv.available -%}
+            <li class="bpp__prod" role="listitem">
+              <button type="button" class="bpp__prod-btn"
+                      data-bpp-add
+                      data-vid="{{ sv.id }}"
+                      data-pid="{{ sp.id }}"
+                      data-title="{{ sp.title | escape }}"
+                      data-img="{{ sp.featured_image | image_url: width: 200 }}"
+                      aria-label="Add {{ sp.title | escape }} to bundle">
+                <span class="bpp__prod-media">
+                  {{ sp.featured_image | image_url: width: 300 | image_tag:
+                       loading: 'lazy',
+                       widths: '150,200,300',
+                       sizes: '(min-width:990px) 16vw, 25vw',
+                       class: 'bpp__prod-img',
+                       alt: sp.title }}
+                  <span class="bpp__prod-check" aria-hidden="true">✓</span>
+                </span>
+                <span class="bpp__prod-name">{{ sp.title | truncate: 40 }}</span>
+              </button>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+
+      <div class="bpp__foot">
+        <div class="bpp__price">
+          <span class="bpp__price-label">Bundle price</span>
+          <strong class="bpp__price-now">Rs. {{ P }}</strong>
+        </div>
+        <button type="button" class="bpp__cta" data-bpp-cta disabled>
+          <span class="bpp__cta-label">Pick {{ N }} to start</span>
+        </button>
+      </div>
+    </div>
+
+    {%- comment -%} Server-emitted product pool — JS reads this to build Surprise. {%- endcomment -%}
+    <script type="application/json" class="bpp__pool">
+      [
+        {%- for sp in pack_coll.products -%}
+          {%- assign sv = sp.selected_or_first_available_variant -%}
+          {%- unless sv.available -%}{%- continue -%}{%- endunless -%}
+          {"id":{{ sp.id }},"vid":{{ sv.id }},"t":{{ sp.title | json }},"img":"{{ sp.featured_image | image_url: width: 200 }}"}{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    </script>
+  </section>
+
+  <style>
+    .bpp {
+      --bpp-red: #e52227;
+      --bpp-yellow: #faed17;
+      --bpp-ink: #1a1a1a;
+      --bpp-mute: #6b6258;
+      --bpp-line: #ece2cc;
+      --bpp-cream: #fdf8ee;
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      color: var(--bpp-ink);
+    }
+    .bpp__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .bpp__head { text-align: left; margin-bottom: 18px; }
+    .bpp__eyebrow {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--bpp-red);
+      margin-bottom: 8px;
+    }
+    .bpp__heading {
+      margin: 0 0 6px;
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -.01em;
+      line-height: 1.18;
+      color: var(--bpp-ink);
+    }
+    .bpp__sub {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--bpp-mute);
+      line-height: 1.5;
+    }
+    .bpp__rule {
+      margin: 6px 0 0;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--bpp-mute);
+    }
+    .bpp__rule strong { font-weight: 600; color: var(--bpp-ink); }
+
+    /* slot grid */
+    .bpp__slots {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin: 16px 0;
+    }
+    .bpp__slot {
+      position: relative;
+      aspect-ratio: 1/1;
+      background: #fff;
+      border: 1.5px dashed #d6c69e;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      transition: border-color .2s ease, transform .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    .bpp__slot.is-filled {
+      border-style: solid;
+      border-color: var(--bpp-red);
+    }
+    .bpp__slot.pop { animation: bpp-pop .35s cubic-bezier(.34,1.56,.64,1); }
+    .bpp__slot.is-spinning .bpp__slot-img { filter: blur(2px); }
+    @keyframes bpp-pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+    .bpp__slot-plus { font-size: 20px; font-weight: 300; color: #c4b48b; line-height: 1; }
+    .bpp__slot.is-filled .bpp__slot-plus { display: none; }
+    .bpp__slot-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .bpp__slot-x {
+      position: absolute; top: 4px; right: 4px;
+      z-index: 2;
+      width: 18px; height: 18px;
+      border: none;
+      background: rgba(4,2,2,.78);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 12px; line-height: 1;
+      cursor: pointer; padding: 0;
+      font-family: inherit;
+      box-shadow: 0 1px 4px rgba(0,0,0,.22);
+    }
+    .bpp__slot-x:hover { background: var(--bpp-ink); }
+    .bpp__slot.is-filled .bpp__slot-x { display: grid; place-items: center; }
+
+    @media (max-width: 560px) {
+      .bpp__slots { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    }
+
+    /* actions row */
+    .bpp__actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 18px;
+      flex-wrap: wrap;
+    }
+    .bpp__surprise {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 16px;
+      background: var(--bpp-yellow);
+      color: var(--bpp-ink);
+      border: 1.5px solid var(--bpp-ink);
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 12.5px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer; font-family: inherit;
+      transition: background .18s, color .18s, transform .12s;
+    }
+    .bpp__surprise:hover:not(:disabled) { background: var(--bpp-red); color: #fff; border-color: var(--bpp-red); }
+    .bpp__surprise:disabled { opacity: .55; cursor: not-allowed; }
+    .bpp__surprise.is-rolling svg { animation: bpp-spin .6s linear infinite; }
+    @keyframes bpp-spin { to { transform: rotate(360deg); } }
+
+    .bpp__reset {
+      background: transparent;
+      color: var(--bpp-mute);
+      border: 0;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 6px 10px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .bpp__reset:hover { color: var(--bpp-red); }
+
+    /* product picker grid */
+    .bpp__grid {
+      list-style: none;
+      margin: 0 0 20px;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+    .bpp__prod-btn {
+      display: block;
+      width: 100%;
+      background: #fff;
+      border: 1px solid var(--bpp-line);
+      border-radius: 10px;
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s, transform .12s, box-shadow .2s;
+      text-align: left;
+    }
+    .bpp__prod-btn:hover {
+      border-color: var(--bpp-red);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(229,34,39,.08);
+    }
+    .bpp__prod-btn.is-added { border-color: var(--bpp-red); background: #fff8e6; }
+    .bpp__prod-btn.is-added .bpp__prod-check { opacity: 1; transform: scale(1); }
+    .bpp__prod-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .bpp__prod-media {
+      position: relative;
+      display: block;
+      aspect-ratio: 1/1;
+      overflow: hidden;
+      border-radius: 10px 10px 0 0;
+      background: #f7f3ea;
+    }
+    .bpp__prod-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bpp__prod-check {
+      position: absolute; top: 6px; right: 6px;
+      width: 22px; height: 22px;
+      background: var(--bpp-red);
+      color: #fff;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 12px; font-weight: 700;
+      opacity: 0; transform: scale(.7);
+      transition: opacity .18s, transform .18s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 2px 6px rgba(0,0,0,.18);
+    }
+    .bpp__prod-name {
+      display: block;
+      padding: 8px 10px 10px;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: .005em;
+      line-height: 1.35;
+      color: rgba(26,26,26,.88);
+      min-height: 2.7em;
+    }
+
+    @media (max-width: 990px) { .bpp__grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 560px) {
+      .bpp__grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .bpp__prod-name { font-size: 11px; padding: 6px 8px 8px; }
+      .bpp__heading { font-size: 22px; }
+    }
+
+    /* footer cta row */
+    .bpp__foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--bpp-line);
+      flex-wrap: wrap;
+    }
+    .bpp__price { display: inline-flex; align-items: baseline; gap: 10px; }
+    .bpp__price-label { font-size: 12px; font-weight: 500; color: var(--bpp-mute); }
+    .bpp__price-now {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--bpp-red);
+      letter-spacing: -.01em;
+      font-variant-numeric: tabular-nums;
+    }
+    .bpp__cta {
+      background: var(--bpp-red);
+      color: #fff;
+      border: 2px solid var(--bpp-red);
+      border-radius: 999px;
+      padding: 12px 26px;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .18s, transform .12s, box-shadow .2s;
+      min-width: 220px;
+    }
+    .bpp__cta:hover:not(:disabled) {
+      background: #c41a1f;
+      border-color: #c41a1f;
+      box-shadow: 0 6px 18px rgba(229,34,39,.22);
+    }
+    .bpp__cta:disabled {
+      background: #efb3b6;
+      border-color: #efb3b6;
+      cursor: not-allowed;
+    }
+    .bpp__cta.is-loading { pointer-events: none; opacity: .85; }
+  </style>
+
+  <script>
+    (function () {
+      var roots = document.querySelectorAll('[data-bpp]:not([data-bpp-wired])');
+      roots.forEach(function (root) {
+        root.setAttribute('data-bpp-wired', '1');
+
+        var QTY     = parseInt(root.dataset.qty, 10) || 0;
+        var PRICE_C = parseInt(root.dataset.priceCents, 10) || 0;
+        var PACK    = root.dataset.pack || '';
+        if (!QTY) return;
+
+        var poolEl = root.querySelector('.bpp__pool');
+        var POOL = [];
+        try { POOL = JSON.parse(poolEl.textContent.trim()) || []; } catch (_) {}
+
+        var slots     = root.querySelectorAll('.bpp__slot');
+        var grid      = root.querySelector('.bpp__grid');
+        var prodBtns  = root.querySelectorAll('[data-bpp-add]');
+        var cta       = root.querySelector('[data-bpp-cta]');
+        var ctaLbl    = cta.querySelector('.bpp__cta-label');
+        var sur       = root.querySelector('[data-bpp-surprise]');
+        var reset     = root.querySelector('[data-bpp-reset]');
+
+        var picks = [];        // [{vid, pid, title, image}]
+        var FILL_METHOD = 'manual';
+
+        // ── source detection — matches assets/byob-builder.js ──
+        function detectSource() {
+          try {
+            var stored = JSON.parse(sessionStorage.getItem('byob_source') || 'null');
+            if (stored && stored.at && (Date.now() - stored.at) < 30 * 60 * 1000) return stored;
+          } catch (_) {}
+          try {
+            var p = new URLSearchParams(location.search);
+            var utm = p.get('utm_source'), ref = p.get('ref');
+            if (utm || ref) return {
+              source: 'campaign',
+              utm_source: utm || '',
+              utm_medium: p.get('utm_medium') || '',
+              utm_campaign: p.get('utm_campaign') || '',
+              ref: ref || '',
+              at: Date.now()
+            };
+          } catch (_) {}
+          return { source: 'bundle_picker_section', at: Date.now() };
+        }
+        var SRC = detectSource();
+
+        function fireEvent(name, payload) {
+          var detail = Object.assign({
+            surface: 'bundle_picker_section',
+            pack_handle: PACK,
+            source: SRC.source
+          }, payload || {});
+          try { document.dispatchEvent(new CustomEvent('byob:' + name, { detail: detail })); } catch (_) {}
+          if (window.dataLayer && window.dataLayer.push) {
+            window.dataLayer.push(Object.assign({ event: 'byob_' + name }, detail));
+          }
+        }
+
+        fireEvent('picker_view', { qty_required: QTY, bundle_price: PRICE_C / 100 });
+
+        // ── render ──
+        function render() {
+          slots.forEach(function (slot, i) {
+            var p = picks[i];
+            var img = slot.querySelector('.bpp__slot-img');
+            var x   = slot.querySelector('.bpp__slot-x');
+            if (p) {
+              img.src = p.image || '';
+              img.hidden = false;
+              if (x) x.hidden = false;
+              slot.classList.add('is-filled');
+            } else {
+              img.removeAttribute('src');
+              img.hidden = true;
+              if (x) x.hidden = true;
+              slot.classList.remove('is-filled');
+            }
+          });
+
+          // mark product tiles that are currently picked
+          var pickedVids = picks.reduce(function (m, p) { m[String(p.vid)] = true; return m; }, {});
+          prodBtns.forEach(function (b) {
+            if (pickedVids[b.dataset.vid]) b.classList.add('is-added');
+            else b.classList.remove('is-added');
+          });
+
+          var remaining = QTY - picks.length;
+          cta.disabled = remaining > 0;
+          ctaLbl.textContent = remaining > 0
+            ? ('Pick ' + remaining + ' more')
+            : ('Add bundle to cart · Rs. ' + (PRICE_C / 100).toFixed(0));
+
+          if (reset) reset.hidden = picks.length === 0;
+        }
+
+        function addPick(item, fromMethod) {
+          if (picks.length >= QTY) return false;
+          // prevent dup of same variant
+          for (var i = 0; i < picks.length; i++) if (String(picks[i].vid) === String(item.vid)) return false;
+          picks.push(item);
+          var slot = slots[picks.length - 1];
+          if (slot) {
+            slot.classList.add('pop');
+            setTimeout(function () { slot.classList.remove('pop'); }, 360);
+          }
+          fireEvent('picker_slot_filled', {
+            method: fromMethod || 'manual',
+            slot_index: picks.length - 1,
+            variant_id: item.vid,
+            product_id: item.pid
+          });
+          return true;
+        }
+
+        function removePickAt(idx) {
+          if (idx < 0 || idx >= picks.length) return;
+          var removed = picks[idx];
+          picks.splice(idx, 1);
+          if (FILL_METHOD === 'surprise') FILL_METHOD = 'mixed';
+          fireEvent('picker_slot_removed', {
+            slot_index: idx,
+            removed_variant_id: removed && removed.vid,
+            picks_remaining: picks.length,
+            qty_required: QTY
+          });
+          render();
+        }
+
+        function removePickByVid(vid) {
+          for (var i = 0; i < picks.length; i++) {
+            if (String(picks[i].vid) === String(vid)) { removePickAt(i); return true; }
+          }
+          return false;
+        }
+
+        // ── product tile clicks (add or toggle off) ──
+        grid.addEventListener('click', function (e) {
+          var btn = e.target.closest('[data-bpp-add]');
+          if (!btn) return;
+          var vid = btn.dataset.vid;
+          if (removePickByVid(vid)) return;  // already in bundle → remove
+          addPick({
+            vid: vid,
+            pid: btn.dataset.pid,
+            title: btn.dataset.title,
+            image: btn.dataset.img
+          }, 'manual');
+          render();
+        });
+
+        // ── slot × clicks ──
+        root.addEventListener('click', function (e) {
+          var x = e.target.closest('.bpp__slot-x');
+          if (!x) return;
+          var slot = x.closest('.bpp__slot');
+          removePickAt(parseInt(slot.dataset.slot, 10));
+        });
+
+        // ── reset ──
+        if (reset) {
+          reset.addEventListener('click', function () {
+            picks = [];
+            FILL_METHOD = 'manual';
+            fireEvent('picker_reset', {});
+            render();
+          });
+        }
+
+        // ── surprise me ──
+        sur.addEventListener('click', function () {
+          if (!POOL.length) { fireEvent('picker_surprise_empty_pool', { pool_size: 0 }); return; }
+          var need = QTY - picks.length;
+          if (need <= 0) return;
+
+          fireEvent('picker_surprise_click', {
+            need: need,
+            pool_size: POOL.length,
+            picks_already: picks.length
+          });
+
+          sur.disabled = true;
+          sur.classList.add('is-rolling');
+
+          // sample without repetition (also not already in picks)
+          var alreadyVids = picks.reduce(function (m, p) { m[String(p.vid)] = true; return m; }, {});
+          var pool = POOL.filter(function (p) { return !alreadyVids[String(p.vid)]; });
+          var finalPicks = [];
+          for (var i = 0; i < need; i++) {
+            if (!pool.length) { pool = POOL.slice(); }
+            var k = Math.floor(Math.random() * pool.length);
+            finalPicks.push(pool[k]);
+            pool.splice(k, 1);
+          }
+
+          var ticks = 0, maxTicks = 10, interval = 60;
+          function spin() {
+            if (ticks < maxTicks) {
+              for (var s = picks.length; s < QTY; s++) {
+                var rp = POOL[Math.floor(Math.random() * POOL.length)];
+                var slot = slots[s]; if (!slot || !rp) continue;
+                var img = slot.querySelector('.bpp__slot-img');
+                img.src = rp.img || ''; img.hidden = false;
+                slot.classList.add('is-filled', 'is-spinning');
+              }
+              ticks++;
+              setTimeout(spin, interval);
+              return;
+            }
+            slots.forEach(function (s) { s.classList.remove('is-spinning'); });
+            finalPicks.forEach(function (item) {
+              addPick({ vid: item.vid, pid: item.id, title: item.t, image: item.img }, 'surprise');
+            });
+            FILL_METHOD = FILL_METHOD === 'manual' && picks.length === QTY ? 'surprise' : 'mixed';
+            render();
+            sur.disabled = false;
+            sur.classList.remove('is-rolling');
+          }
+          setTimeout(spin, interval);
+        });
+
+        // ── add bundle to cart ──
+        cta.addEventListener('click', async function () {
+          if (picks.length < QTY) return;
+          cta.classList.add('is-loading');
+          ctaLbl.textContent = 'Adding…';
+
+          var ts = new Date().toISOString().slice(0, 19).replace('T', ' ');
+          var baseProps = {
+            _byob_pack: PACK,
+            _byob_source: 'bundle_picker_section',
+            _byob_origin: SRC.source,
+            _byob_method: FILL_METHOD,
+            _byob_at: ts
+          };
+          if (SRC.utm_source)   baseProps._byob_utm_source   = SRC.utm_source;
+          if (SRC.utm_medium)   baseProps._byob_utm_medium   = SRC.utm_medium;
+          if (SRC.utm_campaign) baseProps._byob_utm_campaign = SRC.utm_campaign;
+          if (SRC.ref)          baseProps._byob_ref          = SRC.ref;
+          if (SRC.host)         baseProps._byob_referrer_host = SRC.host;
+
+          var items = picks.map(function (p) {
+            return { id: Number(p.vid), quantity: 1, properties: baseProps };
+          });
+
+          fireEvent('bundle_added', {
+            qty: QTY,
+            bundle_price: PRICE_C / 100,
+            method: FILL_METHOD,
+            items: items.map(function (i) { return { variant_id: i.id, quantity: i.quantity }; })
+          });
+
+          var cartEl = document.querySelector('cart-drawer') || document.querySelector('cart-notification');
+          var sectionsParam = '';
+          if (cartEl && typeof cartEl.getSectionsToRender === 'function') {
+            sectionsParam = cartEl.getSectionsToRender().map(function (s) { return s.id; }).join(',');
+          }
+
+          try {
+            var body = { items: items };
+            if (sectionsParam) {
+              body.sections = sectionsParam;
+              body.sections_url = window.location.pathname;
+            }
+            var res = await fetch('/cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error('cart-add ' + res.status);
+            var added = await res.json();
+            try { sessionStorage.removeItem('byob_source'); } catch (_) {}
+            fireEvent('bundle_add_success', { qty: QTY, bundle_price: PRICE_C / 100, method: FILL_METHOD });
+
+            ctaLbl.textContent = 'Added ✓';
+            if (cartEl && typeof cartEl.renderContents === 'function' && added && added.sections) {
+              try { cartEl.renderContents(added); return; } catch (_) {}
+            }
+            var icon = document.querySelector('#cart-icon-bubble, [data-cart-icon], .header__icon--cart');
+            if (icon) { try { icon.click(); return; } catch (_) {} }
+            window.location.href = '/cart';
+          } catch (err) {
+            fireEvent('bundle_add_error', { error: String(err && err.message || err), method: FILL_METHOD });
+            ctaLbl.textContent = 'Try again';
+            cta.classList.remove('is-loading');
+            cta.disabled = false;
+          }
+        });
+
+        render();
+      });
+    })();
+  </script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Bundle pick & pack",
+  "tag": "section",
+  "class": "section-bundle-pick-and-pack",
+  "settings": [
+    { "type": "header", "content": "Bundle source" },
+    { "type": "collection", "id": "collection",   "label": "Source collection", "info": "Shoppers pick from this collection." },
+    { "type": "text",       "id": "pack_handle",  "label": "Pack handle (attribution)", "info": "Used as _byob_pack on every line item. Defaults to the source collection handle." },
+    { "type": "number",     "id": "quantity",     "label": "Quantity (Any N)", "default": 6 },
+    { "type": "number",     "id": "price",        "label": "Bundle price (Rs.)", "default": 199 },
+
+    { "type": "header",   "content": "Copy" },
+    { "type": "text",     "id": "eyebrow",       "label": "Eyebrow",        "default": "Mix & match" },
+    { "type": "text",     "id": "heading",       "label": "Heading",        "default": "Or build your own pack" },
+    { "type": "textarea", "id": "subheading",    "label": "Subheading",     "default": "Pick the ones you love. Pay one flat price." },
+    { "type": "text",     "id": "cta_label",     "label": "Add-to-cart label", "default": "Add bundle to cart" },
+    { "type": "text",     "id": "surprise_label","label": "Surprise button label", "default": "Surprise me" },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top",    "label": "Top padding",    "min": 0, "max": 100, "step": 4, "default": 32, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "default": 32, "unit": "px" }
+  ],
+  "presets": [
+    {
+      "name": "Bundle pick & pack",
+      "settings": {
+        "quantity": 6,
+        "price": 199,
+        "eyebrow": "Mix & match",
+        "heading": "Or build your own pack"
+      }
+    }
+  ]
+}
+{% endschema %}

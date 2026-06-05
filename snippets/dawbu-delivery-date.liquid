@@ -1,0 +1,102 @@
+{%- comment -%}
+  Snippet: dawbu-delivery-date
+  Movable PDP block — "Check Delivery Date" pincode widget.
+  Calls Openleaf rateCalculator API. Hard-coded token kept for parity with
+  the previous inline implementation; replace with settings.openleaf_api_token
+  when you wire it through theme settings.
+  Requires: product, block.
+{%- endcomment -%}
+
+<div class="edd-widget" data-product-id="{{ product.id }}" {{ block.shopify_attributes }}>
+  <label class="edd-label">{{ block.settings.label | default: 'Check Delivery Date' }}</label>
+
+  <div class="edd-input-row">
+    <input
+      type="text"
+      maxlength="6"
+      inputmode="numeric"
+      placeholder="{{ block.settings.placeholder | default: 'Enter Pincode' }}"
+      class="edd-pincode-input"
+    />
+
+    <button type="button" class="edd-check-btn button button--secondary">
+      <span>{{ block.settings.button_label | default: 'Check' }}</span>
+      {%- render 'loading-spinner' -%}
+    </button>
+  </div>
+
+  <div class="edd-result"></div>
+</div>
+
+<style>
+  .edd-widget { margin-top: 1.5rem; }
+  .edd-input-row { display: flex; gap: 8px; }
+  .edd-label { font-size: 14px; }
+  .edd-pincode-input {
+    flex: 1;
+    padding: 1.1rem;
+    border: 1px solid rgba(var(--color-foreground), 0.2);
+    border-radius: var(--buttons-radius);
+    font-size: 1.4rem;
+  }
+  .edd-check-btn { min-width: 90px; position: relative; }
+  .edd-check-btn .loading-spinner { display: none; }
+  .edd-check-btn.loading span { visibility: hidden; }
+  .edd-check-btn.loading .loading-spinner { display: inline-block; }
+  .edd-result { margin-top: 8px; font-size: 13px; }
+</style>
+
+<script>
+  (function () {
+    if (window.__dawbuEddBound) return;
+    window.__dawbuEddBound = true;
+    document.addEventListener('DOMContentLoaded', function () {
+      var widgets = document.querySelectorAll('.edd-widget');
+      if (!widgets.length) return;
+
+      var API_URL = 'https://api.openleaf.tech/api/v1/pricing/rateCalculator';
+      var OPENLEAF_TOKEN = '49a24bc7410a53e5d6fd1e75404a500b';
+
+      widgets.forEach(function (widget) {
+        var input  = widget.querySelector('.edd-pincode-input');
+        var button = widget.querySelector('.edd-check-btn');
+        var result = widget.querySelector('.edd-result');
+
+        button.addEventListener('click', async function () {
+          var pincode = (input.value || '').trim();
+          if (!/^\d{6}$/.test(pincode)) {
+            result.innerHTML = 'Please enter a valid 6-digit pincode';
+            return;
+          }
+          result.innerHTML = 'Checking delivery date...';
+          button.classList.add('loading');
+          button.disabled = true;
+          try {
+            var res = await fetch(API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OPENLEAF_TOKEN },
+              body: JSON.stringify({
+                pickup_pincode: 500011,
+                pincode: Number(pincode),
+                payment: 'prepaid',
+                weight: 400,
+                dimensions: { length: 10, breadth: 10, height: 10 }
+              })
+            });
+            var data = await res.json();
+            var rate = data && data.rates && data.rates[0];
+            if (!rate || !rate.edd) throw new Error();
+            result.innerHTML =
+              '🚚 <strong>Estimated Delivery:</strong> ' + rate.edd +
+              ' <small>via ' + (rate.carrier_name || '') + '</small>';
+          } catch (e) {
+            result.innerHTML = 'Delivery not available for this pincode';
+          } finally {
+            button.classList.remove('loading');
+            button.disabled = false;
+          }
+        });
+      });
+    });
+  })();
+</script>

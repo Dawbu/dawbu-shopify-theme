@@ -1,0 +1,167 @@
+{%- comment -%}
+  sections/byob-hub.liquid
+  BYOB landing page — a grid of pack cards, grouped by Family (Building Blocks /
+  Glow Minis / etc). Each card is a block edited from the theme editor sidebar.
+
+  Edit in theme editor:
+    • Add card  → "Add block" → "Pack card"
+    • Re-order  → drag the block
+    • Hide one  → click the eye icon
+    • Family    → set the same string on all cards that should group together;
+                  leave blank for an "Other" group at the bottom.
+{%- endcomment -%}
+
+{{ 'byob.css' | asset_url | stylesheet_tag }}
+
+<div class="byob" data-byob-hub>
+  <header class="byob__head">
+    <span class="byob__eyebrow">{{ section.settings.eyebrow }}</span>
+    <h2 class="byob__title">{{ section.settings.heading }}</h2>
+    {%- if section.settings.subheading != blank -%}
+      <p class="byob__sub">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+  </header>
+
+  {%- if section.blocks.size == 0 -%}
+
+    <div class="byob__empty">
+      <h3>No packs yet</h3>
+      <p>Click <strong>Add block → Pack card</strong> in the sidebar to add your first bundle.</p>
+    </div>
+
+  {%- else -%}
+
+    {%- comment -%} Collect families in block-order, de-duped. {%- endcomment -%}
+    {%- assign fam_seen = '' -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type != 'pack_card' -%}{%- continue -%}{%- endif -%}
+      {%- assign fam = block.settings.family | strip -%}
+      {%- if fam == blank -%}{%- continue -%}{%- endif -%}
+      {%- assign needle = '|' | append: fam | append: '|' -%}
+      {%- unless fam_seen contains needle -%}
+        {%- assign fam_seen = fam_seen | append: needle -%}
+      {%- endunless -%}
+    {%- endfor -%}
+
+    {%- assign families = fam_seen | split: '||' -%}
+
+    {%- comment -%} Render each named family group. {%- endcomment -%}
+    {%- for fam_raw in families -%}
+      {%- assign fam = fam_raw | replace: '|', '' | strip -%}
+      {%- if fam == blank -%}{%- continue -%}{%- endif -%}
+
+      <section class="byob__family">
+        <h3 class="byob__family-title">{{ fam }}</h3>
+        <ul class="byob__grid" role="list">
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'pack_card' -%}{%- continue -%}{%- endif -%}
+            {%- assign bfam = block.settings.family | strip -%}
+            {%- if bfam != fam -%}{%- continue -%}{%- endif -%}
+            {%- render 'dawbu-byob-card', block: block -%}
+          {%- endfor -%}
+        </ul>
+      </section>
+    {%- endfor -%}
+
+    {%- comment -%} Render any cards with no family — under a "More bundles" group. {%- endcomment -%}
+    {%- assign has_ungrouped = false -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'pack_card' and block.settings.family == blank -%}
+        {%- assign has_ungrouped = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- if has_ungrouped -%}
+      <section class="byob__family">
+        {%- if families.size > 1 -%}
+          <h3 class="byob__family-title">More bundles</h3>
+        {%- endif -%}
+        <ul class="byob__grid" role="list">
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'pack_card' -%}{%- continue -%}{%- endif -%}
+            {%- if block.settings.family != blank -%}{%- continue -%}{%- endif -%}
+            {%- render 'dawbu-byob-card', block: block -%}
+          {%- endfor -%}
+        </ul>
+      </section>
+    {%- endif -%}
+
+  {%- endif -%}
+</div>
+
+<script>
+  /* Stamps the "byob_source: hub" attribution so the next builder page knows
+     where the customer arrived from. One delegated listener for the whole hub.
+     Also fires byob:hub_view (once per page) + byob:hub_click (per pack) so the
+     hub speaks the same event language as the bridge / pack-card / mini surfaces. */
+  (function () {
+    if (window.__byobHubBound) return;
+    window.__byobHubBound = true;
+
+    function emit(name, payload) {
+      try { document.dispatchEvent(new CustomEvent('byob:' + name, { detail: payload || {} })); } catch (_) {}
+      if (window.dataLayer && window.dataLayer.push) {
+        window.dataLayer.push(Object.assign({ event: 'byob_' + name }, payload || {}));
+      }
+    }
+
+    function fireHubView() {
+      var hub = document.querySelector('[data-byob-hub]');
+      if (!hub || hub.__hubViewed) return;
+      hub.__hubViewed = true;
+      var cards = hub.querySelectorAll('.byob-card');
+      emit('hub_view', { surface: 'hub', pack_count: cards.length });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fireHubView);
+    } else {
+      fireHubView();
+    }
+
+    document.addEventListener('click', function (e) {
+      var card = e.target.closest && e.target.closest('[data-byob-hub] .byob-card');
+      if (!card) return;
+      var href = card.getAttribute('href') || '';
+      var pack = href.replace(/^.*\/pages\//, '').replace(/[?#].*$/, '');
+      try {
+        sessionStorage.setItem('byob_source', JSON.stringify({
+          source: 'hub',
+          pack: pack,
+          at: Date.now()
+        }));
+      } catch (_) {}
+      emit('hub_click', { surface: 'hub', pack_handle: pack });
+    }, true);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "BYOB Hub",
+  "tag": "section",
+  "settings": [
+    { "type": "text",     "id": "eyebrow",    "label": "Eyebrow",    "default": "Build Your Own Bundle" },
+    { "type": "text",     "id": "heading",    "label": "Heading",    "default": "Pick a pack. Fill it. Save more." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Mix and match across categories. The more you build, the more you save. Always free shipping above Rs. 150." }
+  ],
+  "blocks": [
+    {
+      "type": "pack_card",
+      "name": "Pack card",
+      "settings": [
+        { "type": "image_picker", "id": "image",    "label": "Image",            "info": "Square (1:1) works best. Recommended 600 × 600 px." },
+        { "type": "text",         "id": "title",    "label": "Title",            "default": "Pack name" },
+        { "type": "number",       "id": "quantity", "label": "Quantity (Any N)", "default": 6 },
+        { "type": "number",       "id": "price",    "label": "Bundle price (Rs.)", "default": 199 },
+        { "type": "url",          "id": "link",     "label": "Link",             "info": "Pick the pack page, e.g. /pages/mega-box." },
+        { "type": "text",         "id": "badge",    "label": "Badge",            "info": "Optional ribbon, e.g. MOST POPULAR." },
+        { "type": "text",         "id": "family",   "label": "Family",           "info": "Group label, e.g. Building Blocks. Leave blank for the More bundles group." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "BYOB Hub" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,225 @@
+{{ 'perfect-for-every-occasion.css' | asset_url | stylesheet_tag }}
+
+<section class="pfeo-section" id="section-{{ section.id }}" data-track-section="perfect_for_occasion">
+  <div class="pfeo-wrapper">
+    <!-- Header -->
+    <div class="pfeo-header">
+      <div class="pfeo-badge">
+        <span>{{ section.settings.badge_text }}</span>
+      </div>
+      <h2 class="pfeo-title">
+        {{ section.settings.heading_black }}
+        <span class="pfeo-title--red">{{ section.settings.heading_red }}</span>
+      </h2>
+    </div>
+
+    <!-- Swiper Slider -->
+    <div class="swiper pfeo-swiper">
+      <div class="swiper-wrapper">
+        {% for block in section.blocks %}
+          {% if block.type == 'occasion_item' %}
+            <div class="swiper-slide pfeo-slide" {{ block.shopify_attributes }}>
+              <a href="{{ block.settings.url }}">
+                <div class="pfeo-card">
+                  <div class="pfeo-image-wrap">
+                    {% if block.settings.image != blank %}
+                      {{
+                        block.settings.image
+                        | image_url: width: 400
+                        | image_tag: class: 'pfeo-img', loading: 'lazy', alt: block.settings.label
+                      }}
+                    {% else %}
+                      {{ 'image' | placeholder_svg_tag: 'pfeo-img pfeo-img--placeholder' }}
+                    {% endif %}
+                  </div>
+                  <div class="pfeo-info">
+                    <p class="pfeo-label">{{ block.settings.label }}</p>
+                    <p class="pfeo-price">{{ block.settings.price_text }}</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Navigation -->
+      <div class="swiper-button-prev pfeo-nav pfeo-nav--prev"></div>
+      <div class="swiper-button-next pfeo-nav pfeo-nav--next"></div>
+
+      <!-- Pagination -->
+      <div class="swiper-pagination pfeo-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Swiper JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    new Swiper('#section-{{ section.id }} .pfeo-swiper', {
+      loop: true,
+      grabCursor: true,
+      centeredSlides: false,
+      spaceBetween: 24,
+      navigation: {
+        nextEl: '#section-{{ section.id }} .pfeo-nav--next',
+        prevEl: '#section-{{ section.id }} .pfeo-nav--prev',
+      },
+      pagination: {
+        el: '#section-{{ section.id }} .pfeo-pagination',
+        clickable: true,
+      },
+      breakpoints: {
+        0: {
+          slidesPerView: 2,
+          spaceBetween: 16,
+          centeredSlides: true,
+        },
+        480: {
+          slidesPerView: 2.5,
+          spaceBetween: 16,
+          centeredSlides: false,
+        },
+        768: {
+          slidesPerView: 3,
+          spaceBetween: 20,
+        },
+        1024: {
+          slidesPerView: 4,
+          spaceBetween: 24,
+        },
+        1280: {
+          slidesPerView: 5,
+          spaceBetween: 24,
+        },
+      },
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Perfect For Occasion",
+  "tag": "section",
+  "class": "pfeo-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "QUICK ADD-ONS"
+    },
+    {
+      "type": "text",
+      "id": "heading_black",
+      "label": "Heading (Black Part)",
+      "default": "PERFECT FOR EVERY"
+    },
+    {
+      "type": "text",
+      "id": "heading_red",
+      "label": "Heading (Red Part)",
+      "default": "OCCASION"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Section Padding Top (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Section Padding Bottom (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "occasion_item",
+      "name": "Occasion Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Occasion Image"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "url"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Occasion Label",
+          "default": "Birthday"
+        },
+        {
+          "type": "text",
+          "id": "price_text",
+          "label": "Price Text",
+          "default": "Under ₹99"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Perfect For Occasion",
+      "blocks": [
+        {
+          "type": "occasion_item",
+          "settings": {
+            "label": "Birthday",
+            "price_text": "Under ₹99"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "label": "Return Gift",
+            "price_text": "Under ₹49"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "label": "School Rewards",
+            "price_text": "Under ₹79"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "label": "Housewarming Decor",
+            "price_text": "Under ₹129"
+          }
+        },
+        {
+          "type": "occasion_item",
+          "settings": {
+            "label": "Date night Gift",
+            "price_text": "Under ₹249 bundle"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

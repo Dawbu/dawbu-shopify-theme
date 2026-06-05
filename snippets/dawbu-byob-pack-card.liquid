@@ -1,0 +1,323 @@
+{%- comment -%}
+  snippet: dawbu-byob-pack-card
+  Compact PDP block — lists every BYOB pack the current product belongs to.
+  Each card shows: pack name · "Any N at ₹P" · 4 thumbnail previews ·
+  "Save up to X%" pill · CTA to the pack builder page.
+  Requires: product (passed from main-product.liquid).
+{%- endcomment -%}
+
+{%- if product == blank or product.id == blank -%}
+{%- else -%}
+  {%- assign pack_handles    = "build-craft-crate,mega-box,block-sets,master-builder-set,collectors-vault,glow-grab-bag,glow-mini-pack,glow-squad-bag,mini-starter-pack,mini-mates-pack,mini-figures,mini-heroes-pack,big-mini-figures,premium-minis" | split: "," -%}
+  {%- assign pack_titles     = "Build & Craft Crate|10-in-1 Mega Box|Block Sets|Master Builder Set|Collector's Vault|Glow Grab Bag|Glow Mini Pack|Glow Squad Bag|Mini Starter Pack|Mini Mates Pack|Mini Figures|Mini Heroes Pack|Big Mini Figures|Premium Minis" | split: "|" -%}
+  {%- assign pack_quantities = "6,6,6,6,6,25,14,11,9,7,6,6,6,6" | split: "," -%}
+  {%- assign pack_prices     = "390,450,735,849,1419,199,199,209,210,199,199,220,279,310" | split: "," -%}
+  {%- assign pack_collections= "byob-block-69,byob-block-79,byob-block-129,byob-block-149,byob-block-249,byob-mini-bulk,byob-mini-15,byob-mini-20,byob-mini-25,byob-mini-30,byob-mini-35,byob-mini-39,byob-mini-49,byob-mini-55" | split: "," -%}
+  {%- assign pack_badges     = "|MOST POPULAR||||VALUE||TRENDING|||||PREMIUM|" | split: "|" -%}
+
+  {%- assign pc_handles = ',' -%}
+  {%- for c in product.collections -%}
+    {%- assign pc_handles = pc_handles | append: c.handle | append: ',' -%}
+  {%- endfor -%}
+
+  {%- assign matching = '' -%}
+  {%- for phandle in pack_handles -%}
+    {%- assign pi = forloop.index0 -%}
+    {%- assign coll_handle = pack_collections[pi] -%}
+    {%- assign search = ',' | append: coll_handle | append: ',' -%}
+    {%- if pc_handles contains search -%}
+      {%- assign matching = matching | append: pi | append: '|' -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- assign matching_arr = matching | split: '|' -%}
+
+  {%- if matching_arr.size > 0 -%}
+    <div class="dawbu-pcards" {{ block.shopify_attributes }}>
+      <div class="dawbu-pcards__head">
+        <span class="dawbu-pcards__eyebrow">{{ block.settings.eyebrow | default: 'This product is part of' }}</span>
+        <span class="dawbu-pcards__count">{{ matching_arr.size }} pack{% if matching_arr.size > 1 %}s{% endif %}</span>
+      </div>
+
+      <ul class="dawbu-pcards__list" role="list">
+        {%- for pi_str in matching_arr -%}
+          {%- if pi_str == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign pi = pi_str | plus: 0 -%}
+          {%- assign p_handle = pack_handles[pi] -%}
+          {%- assign p_title  = pack_titles[pi] -%}
+          {%- assign p_qty    = pack_quantities[pi] | plus: 0 -%}
+          {%- assign p_price  = pack_prices[pi] | plus: 0 -%}
+          {%- assign p_badge  = pack_badges[pi] -%}
+          {%- assign p_coll   = collections[pack_collections[pi]] -%}
+
+          {%- comment -%} estimate savings: avg product price × qty vs bundle price {%- endcomment -%}
+          {%- assign sum_price = 0 -%}
+          {%- assign sample_count = 0 -%}
+          {%- for sp in p_coll.products limit: 8 -%}
+            {%- assign sum_price = sum_price | plus: sp.price -%}
+            {%- assign sample_count = sample_count | plus: 1 -%}
+          {%- endfor -%}
+          {%- if sample_count > 0 -%}
+            {%- assign avg = sum_price | divided_by: sample_count | divided_by: 100 -%}
+            {%- assign mrp = avg | times: p_qty -%}
+            {%- if mrp > p_price -%}
+              {%- assign save_pct = mrp | minus: p_price | times: 100 | divided_by: mrp -%}
+            {%- else -%}
+              {%- assign save_pct = 0 -%}
+            {%- endif -%}
+          {%- else -%}
+            {%- assign save_pct = 0 -%}
+          {%- endif -%}
+
+          <li>
+            <a class="dawbu-pcard" href="/pages/{{ p_handle }}"
+               data-pack-handle="{{ p_handle }}"
+               data-from-product-id="{{ product.id }}"
+               data-from-product-handle="{{ product.handle }}">
+              {%- if p_badge != blank -%}
+                <span class="dawbu-pcard__badge">{{ p_badge }}</span>
+              {%- endif -%}
+
+              <div class="dawbu-pcard__thumbs" aria-hidden="true">
+                {%- assign tn = 0 -%}
+                {%- for sp in p_coll.products limit: 4 -%}
+                  {%- if sp.featured_image -%}
+                    <span class="dawbu-pcard__thumb">
+                      {{ sp.featured_image | image_url: width: 80 | image_tag: loading: 'lazy', alt: '', class: 'dawbu-pcard__thumb-img' }}
+                    </span>
+                    {%- assign tn = tn | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- assign extra = p_coll.products_count | minus: tn -%}
+                {%- if extra > 0 -%}
+                  <span class="dawbu-pcard__thumb dawbu-pcard__thumb--more">+{{ extra }}</span>
+                {%- endif -%}
+              </div>
+
+              <div class="dawbu-pcard__body">
+                <h3 class="dawbu-pcard__name">{{ p_title }}</h3>
+                <div class="dawbu-pcard__meta">
+                  <span class="dawbu-pcard__qty">Any {{ p_qty }}</span>
+                  <span class="dawbu-pcard__dot">·</span>
+                  <span class="dawbu-pcard__price">Rs. {{ p_price }}</span>
+                  {%- if save_pct > 0 -%}
+                    <span class="dawbu-pcard__save">Save {{ save_pct }}%</span>
+                  {%- endif -%}
+                </div>
+              </div>
+
+              <span class="dawbu-pcard__cta" aria-hidden="true">
+                Build
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 5 7 7-7 7"/></svg>
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    <style>
+      .dawbu-pcards {
+        --dawbu-red: #e52227;
+        --dawbu-yellow: #faed17;
+        --dawbu-yellow-soft: #fff9c2;
+        --dawbu-black: #040202;
+        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        margin: 14px 0 18px;
+      }
+      .dawbu-pcards__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .dawbu-pcards__eyebrow {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        color: var(--dawbu-red);
+      }
+      .dawbu-pcards__count {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--dawbu-black);
+        background: var(--dawbu-yellow);
+        padding: 4px 10px;
+        border-radius: 999px;
+      }
+      .dawbu-pcards__list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+      }
+      .dawbu-pcard {
+        position: relative;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 12px 14px;
+        background: #fff;
+        border: 2px solid var(--dawbu-black);
+        border-radius: 14px;
+        text-decoration: none;
+        color: var(--dawbu-black);
+        transition: transform .15s ease, box-shadow .25s ease, border-color .2s ease, background .2s ease;
+      }
+      .dawbu-pcard:hover {
+        background: var(--dawbu-yellow-soft);
+        border-color: var(--dawbu-red);
+        box-shadow: 6px 6px 0 var(--dawbu-yellow);
+        transform: translateY(-2px);
+      }
+      .dawbu-pcard__badge {
+        position: absolute;
+        top: -8px;
+        left: 14px;
+        background: var(--dawbu-red);
+        color: var(--dawbu-yellow);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 999px;
+        box-shadow: 0 4px 12px rgba(229,34,39,.25);
+      }
+      .dawbu-pcard__thumbs {
+        display: inline-flex;
+        flex-shrink: 0;
+      }
+      .dawbu-pcard__thumb {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #f5f3ef;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px rgba(0,0,0,.08);
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--dawbu-red);
+        margin-left: -10px;
+      }
+      .dawbu-pcard__thumb:first-child { margin-left: 0; }
+      .dawbu-pcard__thumb-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .dawbu-pcard__thumb--more {
+        background: var(--dawbu-yellow);
+        color: var(--dawbu-black);
+      }
+      .dawbu-pcard__body { min-width: 0; }
+      .dawbu-pcard__name {
+        margin: 0 0 3px;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.25;
+        letter-spacing: -.005em;
+        color: var(--dawbu-black);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: inherit;
+      }
+      .dawbu-pcard__meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        flex-wrap: wrap;
+      }
+      .dawbu-pcard__qty,
+      .dawbu-pcard__price {
+        font-weight: 700;
+        color: var(--dawbu-black);
+      }
+      .dawbu-pcard__price { color: var(--dawbu-red); }
+      .dawbu-pcard__dot { color: #999; }
+      .dawbu-pcard__save {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        background: var(--dawbu-red);
+        color: var(--dawbu-yellow);
+        padding: 3px 8px;
+        border-radius: 999px;
+        margin-left: 4px;
+      }
+      .dawbu-pcard__cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--dawbu-red);
+        flex-shrink: 0;
+        transition: transform .25s cubic-bezier(.22,1,.36,1);
+      }
+      .dawbu-pcard:hover .dawbu-pcard__cta { transform: translateX(4px); }
+      @media (max-width: 560px) {
+        .dawbu-pcard { padding: 10px 12px; gap: 10px; grid-template-columns: auto 1fr auto; }
+        /* One less circle on mobile — drop the 4th product thumb (keeps the +N badge if present) */
+        .dawbu-pcard__thumbs .dawbu-pcard__thumb:nth-child(4):not(.dawbu-pcard__thumb--more) { display: none; }
+        .dawbu-pcard__thumb { width: 28px; height: 28px; margin-left: -8px; border-width: 1.5px; font-size: 10px; }
+        .dawbu-pcard__name { font-size: 13px; margin-bottom: 1px; }
+        .dawbu-pcard__meta { font-size: 11px; gap: 5px; }
+        .dawbu-pcard__save { font-size: 9px; padding: 2px 6px; }
+        .dawbu-pcard__cta { font-size: 11px; gap: 4px; }
+        .dawbu-pcard__cta svg { width: 12px; height: 12px; }
+        .dawbu-pcard__badge { font-size: 8px; padding: 2px 6px; top: -7px; left: 10px; }
+      }
+    </style>
+
+    <script>
+      /* Tracks clicks on the "This product is part of … Build →" pack cards.
+         Fires the same byob:* event the bridge banner uses + stamps sessionStorage
+         so the destination builder page picks up source=pdp_pack_card. */
+      (function () {
+        if (window.__dawbuPackCardBound) return;
+        window.__dawbuPackCardBound = true;
+        document.addEventListener('click', function (e) {
+          var card = e.target.closest && e.target.closest('.dawbu-pcard');
+          if (!card) return;
+          var pack = card.getAttribute('data-pack-handle') || '';
+          var fromId = card.getAttribute('data-from-product-id') || '';
+          var fromHandle = card.getAttribute('data-from-product-handle') || '';
+          var payload = {
+            surface: 'pdp_pack_card',
+            pack_handle: pack,
+            anchor_product_id: fromId,
+            anchor_product_handle: fromHandle
+          };
+          try {
+            sessionStorage.setItem('byob_source', JSON.stringify({
+              source: 'pdp_pack_card',
+              product_id: fromId,
+              product_handle: fromHandle,
+              pack: pack,
+              at: Date.now()
+            }));
+          } catch (_) {}
+          try { document.dispatchEvent(new CustomEvent('byob:pack_card_click', { detail: payload })); } catch (_) {}
+          if (window.dataLayer && window.dataLayer.push) {
+            window.dataLayer.push(Object.assign({ event: 'byob_pack_card_click' }, payload));
+          }
+        }, true);
+      })();
+    </script>
+  {%- endif -%}
+{%- endif -%}

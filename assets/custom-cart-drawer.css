@@ -1,0 +1,68 @@
+/* Custom Cart Drawer Styles */
+
+/* Remove black overlay */
+.cart-drawer__overlay {
+  background-color: transparent !important;
+}
+
+/* Make cart drawer appear from the side */
+.drawer {
+  background-color: transparent;
+}
+
+.drawer__inner {
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+  height: 100%;
+  width: 35rem;
+  max-width: 100vw;
+  background-color: #fff;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  border-left: 1px solid rgba(var(--color-foreground), 0.1);
+  border-right: none;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.drawer.active .drawer__inner {
+  transform: translateX(0);
+}
+
+/* Improve cart drawer styling */
+.drawer__header {
+  border-bottom: 1px solid rgba(var(--color-foreground), 0.1);
+  padding: 1.5rem 1rem;
+}
+
+.drawer__close {
+  top: 1.2rem;
+  right: 1rem;
+}
+
+/* Cart item styling */
+.cart-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(var(--color-foreground), 0.1);
+}
+
+/* Cart footer styling */
+.drawer__footer {
+  background-color: #fff;
+  border-top: 1px solid rgba(var(--color-foreground), 0.1);
+  padding: 1.5rem 1rem;
+}
+
+/* Ensure drawer content scrolls independently */
+.drawer__inner {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+cart-drawer-items {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}

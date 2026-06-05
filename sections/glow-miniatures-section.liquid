@@ -1,0 +1,399 @@
+{% comment %}
+  Section: Glow Miniatures Product Grid
+  - Desktop: configurable column grid
+  - Mobile: edge-to-edge horizontal scroller with small nav arrows + optional autoplay
+{% endcomment %}
+
+<section
+  class="glow-miniatures-section"
+  id="glow-miniatures-{{ section.id }}"
+  data-track-section="glow_miniatures_top"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-autoplay-speed="{{ section.settings.autoplay_speed }}"
+>
+  <div class="glow-miniatures__wrapper">
+    {% if section.settings.section_title != blank %}
+      <h2 class="glow-miniatures__heading">{{ section.settings.section_title }}</h2>
+    {% endif %}
+
+    <div class="glow-miniatures__track-outer">
+      {% if section.settings.show_arrows %}
+        <button class="glow-miniatures__nav glow-miniatures__nav--prev" type="button" aria-label="Previous" data-gm-prev>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="glow-miniatures__nav glow-miniatures__nav--next" type="button" aria-label="Next" data-gm-next>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      {% endif %}
+
+      <ul class="glow-miniatures__track" role="list">
+        {% for block in section.blocks %}
+          {% if block.type == 'product_item' %}
+            <li class="glow-miniatures__item" {{ block.shopify_attributes }}>
+              <a
+                class="glow-miniatures__link"
+                href="{% if block.settings.product != blank %}{{ block.settings.product.url }}{% else %}#{% endif %}"
+                aria-label="{{ block.settings.label | default: block.settings.product.title | escape }}"
+              >
+                <div class="glow-miniatures__circle">
+                  {% if block.settings.custom_image != blank %}
+                    <img class="glow-miniatures__img" src="{{ block.settings.custom_image | image_url: width: 300 }}" alt="{{ block.settings.label | default: block.settings.product.title | escape }}" width="300" height="300" loading="lazy">
+                  {% elsif block.settings.product != blank and block.settings.product.featured_image != blank %}
+                    <img class="glow-miniatures__img" src="{{ block.settings.product.featured_image | image_url: width: 300 }}" alt="{{ block.settings.product.featured_image.alt | escape }}" width="300" height="300" loading="lazy">
+                  {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'glow-miniatures__placeholder' }}
+                  {% endif %}
+                </div>
+                <span class="glow-miniatures__label">
+                  {{ block.settings.label | default: block.settings.product.title }}
+                </span>
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  #glow-miniatures-{{ section.id }} {
+    --gm-bg: {{ section.settings.background_color }};
+    --gm-circle-bg: {{ section.settings.circle_bg_color }};
+    --gm-label-color: {{ section.settings.label_color }};
+    --gm-label-size: {{ section.settings.label_font_size }}px;
+    --gm-item-gap: {{ section.settings.item_gap }}px;
+    --gm-mobile-gap: {{ section.settings.mobile_item_gap }}px;
+    --gm-circle-size: {{ section.settings.circle_size }}px;
+
+    background: var(--gm-bg);
+    padding: {{ section.settings.section_padding_top }}px {{ section.settings.section_padding_side }}px {{ section.settings.section_padding_bottom }}px;
+  }
+
+  .glow-miniatures__wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .glow-miniatures__heading {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gm-label-color);
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+
+  /* ── Desktop grid ── */
+  .glow-miniatures__track-outer { position: relative; }
+  .glow-miniatures__track {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.desktop_columns }}, 1fr);
+    gap: var(--gm-item-gap);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .glow-miniatures__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .glow-miniatures__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    gap: 12px;
+    transition: transform 0.22s ease;
+  }
+  .glow-miniatures__link:hover { transform: translateY(-4px); }
+  .glow-miniatures__circle {
+    width: var(--gm-circle-size);
+    height: var(--gm-circle-size);
+    border-radius: 18px;
+    background: var(--gm-circle-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    transition: box-shadow 0.22s ease, transform 0.22s ease;
+  }
+  .glow-miniatures__link:hover .glow-miniatures__circle { box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .glow-miniatures__img,
+  .glow-miniatures__placeholder {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .glow-miniatures__label {
+    font-size: var(--gm-label-size);
+    color: var(--gm-label-color);
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    width: 100%;
+    max-width: calc(var(--gm-circle-size) + 24px);
+    padding: 0 2px;
+    margin-bottom: 6px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Small nav arrows (both desktop + mobile) ── */
+  .glow-miniatures__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.96);
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: grid;
+    place-items: center;
+    color: #121212;
+    cursor: pointer;
+    z-index: 5;
+    transition: opacity .2s, transform .15s, background .15s;
+    padding: 0;
+    font-family: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .glow-miniatures__nav:hover { background: #fff; }
+  .glow-miniatures__nav:active { transform: translateY(-50%) scale(0.92); }
+  .glow-miniatures__nav[disabled],
+  .glow-miniatures__nav.is-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+  .glow-miniatures__nav--prev { left: 4px; }
+  .glow-miniatures__nav--next { right: 4px; }
+
+  /* ── Mobile: edge-to-edge tight scroller ── */
+  @media (max-width: 749px) {
+    #glow-miniatures-{{ section.id }} {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .glow-miniatures__heading { padding: 0 16px; margin-bottom: 14px; }
+    .glow-miniatures__wrapper { margin: 0; padding: 0; max-width: 100%; }
+    .glow-miniatures__track-outer { overflow: hidden; position: relative; }
+    .glow-miniatures__track {
+      display: flex;
+      grid-template-columns: unset;
+      gap: var(--gm-mobile-gap);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0 12px 8px 0;
+      cursor: grab;
+      overscroll-behavior-x: contain;
+    }
+    .glow-miniatures__track::-webkit-scrollbar { display: none; }
+    .glow-miniatures__track.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+    .glow-miniatures__item {
+      flex: 0 0 auto;
+      width: {{ section.settings.mobile_item_width }}px;
+      scroll-snap-align: start;
+    }
+    .glow-miniatures__link { gap: 8px; width: 100%; }
+    .glow-miniatures__circle {
+      width: {{ section.settings.mobile_circle_size }}px;
+      height: {{ section.settings.mobile_circle_size }}px;
+      border-radius: 14px;
+    }
+    .glow-miniatures__label {
+      font-size: max(var(--gm-label-size), 12px);
+      max-width: 100%;
+      margin-bottom: 4px;
+      line-height: 1.25;
+    }
+    .glow-miniatures__link:active .glow-miniatures__circle { transform: scale(0.96); }
+
+    /* smaller, tighter arrows on mobile */
+    .glow-miniatures__nav { width: 24px; height: 24px; }
+    .glow-miniatures__nav--prev { left: 6px; }
+    .glow-miniatures__nav--next { right: 6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow-miniatures__link,
+    .glow-miniatures__circle,
+    .glow-miniatures__nav { transition: none !important; }
+  }
+</style>
+
+<script>
+  (function () {
+    var section = document.getElementById('glow-miniatures-{{ section.id }}');
+    if (!section) return;
+
+    var track = section.querySelector('.glow-miniatures__track');
+    var items = section.querySelectorAll('.glow-miniatures__item');
+    var prevBtn = section.querySelector('[data-gm-prev]');
+    var nextBtn = section.querySelector('[data-gm-next]');
+
+    if (!track) return;
+
+    function stepSize() {
+      var w = items[0] ? items[0].offsetWidth : 0;
+      var gap = parseInt(getComputedStyle(track).gap, 10) || 0;
+      return w + gap;
+    }
+
+    function updateArrowState() {
+      if (!prevBtn || !nextBtn) return;
+      var atStart = track.scrollLeft <= 2;
+      var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+      prevBtn.classList.toggle('is-disabled', atStart);
+      nextBtn.classList.toggle('is-disabled', atEnd);
+    }
+    updateArrowState();
+    track.addEventListener('scroll', updateArrowState, { passive: true });
+    window.addEventListener('resize', updateArrowState);
+
+    /* arrows */
+    if (prevBtn) prevBtn.addEventListener('click', function () {
+      stopAuto();
+      track.scrollBy({ left: -stepSize(), behavior: 'smooth' });
+      scheduleResume();
+    });
+    if (nextBtn) nextBtn.addEventListener('click', function () {
+      stopAuto();
+      track.scrollBy({ left: stepSize(), behavior: 'smooth' });
+      scheduleResume();
+    });
+
+    /* mouse-drag scroll (kept from original) */
+    var isDragging = false, startX = 0, scrollStart = 0;
+    track.addEventListener('mousedown', function (e) {
+      isDragging = true;
+      startX = e.pageX;
+      scrollStart = track.scrollLeft;
+      track.classList.add('is-dragging');
+      stopAuto();
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      track.scrollLeft = scrollStart - (e.pageX - startX);
+    });
+    document.addEventListener('mouseup', function () {
+      if (!isDragging) return;
+      isDragging = false;
+      track.classList.remove('is-dragging');
+      scheduleResume();
+    });
+
+    /* ── auto-scroll ── */
+    var autoplay = section.getAttribute('data-autoplay') === 'true';
+    var speed = parseFloat(section.getAttribute('data-autoplay-speed')) || 3.5;
+    var autoTimer = null;
+    var resumeTimer = null;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function startAuto() {
+      if (!autoplay || reduced || autoTimer || items.length <= 1) return;
+      autoTimer = setInterval(function () {
+        if (document.hidden) return;
+        var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+        if (atEnd) {
+          track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          track.scrollBy({ left: stepSize(), behavior: 'smooth' });
+        }
+      }, speed * 1000);
+    }
+    function stopAuto() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+    function scheduleResume() {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(startAuto, 4000);
+    }
+
+    /* pause on user touch / wheel */
+    ['touchstart', 'wheel'].forEach(function (ev) {
+      track.addEventListener(ev, function () { stopAuto(); scheduleResume(); }, { passive: true });
+    });
+    /* pause when section is offscreen, resume when visible */
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) startAuto(); else stopAuto();
+        });
+      }, { threshold: 0.2 });
+      io.observe(section);
+    } else {
+      startAuto();
+    }
+    /* pause on hover for desktop */
+    section.addEventListener('mouseenter', stopAuto);
+    section.addEventListener('mouseleave', scheduleResume);
+    /* pause when tab loses focus */
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stopAuto(); else startAuto();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Glow Miniatures",
+  "tag": "section",
+  "class": "glow-miniatures-section-wrapper",
+  "settings": [
+    { "type": "text", "id": "section_title", "label": "Section Heading" },
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "desktop_columns", "label": "Desktop columns", "min": 2, "max": 8, "step": 1, "default": 5 },
+    { "type": "range", "id": "circle_size", "label": "Circle size (desktop, px)", "min": 80, "max": 280, "step": 4, "default": 160 },
+    { "type": "range", "id": "mobile_circle_size", "label": "Circle size (mobile, px)", "min": 60, "max": 200, "step": 4, "default": 108 },
+    { "type": "range", "id": "mobile_item_width", "label": "Item width (mobile, px)", "min": 80, "max": 200, "step": 4, "default": 124 },
+    { "type": "range", "id": "item_gap", "label": "Gap between items, desktop (px)", "min": 4, "max": 60, "step": 2, "default": 16 },
+    { "type": "range", "id": "mobile_item_gap", "label": "Gap between items, mobile (px)", "min": 0, "max": 24, "step": 1, "default": 6 },
+    { "type": "range", "id": "label_font_size", "label": "Label font size (px)", "min": 10, "max": 24, "step": 1, "default": 13 },
+    { "type": "header", "content": "Section spacing" },
+    { "type": "range", "id": "section_padding_top", "label": "Section padding top (px)", "min": 0, "max": 120, "step": 4, "default": 32 },
+    { "type": "range", "id": "section_padding_bottom", "label": "Section padding bottom (px)", "min": 0, "max": 120, "step": 4, "default": 32 },
+    { "type": "range", "id": "section_padding_side", "label": "Section padding sides, desktop (px)", "min": 0, "max": 80, "step": 4, "default": 16 },
+    { "type": "range", "id": "max_width", "label": "Max content width (px)", "min": 600, "max": 1600, "step": 20, "default": 1200 },
+    { "type": "header", "content": "Auto-scroll" },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto-scroll on mobile", "default": true },
+    { "type": "range", "id": "autoplay_speed", "label": "Seconds between slides", "min": 1, "max": 10, "step": 0.5, "default": 3.5, "unit": "s" },
+    { "type": "checkbox", "id": "show_arrows", "label": "Show prev / next arrows", "default": true },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Section background", "default": "#ffffff" },
+    { "type": "color", "id": "circle_bg_color", "label": "Circle background", "default": "#f5f9e6" },
+    { "type": "color", "id": "label_color", "label": "Label text color", "default": "#1a1a1a" }
+  ],
+  "blocks": [
+    {
+      "type": "product_item",
+      "name": "Product Item",
+      "settings": [
+        { "type": "collection", "id": "product", "label": "Collection" },
+        { "type": "image_picker", "id": "custom_image", "label": "Custom image (overrides product image)" },
+        { "type": "text", "id": "label", "label": "Label (overrides product title)", "default": "Glow Miniatures" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Glow Miniatures",
+      "blocks": [
+        { "type": "product_item", "settings": { "label": "Glow Miniatures" } },
+        { "type": "product_item", "settings": { "label": "Glow Miniatures" } },
+        { "type": "product_item", "settings": { "label": "Glow Miniatures" } },
+        { "type": "product_item", "settings": { "label": "Glow Miniatures" } },
+        { "type": "product_item", "settings": { "label": "Glow Miniatures" } }
+      ]
+    }
+  ],
+  "max_blocks": 20
+}
+{% endschema %}

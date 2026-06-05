@@ -1,0 +1,34 @@
+{% comment %}
+  Dawbu quantity chips
+  --------------------
+  Renders 1 / 2 / 4 / 8 chips plus a custom number input (max 20).
+  Sits ABOVE an existing `input[name="quantity"]` — clicking a chip
+  updates that input and dispatches input + change events so all
+  existing cart-sync logic keeps working.
+
+  Params:
+    target_input_id (optional) — id of the existing quantity input to drive
+    compact (optional) — render at smaller scale
+{% endcomment %}
+<div
+  class="dqc{% if compact %} dqc--compact{% endif %}"
+  data-dqc
+  {% if target_input_id %}data-dqc-target="{{ target_input_id }}"{% endif %}
+>
+  <div class="dqc__row" role="radiogroup" aria-label="Quantity">
+    <button type="button" class="dqc__chip is-active" data-qty="1" aria-pressed="true">1</button>
+    <button type="button" class="dqc__chip" data-qty="2" aria-pressed="false">2</button>
+    <button type="button" class="dqc__chip" data-qty="4" aria-pressed="false">4</button>
+    <button type="button" class="dqc__chip" data-qty="8" aria-pressed="false">8</button>
+    <input
+      type="number"
+      class="dqc__custom"
+      min="1"
+      max="20"
+      step="1"
+      placeholder="Qty"
+      aria-label="Custom quantity (max 20)"
+      inputmode="numeric"
+    >
+  </div>
+</div>

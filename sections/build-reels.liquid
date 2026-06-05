@@ -1,0 +1,636 @@
+{% comment %}
+  Section: LEGO - See What People Build (Video Reels)
+  Dependencies: Swiper JS (loaded via CDN)
+{% endcomment %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<section class="build-reels-section" id="build-reels-{{ section.id }}" data-track-section="build_reels">
+  <div class="build-reels-inner">
+    <div class="build-reels-header-grid">
+      <div class="build-reels-header">
+        {%- if section.settings.badge_text != blank -%}
+          <div class="build-reels-badge">{{ section.settings.badge_text }}</div>
+        {%- endif -%}
+
+        <h2 class="build-reels-title">
+          {{ section.settings.heading_line1 }}
+          <span class="build-reels-title__highlight">{{ section.settings.heading_line2 }}</span>
+        </h2>
+      </div>
+      {%- if section.settings.cta_text != blank and section.settings.cta_url != blank -%}
+        <a href="{{ section.settings.cta_url }}" class="build-reels-cta"> {{ section.settings.cta_text }} &rarr; </a>
+      {%- endif -%}
+    </div>
+
+    <div class="build-reels-slider-wrap">
+      <div class="swiper build-reels-swiper">
+        <div class="swiper-wrapper">
+          {%- for block in section.blocks -%}
+            <div class="swiper-slide build-reel-slide" {{ block.shopify_attributes }}>
+              <div
+                class="build-reel-card"
+                data-reel-index="{{ forloop.index0 }}"
+                data-video-type="{% if block.settings.video_url contains 'youtube' or block.settings.video_url contains 'youtu.be' %}youtube{% elsif block.settings.video_url contains 'vimeo' %}vimeo{% else %}mp4{% endif %}"
+              >
+                <div class="build-reel-media-wrap">
+                  <div class="build-reel-video-container">
+                    {%- if block.settings.video_url contains 'youtube'
+                      or block.settings.video_url contains 'youtu.be'
+                    -%}
+                      <iframe
+                        class="build-reel-iframe"
+                        src=""
+                        data-src="{{ block.settings.video_url | replace: 'watch?v=', 'embed/' | replace: 'youtu.be/', 'www.youtube.com/embed/' }}?autoplay=1&rel=0&mute=1&enablejsapi=1"
+                        allow="autoplay; fullscreen"
+                        frameborder="0"
+                      ></iframe>
+                    {%- elsif block.settings.video_url contains 'vimeo' -%}
+                      <iframe
+                        class="build-reel-iframe"
+                        src=""
+                        data-src="{{ block.settings.video_url | replace: 'vimeo.com/', 'player.vimeo.com/video/' }}?autoplay=1&muted=1"
+                        allow="autoplay; fullscreen"
+                        frameborder="0"
+                      ></iframe>
+                    {%- elsif block.settings.video_mp4 != blank -%}
+                      <video class="build-reel-mp4" playsinline loop muted autoplay>
+                        <source src="{{ block.settings.video_mp4 }}" type="video/mp4">
+                      </video>
+                    {%- endif -%}
+                  </div>
+
+                  {% comment %} <button class="build-reel-play-overlay" aria-label="Play video">
+                    <span class="build-reel-play-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5.14v14l11-7-11-7z"/>
+                      </svg>
+                    </span>
+                  </button> {% endcomment %}
+                </div>
+
+                {%- if block.settings.title != blank -%}
+                  <div class="build-reel-label">{{ block.settings.title }}</div>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        <div class="swiper-button-prev build-reels-prev"></div>
+        <div class="swiper-button-next build-reels-next"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{%- comment -%} ── Fullscreen reels viewer (Instagram-style) ── {%- endcomment -%}
+<div class="reels-viewer" id="reels-viewer-{{ section.id }}" aria-hidden="true">
+  <button class="reels-viewer__close" type="button" aria-label="Close" data-reels-close>
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <button class="reels-viewer__mute" type="button" aria-label="Toggle sound" data-reels-mute>
+    <svg class="rv-icon-mute" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/><path d="M14 4l6 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg class="rv-icon-unmute" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="display:none"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54z"/></svg>
+  </button>
+  <div class="swiper reels-viewer__swiper">
+    <div class="swiper-wrapper">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign products_count = 0
+          if block.settings.product_1 != blank
+            assign products_count = products_count | plus: 1
+          endif
+          if block.settings.product_2 != blank
+            assign products_count = products_count | plus: 1
+          endif
+          if block.settings.product_3 != blank
+            assign products_count = products_count | plus: 1
+          endif
+        -%}
+        <div class="swiper-slide reels-viewer__slide" data-reel-idx="{{ forloop.index0 }}">
+          <div class="reels-viewer__stage">
+          <div class="reels-viewer__media">
+            {%- if block.settings.video_url contains 'youtube' or block.settings.video_url contains 'youtu.be' -%}
+              <iframe class="rv-iframe" data-src="{{ block.settings.video_url | replace: 'watch?v=', 'embed/' | replace: 'youtu.be/', 'www.youtube.com/embed/' }}?autoplay=0&rel=0&playsinline=1&enablejsapi=1" allow="autoplay; fullscreen" frameborder="0"></iframe>
+            {%- elsif block.settings.video_url contains 'vimeo' -%}
+              <iframe class="rv-iframe" data-src="{{ block.settings.video_url | replace: 'vimeo.com/', 'player.vimeo.com/video/' }}?autoplay=0&muted=1" allow="autoplay; fullscreen" frameborder="0"></iframe>
+            {%- elsif block.settings.video_mp4 != blank -%}
+              <video class="rv-mp4" playsinline loop muted preload="metadata" data-src="{{ block.settings.video_mp4 }}"></video>
+            {%- endif -%}
+          </div>
+
+          {%- if block.settings.title != blank -%}
+            <div class="reels-viewer__title">{{ block.settings.title }}</div>
+          {%- endif -%}
+
+          {%- if products_count > 0 -%}
+            <div class="reels-viewer__products">
+              <div class="rv-products-track">
+                {%- for n in (1..3) -%}
+                  {%- assign product_setting = 'product_' | append: n -%}
+                  {%- assign p = block.settings[product_setting] -%}
+                  {%- if p != blank -%}
+                    {%- assign variant = p.selected_or_first_available_variant -%}
+                    <div class="rv-product" data-track-source="build_reels_viewer">
+                      <a class="rv-product__media" href="{{ p.url }}" data-track-click="reel_product_click" data-track-params='{"product":"{{ p.handle }}"}'>
+                        {%- if p.featured_image != blank -%}
+                          <img src="{{ p.featured_image | image_url: width: 200 }}" alt="{{ p.featured_image.alt | escape }}" loading="lazy" width="200" height="200">
+                        {%- endif -%}
+                      </a>
+                      <div class="rv-product__info">
+                        <a class="rv-product__title" href="{{ p.url }}">{{ p.title }}</a>
+                        <div class="rv-product__price">
+                          {%- if variant.compare_at_price > variant.price -%}
+                            <span class="rv-product__sale">{{ variant.price | money }}</span>
+                            <span class="rv-product__compare">{{ variant.compare_at_price | money }}</span>
+                          {%- else -%}
+                            <span class="rv-product__sale">{{ variant.price | money }}</span>
+                          {%- endif -%}
+                        </div>
+                      </div>
+                      <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" class="rv-product__form" data-track-source="build_reels_viewer">
+                        <input type="hidden" name="id" value="{{ variant.id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit"
+                          class="rv-product__atc"
+                          {% unless variant.available %}disabled aria-disabled="true" data-available="false"{% endunless %}
+                          aria-label="Add {{ p.title | escape }} to cart"
+                        >
+                          {% if variant.available %}Add{% else %}Sold out{% endif %}
+                        </button>
+                      </form>
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+
+          <div class="reels-viewer__progress" aria-hidden="true">
+            <div class="rv-progress__bar"></div>
+          </div>
+          </div>{%- comment -%} /reels-viewer__stage {%- endcomment -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+<div class="build-reels-animate-text">
+  <svg class="bg-svg" width="1921" height="145" viewBox="0 0 1921 145" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M74.298 103.222C44 91.4915 12 93.3012 0 93.3012L1 0H1921V116.515C1839.56 107.4 1741 112.888 1711.29 116.515C1639.27 125.306 1515.89 145 1479.18 145C1371.27 145 1308.15 133.438 1220.6 53.6795C1159.52 -7.08876 1122.87 -7.08873 1031.24 87.8616C937.935 184.56 807.5 133.89 764.521 95.6258C692.852 31.8192 600 72.7821 556.843 95.6258C498.49 126.513 380.385 141.835 328.805 143.101C205.013 152.216 107.5 116.076 74.298 103.222Z" fill="{{ section.settings.bg_color }}"/>
+  </svg>
+  <svg
+    viewBox="0 0 1921 240"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    xml:space="preserve"
+    preserveAspectRatio="xMidYMid slice"
+  >
+    <defs><path id="buildReelsPath-{{ section.id }}" d="M1.46924 143.06C13.4692 143.06 46.4692 150.385 76.7672 162.115C109.969 174.969 207.482 211.109 331.274 201.994C382.854 200.728 500.959 185.406 559.312 154.519C602.469 131.675 698.469 96.0603 763.469 143.06C820.43 184.248 935.469 238.56 1012.97 143.06C1096.11 40.6047 1177.89 49.2917 1238.97 110.06C1326.52 189.818 1373.73 203.893 1481.65 203.893C1518.36 203.893 1641.74 187.199 1713.76 178.408C1743.47 174.781 1841.03 166.293 1922.47 175.408" stroke="white" stroke-width="130"/></defs>
+    <path d="M143.524 108.632C57.1951 64.5746 12.5376 56.0923 1 57.3583L0 188.301C12 188.301 44 186.492 74.298 198.222C107.5 211.077 205.013 247.216 328.805 238.101C380.385 236.835 498.49 221.513 556.843 190.626C600 167.782 692.852 126.819 764.521 190.626C807.5 228.89 937.935 279.56 1031.24 182.862C1122.87 87.9113 1159.52 87.9113 1220.6 148.68C1308.15 228.438 1371.27 240 1479.18 240C1515.89 240 1639.27 220.306 1711.29 211.515C1741 207.888 1839.56 202.4 1921 211.515V108.632H1764.22C1723 108.632 1614 128.377 1562.65 135.218C1528.45 139.776 1480.53 137.117 1460.85 135.218C1387.55 136.738 1332.58 102.134 1314.26 79.979C1247.47 13.1339 1168.34 -1.04544 1137.12 0.220506C1065.45 -4.33711 990.523 62.8877 962.018 97.0699C921.297 160.877 826.96 110.531 784.881 82.0452C692.037 27.3538 586.026 59.2572 544.627 82.0452C510.421 100.276 461.148 114.961 440.788 120.025C281.161 150.41 176.101 125.09 143.524 108.632Z" fill="#FAED17"/>
+    {% capture marquee_text %}{{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% endcapture %}
+    <text class="buildReels-curved-text-svg" fill="#E52227"><textPath xlink:href="#buildReelsPath-{{ section.id }}" startOffset="0%" textLength="100%" lengthAdjust="spacing">{{ marquee_text }}<animate attributeName="startOffset" from="0%" to="-100%" dur="20s" repeatCount="indefinite" /></textPath></text>
+    <text class="buildReels-curved-text-svg" fill="#E52227"><textPath xlink:href="#buildReelsPath-{{ section.id }}" startOffset="100%" textLength="100%" lengthAdjust="spacing">{{ marquee_text }}<animate attributeName="startOffset" from="100%" to="0%" dur="20s" repeatCount="indefinite" /></textPath></text>
+  </svg>
+</div>
+
+<style>
+    #build-reels-{{ section.id }} {
+      --reel-bg: {{ section.settings.bg_color }};
+      --reel-heading: {{ section.settings.heading_color }};
+      --reel-highlight: {{ section.settings.highlight_color }};
+      --reel-badge-bg: {{ section.settings.badge_bg }};
+      --reel-radius: 18px;
+    }
+    .build-reels-swiper .swiper-slide {
+      max-width: 280px;
+  }
+    .build-reels-section-wrapper { overflow: hidden; }
+    .build-reels-section { background: var(--reel-bg); padding: 60px 0 70px; position: relative; }
+    .build-reels-header-grid { padding: 0 140px; display: flex; align-items: flex-end; flex-wrap: wrap; gap: 20px; justify-content: space-between; margin-bottom: 50px; }
+    .build-reels-badge { display: inline-flex; align-items: center; background: var(--reel-badge-bg); color: #000; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 100px; padding: 6px 16px; }
+    .build-reels-header { display: flex; flex-direction: column; gap: 20px;align-items:flex-start; }
+    .build-reels-title { font-family: 'Kopiku'; font-size: clamp(32px, 5.5vw, 74px); color: var(--reel-heading); text-transform: uppercase; margin: 0; line-height: 1; }
+    .build-reels-title__highlight { color: var(--reel-highlight); }
+    .build-reels-cta { font-size: 13px; font-weight: 700; text-transform: uppercase; color: {{ section.settings.cta_color }}; border-bottom: 2px solid currentColor; text-decoration: none; }
+    .build-reels-slider-wrap { padding-left: 140px; position: relative; }
+    .build-reel-card { border-radius: var(--reel-radius); overflow: hidden; position: relative; background: #111; aspect-ratio: 33/50; cursor: pointer; }
+    .build-reel-media-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .build-reel-thumb { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+    .build-reel-thumb-placeholder { background: #222; }
+    .build-reel-video-container { position: absolute; inset: 0; background: #000; opacity: 1; pointer-events: none; transition: opacity 0.3s; }
+    .build-reel-card.is-playing .build-reel-video-container { opacity: 1; pointer-events: auto; }
+    .build-reel-iframe, .build-reel-mp4 { width: 100%; height: 100%; object-fit: cover; border: none; }
+    .build-reel-play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.15); border: none; cursor: pointer; transition: background 0.3s; z-index: 2; }
+    .build-reel-card.is-playing .build-reel-play-overlay { display: none; }
+    .build-reel-play-icon { width: 52px; height: 52px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
+    .build-reel-card:hover .build-reel-play-icon { transform: scale(1.1); }
+    .build-reel-label { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 100px; padding: 5px 13px; z-index: 3; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .swiper-button-prev, .swiper-button-next { width: 44px; height: 44px; background: #fff; border-radius: 50%; color: #000; top: 50%; transform: translateY(-50%); }
+    .swiper-button-prev::after, .swiper-button-next::after { font-size: 16px; font-weight: bold; }
+    .build-reels-animate-text { position: relative; z-index: 1; top: -1px; }
+    .build-reels-animate-text .bg-svg { position: absolute; z-index: -1; top: 0; width: 100%; height: auto; }
+    .buildReels-curved-text-svg { font-family: Kopiku, sans-serif; font-size: 30px; text-transform: uppercase; letter-spacing: 8px; }
+
+    /* ── Fullscreen reels viewer (Instagram-style) ── */
+    .reels-viewer { position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 9999; display: none; backdrop-filter: blur(6px); }
+    .reels-viewer.is-open { display: block; }
+    .reels-viewer__swiper { width: 100%; height: 100%; }
+    .reels-viewer .swiper-slide.reels-viewer__slide {
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    /* Phone-sized stage (Instagram desktop pattern): centered, 9:16 portrait */
+    .reels-viewer__stage {
+      position: relative;
+      width: min(420px, 90vw);
+      aspect-ratio: 9 / 16;
+      max-height: 92vh;
+      background: #000;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .reels-viewer__media { position: absolute; inset: 0; }
+    .reels-viewer__media .rv-mp4,
+    .reels-viewer__media .rv-iframe { width: 100%; height: 100%; object-fit: cover; border: 0; display: block; background: #000; }
+
+    /* On mobile: edge-to-edge fullscreen (original behavior) */
+    @media (max-width: 749px) {
+      .reels-viewer { background: #000; backdrop-filter: none; }
+      .reels-viewer__stage {
+        width: 100%;
+        aspect-ratio: auto;
+        max-height: none;
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+    .reels-viewer__title { position: absolute; top: 64px; left: 16px; right: 16px; color: #fff; font-weight: 700; font-size: 16px; text-shadow: 0 2px 8px rgba(0,0,0,.6); z-index: 5; pointer-events: none; }
+    .reels-viewer__close, .reels-viewer__mute {
+      position: absolute; top: 14px; width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(0,0,0,.55); border: 0; color: #fff; display: inline-flex;
+      align-items: center; justify-content: center; cursor: pointer; z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+    .reels-viewer__close { right: 14px; }
+    .reels-viewer__mute  { right: 64px; }
+    .reels-viewer__close:active, .reels-viewer__mute:active { transform: scale(.92); }
+    .reels-viewer__progress { position: absolute; top: 8px; left: 12px; right: 12px; height: 3px; background: rgba(255,255,255,.25); border-radius: 999px; z-index: 6; overflow: hidden; }
+    .rv-progress__bar { width: 0; height: 100%; background: #fff; transition: width .1s linear; }
+
+    /* Product strip overlay */
+    .reels-viewer__products { position: absolute; left: 0; right: 0; bottom: 16px; z-index: 7; padding: 0 12px; }
+    .rv-products-track {
+      display: flex; gap: 10px; overflow-x: auto;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding: 4px 4px 8px;
+    }
+    .rv-products-track::-webkit-scrollbar { display: none; }
+    .rv-product {
+      flex: 0 0 240px; scroll-snap-align: start;
+      background: rgba(255,255,255,.97); border-radius: 14px;
+      display: grid; grid-template-columns: 56px 1fr auto; gap: 10px;
+      align-items: center; padding: 8px 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+    .rv-product__media { width: 56px; height: 56px; border-radius: 10px; overflow: hidden; background: #f4f4f4; display: block; }
+    .rv-product__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rv-product__info { min-width: 0; }
+    .rv-product__title { font-size: 12px; font-weight: 700; color: #040202; text-decoration: none; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .rv-product__price { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; margin-top: 3px; line-height: 1.15; }
+    .rv-product__sale { font-size: 14px; font-weight: 800; color: #e52227; white-space: nowrap; }
+    .rv-product__compare { font-size: 11px; font-weight: 500; color: #8a8a8a; text-decoration: line-through; white-space: nowrap; }
+    .rv-product__form { margin: 0; }
+    .rv-product__atc {
+      background: #e52227; color: #fff; border: 0; border-radius: 999px;
+      padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer;
+      text-transform: uppercase; letter-spacing: .3px; transition: transform .12s, background .12s;
+    }
+    .rv-product__atc:hover { background: #c81a1f; }
+    .rv-product__atc:active { transform: scale(.96); }
+    .rv-product__atc[disabled] { background: #888; cursor: not-allowed; }
+
+    /* Indicate slide is tappable */
+    .build-reel-card:active { transform: scale(.99); transition: transform .1s; }
+
+    @media (max-width: 1339px) { .build-reels-header-grid { padding: 0 40px; } .build-reels-title { font-size: 66px; } .build-reels-slider-wrap { padding-left: 40px; } }
+    @media (max-width: 1199px) { .build-reels-title { font-size: 56px; } .build-reel-slide { width: 220px !important; } }
+    @media (max-width: 749px) {
+      .build-reels-section { padding: 40px 0; }
+      .build-reels-header-grid, .build-reels-slider-wrap { padding: 0 16px; }
+      .build-reels-title { font-size: 32px; }
+      .build-reel-slide { width: 160px !important; }
+      .swiper-button-prev, .swiper-button-next { display: none; }
+      .build-reels-animate-text { min-width: 200%; left: 50%; transform: translate(-35%); }
+    }
+</style>
+
+<script>
+  (function () {
+    function initBuildReels() {
+      const section = document.getElementById('build-reels-{{ section.id }}');
+      if (!section) return;
+
+      let swiper;
+      let currentPlayingCard = null;
+
+      {% comment %} function stopVideo(card) {
+        if (!card) return;
+        card.classList.remove('is-playing');
+        const video = card.querySelector('.build-reel-mp4');
+        const iframe = card.querySelector('.build-reel-iframe');
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+        }
+        if (iframe) {
+          iframe.src = '';
+        }
+        currentPlayingCard = null;
+      }
+
+      function playVideo(card) {
+        if (!card) return;
+        if (currentPlayingCard && currentPlayingCard !== card) {
+          stopVideo(currentPlayingCard);
+        }
+        card.classList.add('is-playing');
+        const video = card.querySelector('.build-reel-mp4');
+        const iframe = card.querySelector('.build-reel-iframe');
+        if (video) {
+          video.play();
+        }
+        if (iframe && !iframe.src) {
+          iframe.src = iframe.dataset.src;
+        }
+        currentPlayingCard = card;
+      } {% endcomment %}
+
+      // ── Fullscreen viewer logic ──
+      const viewer = document.getElementById('reels-viewer-{{ section.id }}');
+      let viewerSwiper = null;
+      let isMuted = true;
+
+      function getSlideMedia(slide) {
+        return {
+          mp4: slide.querySelector('.rv-mp4'),
+          iframe: slide.querySelector('.rv-iframe')
+        };
+      }
+
+      function playSlide(idx) {
+        if (!viewer) return;
+        viewer.querySelectorAll('.reels-viewer__slide').forEach((s, i) => {
+          const m = getSlideMedia(s);
+          if (i === idx) {
+            if (m.mp4) {
+              if (!m.mp4.src && m.mp4.dataset.src) m.mp4.src = m.mp4.dataset.src;
+              m.mp4.muted = isMuted;
+              m.mp4.play().catch(() => {});
+            }
+            if (m.iframe && !m.iframe.src && m.iframe.dataset.src) {
+              m.iframe.src = m.iframe.dataset.src;
+            }
+            // Preload neighbours
+            [-1, 1].forEach(off => {
+              const n = viewer.querySelectorAll('.reels-viewer__slide')[i + off];
+              if (n) {
+                const nm = getSlideMedia(n);
+                if (nm.mp4 && !nm.mp4.src && nm.mp4.dataset.src) nm.mp4.src = nm.mp4.dataset.src;
+              }
+            });
+          } else {
+            if (m.mp4) { m.mp4.pause(); }
+            if (m.iframe) { m.iframe.src = ''; }
+          }
+        });
+      }
+
+      function openViewer(startIdx) {
+        if (!viewer) return;
+        viewer.classList.add('is-open');
+        viewer.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (!viewerSwiper) {
+          viewerSwiper = new Swiper(viewer.querySelector('.reels-viewer__swiper'), {
+            direction: 'vertical',
+            slidesPerView: 1,
+            spaceBetween: 0,
+            mousewheel: { sensitivity: 1, releaseOnEdges: true },
+            keyboard: { enabled: true },
+            speed: 350,
+            on: {
+              slideChangeTransitionEnd: function () { playSlide(this.activeIndex); }
+            }
+          });
+        }
+        viewerSwiper.slideTo(startIdx, 0);
+        // Run play after the slide is set
+        setTimeout(() => playSlide(viewerSwiper.activeIndex), 50);
+        if (window.DawbuTrack) window.DawbuTrack('reels_viewer_open', { surface: 'build_reels', start_index: startIdx });
+      }
+
+      function closeViewer() {
+        if (!viewer) return;
+        viewer.classList.remove('is-open');
+        viewer.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        // Stop all media
+        viewer.querySelectorAll('.rv-mp4').forEach(v => v.pause());
+        viewer.querySelectorAll('.rv-iframe').forEach(f => { f.src = ''; });
+      }
+
+      // Open on thumbnail tap
+      section.querySelectorAll('.build-reel-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const idx = parseInt(card.dataset.reelIndex || '0', 10);
+          openViewer(idx);
+        });
+      });
+
+      // Close
+      viewer && viewer.querySelector('[data-reels-close]').addEventListener('click', closeViewer);
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && viewer && viewer.classList.contains('is-open')) closeViewer();
+      });
+
+      // Mute toggle
+      viewer && viewer.querySelector('[data-reels-mute]').addEventListener('click', function () {
+        isMuted = !isMuted;
+        viewer.querySelectorAll('.rv-mp4').forEach(v => v.muted = isMuted);
+        this.querySelector('.rv-icon-mute').style.display = isMuted ? '' : 'none';
+        this.querySelector('.rv-icon-unmute').style.display = isMuted ? 'none' : '';
+      });
+
+      // AJAX add-to-cart from reel product cards (keeps viewer open, fires tracker + line item property)
+      viewer && viewer.querySelectorAll('.rv-product__form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const btn = form.querySelector('.rv-product__atc');
+          if (!btn || btn.disabled) return;
+          const orig = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = '...';
+          const fd = new FormData(form);
+          fetch(window.Shopify && Shopify.routes && Shopify.routes.root ? Shopify.routes.root + 'cart/add.js' : '/cart/add.js', {
+            method: 'POST',
+            body: fd,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+          })
+          .then(r => r.json())
+          .then(item => {
+            // Fetch fresh cart so the cart-update event has full cart payload
+            return fetch('/cart.js').then(r => r.json()).then(cart => ({ item: item, cart: cart }));
+          })
+          .then(({ item, cart }) => {
+            btn.textContent = '✓ Added';
+            btn.style.background = '#0e855b';
+            // Notify the rest of the theme (cart drawer, mini-cart count, analytics) that cart changed
+            if (window.PUB_SUB_EVENTS && typeof window.publish === 'function') {
+              window.publish(window.PUB_SUB_EVENTS.cartUpdate, {
+                source: 'build_reels_viewer',
+                cartData: cart,
+                variantId: item.variant_id
+              });
+            }
+            document.dispatchEvent(new CustomEvent('cart:updated', { detail: { cartData: cart, source: 'build_reels_viewer' } }));
+            setTimeout(() => {
+              btn.textContent = orig;
+              btn.style.background = '';
+              btn.disabled = false;
+            }, 1800);
+          })
+          .catch(err => {
+            btn.textContent = 'Try again';
+            btn.style.background = '#a91a1f';
+            setTimeout(() => {
+              btn.textContent = orig;
+              btn.style.background = '';
+              btn.disabled = false;
+            }, 1800);
+          });
+        });
+      });
+
+      // Tap-to-pause/play on the current video
+      viewer && viewer.querySelectorAll('.reels-viewer__slide').forEach(slide => {
+        slide.addEventListener('click', (e) => {
+          if (e.target.closest('.rv-product, .reels-viewer__close, .reels-viewer__mute')) return;
+          const v = slide.querySelector('.rv-mp4');
+          if (!v) return;
+          if (v.paused) v.play().catch(()=>{}); else v.pause();
+        });
+      });
+
+      var autoplayMs = {{ section.settings.autoplay_seconds | default: 4 | times: 1000 }};
+      var enableLoop = {% if section.blocks.size > 2 %}true{% else %}false{% endif %};
+      swiper = new Swiper(section.querySelector('.build-reels-swiper'), {
+        slidesPerView: 'auto',
+        spaceBetween: 16,
+        grabCursor: true,
+        loop: enableLoop,
+        loopAdditionalSlides: 2,
+        speed: 600,
+        autoplay: autoplayMs > 0 ? {
+          delay: autoplayMs,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true
+        } : false,
+        navigation: {
+          nextEl: section.querySelector('.build-reels-next'),
+          prevEl: section.querySelector('.build-reels-prev'),
+        },
+        {% comment %} on: {
+          slideChangeTransitionEnd: function () {
+            const activeSlide = this.slides[this.activeIndex];
+            if (activeSlide) {
+              const card = activeSlide.querySelector('.build-reel-card');
+              playVideo(card);
+            }
+          },
+        }, {% endcomment %}
+      });
+{% comment %} 
+      section.querySelectorAll('.build-reel-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          if (card.classList.contains('is-playing')) {
+            stopVideo(card);
+          } else {
+            playVideo(card);
+          }
+        });
+      }); {% endcomment %}
+
+      // Play first slide video on init
+      {% comment %} setTimeout(() => {
+        const firstCard = section.querySelector('.build-reel-card');
+        if (firstCard) playVideo(firstCard);
+      }, 500); {% endcomment %}
+    }
+
+    function waitForSwiper(cb) {
+      if (window.Swiper) return cb();
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js';
+      script.onload = cb;
+      document.head.appendChild(script);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => waitForSwiper(initBuildReels));
+    document.addEventListener('shopify:section:load', (e) => {
+      if (e.detail.sectionId === '{{ section.id }}') waitForSwiper(initBuildReels);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Build Reels",
+  "tag": "section",
+  "class": "build-reels-section-wrapper",
+  "settings": [
+    { "type": "text", "id": "badge_text", "label": "Badge Text", "default": "Bestseller Collection" },
+    { "type": "text", "id": "heading_line1", "label": "Heading Line 1", "default": "See What People" },
+    { "type": "text", "id": "heading_line2", "label": "Heading Line 2", "default": "Build" },
+    { "type": "text", "id": "cta_text", "label": "CTA Text", "default": "Watch All Reels" },
+    { "type": "url", "id": "cta_url", "label": "CTA Link" },
+    { "type": "text", "id": "animate_text", "label": "Animated Text", "default": "10,000+ HAPPY KIDS" },
+    { "type": "color", "id": "bg_color", "label": "BG Color", "default": "#111" },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#fff" },
+    { "type": "color", "id": "highlight_color", "label": "Highlight Color", "default": "#FFD700" },
+    { "type": "color", "id": "badge_bg", "label": "Badge BG", "default": "#E3000B" },
+    { "type": "color", "id": "cta_color", "label": "CTA Color", "default": "#FFD700" },
+    { "type": "header", "content": "Slider behavior" },
+    { "type": "range", "id": "autoplay_seconds", "label": "Auto-scroll interval (seconds)", "min": 0, "max": 15, "step": 1, "default": 4, "info": "0 = disable auto-scroll. Slider always loops infinitely." }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Reel",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Label", "default": "Morning Friends" },
+        { "type": "image_picker", "id": "thumbnail", "label": "Thumb" },
+        { "type": "text", "id": "video_url", "label": "YT/Vimeo URL" },
+        { "type": "text", "id": "video_mp4", "label": "MP4 URL" },
+        { "type": "header", "content": "Products in this reel (up to 3)" },
+        { "type": "product", "id": "product_1", "label": "Product 1" },
+        { "type": "product", "id": "product_2", "label": "Product 2" },
+        { "type": "product", "id": "product_3", "label": "Product 3" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Build Reels", "blocks": [{ "type": "reel" }, { "type": "reel" }, { "type": "reel" }] }]
+}
+{% endschema %}

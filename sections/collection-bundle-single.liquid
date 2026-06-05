@@ -1,0 +1,1592 @@
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign bundle_collection = section.settings.collection
+  assign bundle_discount_percent = section.settings.bundle_discount_percent | default: 0
+  
+  if bundle_collection == blank
+    assign bundle_collection = collections['animal-building-blocks-collection']
+  endif
+  
+  # Check if current product is in the collection (for product pages)
+  assign product_in_collection = false
+  if bundle_collection != blank and product != blank
+    assign collection_product_ids = bundle_collection.products | map: 'id'
+    if collection_product_ids contains product.id
+      assign product_in_collection = true
+    endif
+  endif
+  
+  # Show on regular pages (not product pages) if collection is selected
+  # Also show on product pages if product is in collection
+  # Basically: show if collection is selected and has products, unless we're on a product page where product is NOT in collection
+  assign should_show = false
+  if bundle_collection != blank and bundle_collection.products.size > 0
+    if product != blank
+      # On product page: only show if product is in collection
+      assign should_show = product_in_collection
+    else
+      # On regular page (not product page): show if collection is selected
+      assign should_show = true
+    endif
+  endif
+-%}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .collection-bundle-single-{{ section.id }} {
+    position: relative;
+  }
+
+  /* Single Bundle Product Card Styles */
+  .bundle-single-product-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .bundle-single-product-card {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    border-radius: 16px;
+    background: rgb(var(--color-background));
+    border: 2px solid rgba(var(--color-foreground), 0.1);
+    box-shadow: 0 4px 20px rgba(var(--color-foreground), 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .bundle-single-product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(var(--color-foreground), 0.12);
+    border-color: rgba(var(--color-button), 0.3);
+  }
+
+  .bundle-single-product__image {
+    position: relative;
+    flex-shrink: 0;
+    width: 300px;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(var(--color-foreground), 0.04);
+  }
+
+  .bundle-single-product__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .bundle-single-product__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(var(--color-foreground), 0.5);
+    font-size: 1rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .bundle-single-product__badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .bundle-single-product__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .bundle-single-product__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: rgb(var(--color-foreground));
+    line-height: 1.3;
+  }
+
+  .bundle-single-product__description {
+    font-size: 1rem;
+    color: rgba(var(--color-foreground), 0.7);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .bundle-single-product__note {
+    color: rgba(var(--color-foreground), 0.6);
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  .bundle-single-product__pricing {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+
+  .bundle-single-product__price-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bundle-single-product__price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: rgb(var(--color-foreground));
+  }
+
+  .bundle-single-product__original-price {
+    font-size: 1.25rem;
+    color: rgba(var(--color-foreground), 0.5);
+    text-decoration: line-through;
+  }
+
+  .bundle-single-product__savings {
+    font-size: 1rem;
+    color: #27ae60;
+    font-weight: 600;
+  }
+
+  .bundle-single-product__item-count {
+    font-size: 0.9375rem;
+    color: rgba(var(--color-foreground), 0.6);
+    margin: 0;
+  }
+
+  .bundle-single-product__button {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 2px solid rgb(var(--color-button));
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bundle-single-product__button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--color-button), 0.4);
+  }
+
+  .bundle-single-product__button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .bundle-single-product__button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(var(--color-foreground), 0.1);
+    border-color: rgba(var(--color-foreground), 0.2);
+  }
+
+  .bundle-single-product__button.loading {
+    pointer-events: none;
+  }
+
+  .bundle-single-product__button.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: rgb(var(--color-button-text));
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  .bundle-single-product__button.loading .bundle-single-product__button-text {
+    opacity: 0;
+  }
+
+  @keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  @media screen and (max-width: 749px) {
+    .bundle-single-product-card {
+      flex-direction: column;
+      padding: 1.5rem;
+      gap: 1.5rem;
+    }
+
+    .bundle-single-product__image {
+      width: 100%;
+      height: 250px;
+    }
+
+    .bundle-single-product__title {
+      font-size: 1.5rem;
+    }
+
+    .bundle-single-product__price {
+      font-size: 1.75rem;
+    }
+  }
+
+  /* Bundle Products Preview Grid */
+  .bundle-products-preview {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(var(--color-foreground), 0.1);
+  }
+
+  .bundle-products-preview__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 1.25rem 0;
+    color: rgb(var(--color-foreground));
+    text-align: center;
+  }
+
+  .bundle-products-preview__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .bundle-products-preview__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease;
+  }
+
+  .bundle-products-preview__item:hover {
+    transform: translateY(-4px);
+  }
+
+  .bundle-products-preview__link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .bundle-products-preview__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(var(--color-foreground), 0.04);
+    border: 1px solid rgba(var(--color-foreground), 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .bundle-products-preview__link:hover .bundle-products-preview__image-wrapper {
+    border-color: rgba(var(--color-button), 0.4);
+    box-shadow: 0 4px 12px rgba(var(--color-button), 0.15);
+  }
+
+  .bundle-products-preview__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .bundle-products-preview__link:hover .bundle-products-preview__image {
+    transform: scale(1.05);
+  }
+
+  .bundle-products-preview__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(var(--color-foreground), 0.4);
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  .bundle-products-preview__badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .bundle-products-preview__badge--out-of-stock {
+    background: rgba(211, 47, 47, 0.9);
+  }
+
+  .bundle-products-preview__name {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+    color: rgb(var(--color-foreground));
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    min-height: 2.5em;
+    transition: color 0.2s ease;
+  }
+
+  .bundle-products-preview__link:hover .bundle-products-preview__name {
+    color: rgb(var(--color-button));
+  }
+
+  @media screen and (max-width: 749px) {
+    .bundle-products-preview {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+    }
+
+    .bundle-products-preview__title {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .bundle-products-preview__grid {
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .bundle-products-preview__name {
+      font-size: 0.75rem;
+      min-height: 2.2em;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .bundle-products-preview__grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  .bundle-error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .bundle-error-message.show {
+    display: block;
+  }
+
+  .bundle-success-message {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .bundle-success-message.show {
+    display: block;
+  }
+
+  /* Popup Notification Styles */
+  .bundle-cart-popup {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    background: #fff !important;
+    border: 2px solid #27ae60 !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    z-index: 99999 !important;
+    max-width: 400px !important;
+    transform: translateX(500px) !important;
+    opacity: 0 !important;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    visibility: hidden !important;
+  }
+
+  .bundle-cart-popup.show {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .bundle-cart-popup__icon {
+    width: 48px;
+    height: 48px;
+    background: #27ae60;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .bundle-cart-popup__icon svg {
+    width: 24px;
+    height: 24px;
+    fill: #fff;
+  }
+
+  .bundle-cart-popup__content {
+    flex: 1;
+  }
+
+  .bundle-cart-popup__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #27ae60;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .bundle-cart-popup__message {
+    font-size: 0.9rem;
+    color: rgba(var(--color-foreground), 0.8);
+    margin: 0;
+  }
+
+  .bundle-cart-popup__actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .bundle-cart-popup__button {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .bundle-cart-popup__button--primary {
+    background: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+  }
+
+  .bundle-cart-popup__button--primary:hover {
+    opacity: 0.9;
+  }
+
+  .bundle-cart-popup__button--secondary {
+    background: transparent;
+    color: rgb(var(--color-foreground));
+    border: 1px solid rgba(var(--color-foreground), 0.2);
+  }
+
+  .bundle-cart-popup__button--secondary:hover {
+    background: rgba(var(--color-foreground), 0.05);
+  }
+
+  .bundle-cart-popup__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: rgba(var(--color-foreground), 0.6);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bundle-cart-popup__close:hover {
+    color: rgb(var(--color-foreground));
+  }
+
+  @media screen and (max-width: 749px) {
+    .bundle-cart-popup {
+      top: 10px;
+      right: 10px;
+      left: 10px;
+      max-width: none;
+      transform: translateY(-200px);
+    }
+
+    .bundle-cart-popup.show {
+      transform: translateY(0);
+    }
+  }
+{%- endstyle -%}
+
+<!-- Cart Popup Notification -->
+<div class="bundle-cart-popup" id="bundle-cart-popup-{{ section.id }}" style="display: none;">
+  <div class="bundle-cart-popup__icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+    </svg>
+  </div>
+  <div class="bundle-cart-popup__content">
+    <h3 class="bundle-cart-popup__title">Items Added to Cart!</h3>
+    <p class="bundle-cart-popup__message" id="bundle-popup-message-{{ section.id }}"></p>
+    <div class="bundle-cart-popup__actions">
+      <button type="button" class="bundle-cart-popup__button bundle-cart-popup__button--secondary" id="bundle-popup-continue-{{ section.id }}">
+        Continue Shopping
+      </button>
+      <a href="/cart" class="bundle-cart-popup__button bundle-cart-popup__button--primary" id="bundle-popup-view-cart-{{ section.id }}">
+        View Cart
+      </a>
+    </div>
+  </div>
+  <button type="button" class="bundle-cart-popup__close" id="bundle-popup-close-{{ section.id }}" aria-label="Close">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/>
+    </svg>
+  </button>
+</div>
+
+{%- comment -%} Show section if collection is selected and has products. On product pages, only show if product is in collection. On other pages, always show if collection is selected. {%- endcomment -%}
+{%- if should_show -%}
+<div class="color-{{ section.settings.color_scheme }} isolate gradient collection-bundle-single-{{ section.id }} section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <div class="title-wrapper title-wrapper--no-top-margin">
+        <h2 class="title {{ section.settings.heading_size }}">
+          {{ section.settings.heading }}
+        </h2>
+        {%- if section.settings.description != blank -%}
+          <div class="rte">
+            {{ section.settings.description }}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if bundle_collection.products.size > 0 -%}
+      {%- liquid
+        # Calculate bundle totals
+        assign bundle_total_price = 0
+        assign bundle_original_total = 0
+        assign bundle_available_count = 0
+        assign bundle_total_count = bundle_collection.products.size
+        
+        for product in bundle_collection.products
+          assign first_variant = product.selected_or_first_available_variant
+          if first_variant.available
+            assign bundle_total_price = bundle_total_price | plus: first_variant.price
+            assign bundle_original_total = bundle_original_total | plus: first_variant.price
+            assign bundle_available_count = bundle_available_count | plus: 1
+          endif
+        endfor
+        
+        # Apply discount if configured
+        if bundle_discount_percent > 0
+          assign discount_amount = bundle_original_total | times: bundle_discount_percent | divided_by: 100
+          assign bundle_total_price = bundle_original_total | minus: discount_amount
+        endif
+      -%}
+      
+      <div class="bundle-error-message" id="bundle-error-{{ section.id }}"></div>
+      <div class="bundle-success-message" id="bundle-success-{{ section.id }}"></div>
+
+      <div class="bundle-single-product-wrapper" id="bundle-single-{{ section.id }}">
+        <div class="bundle-single-product-card">
+          <div class="bundle-single-product__image">
+            {%- if bundle_collection.featured_image -%}
+              <img 
+                src="{{ bundle_collection.featured_image | image_url: width: 400 }}"
+                alt="{{ bundle_collection.title | escape }}"
+                loading="lazy"
+                width="300"
+                height="300"
+              >
+            {%- elsif bundle_collection.products.first.featured_image -%}
+              <img 
+                src="{{ bundle_collection.products.first.featured_image | image_url: width: 400 }}"
+                alt="{{ bundle_collection.title | escape }}"
+                loading="lazy"
+                width="300"
+                height="300"
+              >
+            {%- else -%}
+              <div class="bundle-single-product__placeholder">
+                <span>{{ bundle_collection.title | escape }}</span>
+              </div>
+            {%- endif -%}
+            {%- if bundle_discount_percent > 0 -%}
+              <div class="bundle-single-product__badge">
+                Save {{ bundle_discount_percent }}%
+              </div>
+            {%- endif -%}
+          </div>
+          
+          <div class="bundle-single-product__content">
+            <h3 class="bundle-single-product__title">{{ bundle_collection.title | escape }} - Complete Bundle</h3>
+            <p class="bundle-single-product__description">
+              This bundle includes <strong>{{ bundle_total_count }} products</strong> from the {{ bundle_collection.title | escape }} collection.
+              {%- if bundle_available_count < bundle_total_count -%}
+                <br><span class="bundle-single-product__note">Note: {{ bundle_total_count | minus: bundle_available_count }} item(s) currently out of stock.</span>
+              {%- endif -%}
+            </p>
+            
+            <div class="bundle-single-product__pricing">
+              <div class="bundle-single-product__price-wrapper">
+                {%- if bundle_discount_percent > 0 -%}
+                  <span class="bundle-single-product__original-price">{{ bundle_original_total | money }}</span>
+                {%- endif -%}
+                <span class="bundle-single-product__price">{{ bundle_total_price | money }}</span>
+                {%- if bundle_discount_percent > 0 -%}
+                  <span class="bundle-single-product__savings">You Save {{ bundle_discount_percent }}%</span>
+                {%- endif -%}
+              </div>
+              <p class="bundle-single-product__item-count">{{ bundle_available_count }} item{{ bundle_available_count | pluralize: '', 's' }} included</p>
+            </div>
+            
+            <button 
+              type="button" 
+              class="bundle-single-product__button" 
+              id="bundle-add-all-{{ section.id }}"
+              data-bundle-name="{{ bundle_collection.title | escape }}"
+              data-bundle-id="{{ bundle_collection.id }}"
+              {% if bundle_available_count == 0 %}disabled{% endif %}
+            >
+              <span class="bundle-single-product__button-text">
+                {%- if bundle_available_count == 0 -%}
+                  Bundle Unavailable
+                {%- else -%}
+                  Add Complete Bundle to Cart
+                {%- endif -%}
+              </span>
+            </button>
+          </div>
+        </div>
+        
+        {%- comment -%} Product Images Grid - Show all products in bundle {%- endcomment -%}
+        <div class="bundle-products-preview">
+          <h4 class="bundle-products-preview__title">Products Included in This Bundle:</h4>
+          <div class="bundle-products-preview__grid">
+            {%- for product in bundle_collection.products -%}
+              {%- liquid
+                assign first_variant = product.selected_or_first_available_variant
+                assign is_available = first_variant.available
+              -%}
+              <div class="bundle-products-preview__item" data-product-id="{{ product.id }}">
+                <a href="{{ product.url }}" class="bundle-products-preview__link" aria-label="{{ product.title | escape }}">
+                  <div class="bundle-products-preview__image-wrapper">
+                    {%- if product.featured_image -%}
+                      <img 
+                        src="{{ product.featured_image | image_url: width: 150 }}"
+                        alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                        class="bundle-products-preview__image"
+                        loading="lazy"
+                        width="150"
+                        height="150"
+                      >
+                    {%- else -%}
+                      <div class="bundle-products-preview__placeholder">
+                        <span>No Image</span>
+                      </div>
+                    {%- endif -%}
+                    {%- unless is_available -%}
+                      <div class="bundle-products-preview__badge bundle-products-preview__badge--out-of-stock">
+                        Out of Stock
+                      </div>
+                    {%- endunless -%}
+                  </div>
+                  <p class="bundle-products-preview__name">{{ product.title | escape }}</p>
+                </a>
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="rte" style="padding: 2rem; text-align: center; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px;">
+        {%- if request.design_mode -%}
+          <h3 style="margin-bottom: 1rem;">⚠️ Collection Bundle Setup Required</h3>
+          <p><strong>Please select a collection in the section settings.</strong></p>
+          <p style="margin-top: 1rem; font-size: 0.9rem;">
+            <strong>How to fix:</strong><br>
+            1. Click on this section in the theme editor<br>
+            2. Find "Collection" setting at the top<br>
+            3. Select your collection from the dropdown<br>
+            4. Save your changes
+          </p>
+        {%- else -%}
+          <p>Collection not available at this time. Please check back later.</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+<script>
+(function() {
+  'use strict';
+  
+  // Wait for DOM to be ready
+  function initCollectionBundleSingle() {
+    const sectionId = '{{ section.id }}';
+    const bundleCollectionId = '{{ bundle_collection.id }}';
+    const bundleCollectionName = '{{ bundle_collection.title | escape }}';
+    const bundleCollectionHandle = '{{ bundle_collection.handle }}';
+    
+    const bundleAddAllBtn = document.getElementById('bundle-add-all-' + sectionId);
+    const bundleErrorMsg = document.getElementById('bundle-error-' + sectionId);
+    const bundleSuccessMsg = document.getElementById('bundle-success-' + sectionId);
+    
+    // Exit if button doesn't exist (section might not be visible)
+    if (!bundleAddAllBtn) {
+      // Silently exit - section might not be displayed due to conditions
+      return;
+    }
+    
+    // Exit if collection handle is missing
+    if (!bundleCollectionHandle || bundleCollectionHandle.trim() === '') {
+      console.warn('Collection Bundle Single: Collection handle is missing for section', sectionId);
+      if (bundleErrorMsg) {
+        bundleErrorMsg.textContent = 'Please select a collection in the section settings.';
+        bundleErrorMsg.classList.add('show');
+      }
+      return;
+    }
+    
+    console.log('Collection Bundle Single: Initializing for section', sectionId, 'Collection:', bundleCollectionHandle);
+    
+    // Add all bundle items to cart with bundle properties
+    async function addBundleToCart() {
+      // Get bundle info from button
+      const bundleName = bundleAddAllBtn.dataset.bundleName || bundleCollectionName;
+      const bundleId = bundleAddAllBtn.dataset.bundleId || bundleCollectionId;
+      
+      // Get all products from the collection via API
+      const items = [];
+      const unavailableItems = [];
+      
+      try {
+        // Fetch collection products
+        const collectionHandle = bundleCollectionHandle || '{{ bundle_collection.handle }}';
+        
+        if (!collectionHandle || collectionHandle.trim() === '') {
+          throw new Error('Collection handle is missing. Please select a collection in the section settings.');
+        }
+        
+        const collectionUrl = `/collections/${collectionHandle}/products.json?limit=250`;
+        
+        const productsResponse = await fetch(collectionUrl);
+        if (!productsResponse.ok) {
+          if (productsResponse.status === 404) {
+            throw new Error('Collection not found. Please check the collection setting.');
+          }
+          throw new Error('Failed to fetch collection products');
+        }
+        
+        const productsData = await productsResponse.json();
+        const products = productsData.products || [];
+        
+        console.log('Collection Bundle Single: Found products', products.length);
+        
+        // Process each product
+        products.forEach(product => {
+          if (!product.variants || product.variants.length === 0) {
+            return;
+          }
+          
+          const firstVariant = product.variants[0];
+          const isAvailable = firstVariant.available;
+          
+          if (!isAvailable) {
+            unavailableItems.push(product.title);
+            return;
+          }
+          
+          // Add item with bundle properties
+          items.push({
+            id: parseInt(firstVariant.id, 10),
+            quantity: 1,
+            properties: {
+              '_bundle': bundleName,
+              '_bundle_id': bundleId,
+              '_bundle_type': 'collection_bundle'
+            }
+          });
+        });
+        
+        if (unavailableItems.length > 0 && items.length === 0) {
+          showError(`All items in this bundle are currently out of stock.`);
+          return;
+        }
+        
+        if (items.length === 0) {
+          showError('No valid items to add to cart.');
+          return;
+        }
+        
+        if (unavailableItems.length > 0) {
+          console.warn('Collection Bundle Single: Some items out of stock:', unavailableItems);
+          // Continue anyway, just add available items
+        }
+      } catch (error) {
+        console.error('Collection Bundle Single: Error fetching products', error);
+        showError('Failed to load bundle products. Please try again.');
+        return;
+      }
+      
+      // Disable button and show loading
+      bundleAddAllBtn.disabled = true;
+      bundleAddAllBtn.classList.add('loading');
+      const buttonText = bundleAddAllBtn.querySelector('.bundle-single-product__button-text');
+      if (buttonText) {
+        buttonText.textContent = 'Adding to Cart...';
+      } else {
+        bundleAddAllBtn.textContent = 'Adding to Cart...';
+      }
+      hideMessages();
+      
+      try {
+        console.log('Collection Bundle Single: Adding items to cart:', items);
+        
+        // Use theme's route if available, otherwise fallback to direct path
+        let cartAddUrl = '/cart/add.js';
+        if (window.routes && window.routes.cart_add_url) {
+          cartAddUrl = window.routes.cart_add_url;
+        } else if (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) {
+          cartAddUrl = window.Shopify.routes.root + 'cart/add.js';
+        }
+        
+        console.log('Collection Bundle Single: Using cart URL:', cartAddUrl);
+        
+        const response = await fetch(cartAddUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ items: items })
+        });
+        
+        // Read response as text first to check if it's JSON
+        const responseText = await response.text();
+        const contentType = response.headers.get('content-type') || '';
+        let responseData;
+        
+        // Check if response is JSON
+        if (contentType.includes('application/json') || (responseText.trim().startsWith('{') || responseText.trim().startsWith('['))) {
+          try {
+            responseData = JSON.parse(responseText);
+          } catch (e) {
+            console.error('Collection Bundle Single: Failed to parse JSON response:', responseText.substring(0, 200));
+            let errorMessage = 'Invalid response from server. Please try again.';
+            if (responseText.includes('404') || responseText.includes('Not Found')) {
+              errorMessage = 'Cart endpoint not found. Please refresh the page.';
+            } else if (responseText.includes('403') || responseText.includes('Forbidden')) {
+              errorMessage = 'Access denied. Please refresh the page.';
+            } else if (responseText.includes('<!doctype') || responseText.includes('<html')) {
+              errorMessage = 'Server returned HTML instead of JSON. Please check your store configuration.';
+            }
+            throw new Error(errorMessage);
+          }
+        } else {
+          console.error('Collection Bundle Single: Received HTML instead of JSON:', responseText.substring(0, 500));
+          let errorMessage = 'Failed to add items to cart. Please try again.';
+          if (responseText.includes('404') || responseText.includes('Not Found')) {
+            errorMessage = 'Cart endpoint not found. Please refresh the page.';
+          } else if (responseText.includes('403') || responseText.includes('Forbidden')) {
+            errorMessage = 'Access denied. Please refresh the page.';
+          } else if (!response.ok) {
+            errorMessage = `Server error ${response.status}. Please try again.`;
+          } else if (responseText.includes('<!doctype') || responseText.includes('<html')) {
+            errorMessage = 'Server returned HTML instead of JSON. The cart endpoint may not be available.';
+          }
+          throw new Error(errorMessage);
+        }
+        
+        console.log('Collection Bundle Single: Cart API response:', responseData);
+        
+        // Check for Shopify API errors
+        if (!response.ok || (responseData && responseData.status && responseData.status >= 400)) {
+          const errorMessage = (responseData && (responseData.description || responseData.message || responseData.error)) || 'Failed to add items to cart';
+          throw new Error(errorMessage);
+        }
+        
+        // Check for errors array
+        if (responseData && responseData.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+          throw new Error(responseData.errors.join(', '));
+        }
+        
+        // Validate response data exists
+        if (!responseData) {
+          throw new Error('No response data received from server');
+        }
+        
+        // Success! Now use theme's cart update system
+        const cartDrawer = document.querySelector('cart-drawer') || document.querySelector('cart-notification');
+        
+        // Get sections to render for cart drawer - use same method as product-form.js
+        let sectionsToRender = [];
+        let sectionsData = {};
+        
+        if (cartDrawer && cartDrawer.getSectionsToRender) {
+          sectionsToRender = cartDrawer.getSectionsToRender();
+          
+          // Extract section names for fetching - use section property if available, otherwise id
+          const sectionNames = sectionsToRender.map(s => {
+            return s.section || s.id;
+          }).filter(Boolean);
+          
+          if (sectionNames.length > 0) {
+            try {
+              const sectionsUrl = `/?sections=${sectionNames.join(',')}&sections_url=${encodeURIComponent(window.location.pathname)}`;
+              console.log('Collection Bundle Single: Fetching sections:', sectionNames);
+              const sectionsResponse = await fetch(sectionsUrl);
+              
+              if (sectionsResponse.ok) {
+                const contentType = sectionsResponse.headers.get('content-type') || '';
+                
+                if (contentType.includes('application/json')) {
+                  const fetchedSections = await sectionsResponse.json();
+                  console.log('Collection Bundle Single: Received sections JSON:', Object.keys(fetchedSections));
+                  
+                  sectionsToRender.forEach(section => {
+                    const sectionName = section.section || section.id;
+                    const sectionId = section.id;
+                    
+                    if (fetchedSections[sectionName] && sectionId) {
+                      sectionsData[sectionId] = fetchedSections[sectionName];
+                    }
+                  });
+                } else {
+                  const sectionsContent = await sectionsResponse.text();
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(sectionsContent, 'text/html');
+                  
+                  sectionsToRender.forEach(section => {
+                    const sectionName = section.section || section.id;
+                    const sectionId = section.id;
+                    if (!sectionName || !sectionId) return;
+                    
+                    let sectionElement = doc.querySelector(`#shopify-section-${sectionName}`);
+                    if (!sectionElement) {
+                      sectionElement = doc.querySelector(`[id*="${sectionName}"]`);
+                    }
+                    if (!sectionElement) {
+                      sectionElement = doc.querySelector(`.shopify-section[data-section-id="${sectionName}"]`);
+                    }
+                    if (sectionElement) {
+                      sectionsData[sectionId] = sectionElement.outerHTML;
+                    }
+                  });
+                  console.log('Collection Bundle Single: Parsed sections from HTML:', Object.keys(sectionsData));
+                }
+              } else {
+                console.warn('Collection Bundle Single: Sections fetch failed:', sectionsResponse.status);
+              }
+            } catch (e) {
+              console.warn('Collection Bundle Single: Could not fetch sections', e);
+            }
+          }
+        }
+        
+        // Build parsedState with sections for renderContents
+        const parsedState = {
+          ...responseData,
+          sections: sectionsData
+        };
+        
+        // Update cart drawer contents using theme's method
+        let renderContentsCalled = false;
+        if (cartDrawer && typeof cartDrawer.renderContents === 'function') {
+          try {
+            if (Object.keys(sectionsData).length > 0) {
+              cartDrawer.renderContents(parsedState);
+              renderContentsCalled = true;
+              console.log('Collection Bundle Single: Cart drawer updated via renderContents');
+            } else {
+              console.warn('Collection Bundle Single: No sections data, refreshing cart drawer');
+              const cartDrawerResponse = await fetch('/?section_id=cart-drawer');
+              if (cartDrawerResponse.ok) {
+                const cartDrawerHtml = await cartDrawerResponse.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(cartDrawerHtml, 'text/html');
+                const newCartDrawer = doc.querySelector('cart-drawer');
+                if (newCartDrawer && cartDrawer.querySelector('.drawer__inner')) {
+                  const newInner = newCartDrawer.querySelector('.drawer__inner');
+                  const currentInner = cartDrawer.querySelector('.drawer__inner');
+                  if (newInner && currentInner) {
+                    currentInner.innerHTML = newInner.innerHTML;
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Collection Bundle Single: Could not update cart drawer contents', e);
+            try {
+              const cartDrawerResponse = await fetch('/?section_id=cart-drawer');
+              if (cartDrawerResponse.ok) {
+                const cartDrawerHtml = await cartDrawerResponse.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(cartDrawerHtml, 'text/html');
+                
+                const drawerInner = cartDrawer.querySelector('.drawer__inner');
+                const newDrawerInner = doc.querySelector('.drawer__inner');
+                if (drawerInner && newDrawerInner) {
+                  drawerInner.innerHTML = newDrawerInner.innerHTML;
+                }
+                
+                const cartDrawerItems = cartDrawer.querySelector('cart-drawer-items');
+                const newCartDrawerItems = doc.querySelector('cart-drawer-items');
+                if (cartDrawerItems && newCartDrawerItems) {
+                  cartDrawerItems.innerHTML = newCartDrawerItems.innerHTML;
+                  if (window.customElements && window.customElements.get('cart-drawer-items')) {
+                    cartDrawerItems.dispatchEvent(new Event('connected'));
+                  }
+                }
+                
+                console.log('Collection Bundle Single: Cart drawer updated via fallback method');
+              }
+            } catch (e2) {
+              console.warn('Collection Bundle Single: Fallback cart update also failed', e2);
+            }
+          }
+        }
+        
+        // Update cart drawer using the EXACT same method as onCartUpdate() in cart.js
+        // This is the most reliable method that works for all scenarios
+        // Publish cart update event first (for other listeners)
+        if (window.publish && window.PUB_SUB_EVENTS) {
+          window.publish(window.PUB_SUB_EVENTS.cartUpdate, {
+            source: 'collection-bundle-single',
+            cartData: responseData
+          });
+        }
+        
+        // Also dispatch custom event for compatibility
+        document.dispatchEvent(new CustomEvent('cart:updated', { 
+          detail: { cartData: responseData },
+          bubbles: true 
+        }));
+        
+        // Update cart count
+        await updateCartCount();
+        
+        // Fetch and update cart drawer sections directly (same as onCartUpdate())
+        try {
+          const cartDrawerResponse = await fetch(window.routes.cart_url + '?section_id=cart-drawer');
+          if (cartDrawerResponse.ok) {
+            const responseText = await cartDrawerResponse.text();
+            const html = new DOMParser().parseFromString(responseText, 'text/html');
+            
+            // Strategy: Update the ENTIRE drawer__inner content to ensure everything is properly rendered
+            const targetDrawerInner = cartDrawer ? cartDrawer.querySelector('.drawer__inner') : document.querySelector('.drawer__inner');
+            const sourceDrawerInner = html.querySelector('.drawer__inner');
+            
+            if (targetDrawerInner && sourceDrawerInner) {
+              console.log('Collection Bundle Single: Updating entire drawer__inner');
+              targetDrawerInner.innerHTML = sourceDrawerInner.innerHTML;
+              console.log('Collection Bundle Single: drawer__inner updated successfully');
+            } else {
+              console.warn('Collection Bundle Single: Could not find drawer__inner', { 
+                target: !!targetDrawerInner, 
+                source: !!sourceDrawerInner 
+              });
+              
+              // Fallback: try updating individual sections
+              const targetItems = document.querySelector('cart-drawer-items');
+              const sourceItems = html.querySelector('cart-drawer-items');
+              if (targetItems && sourceItems) {
+                targetItems.replaceWith(sourceItems);
+                console.log('Collection Bundle Single: Updated cart-drawer-items (fallback)');
+              }
+              
+              const targetFooter = document.querySelector('.drawer__footer');
+              const sourceFooter = html.querySelector('.drawer__footer');
+              if (targetFooter && sourceFooter) {
+                targetFooter.innerHTML = sourceFooter.innerHTML;
+                console.log('Collection Bundle Single: Updated drawer__footer (fallback)');
+              }
+            }
+            
+            // Remove is-empty class if present
+            if (cartDrawer) {
+              if (cartDrawer.classList.contains('is-empty')) {
+                cartDrawer.classList.remove('is-empty');
+              }
+              const drawerInner = cartDrawer.querySelector('.drawer__inner');
+              if (drawerInner && drawerInner.classList.contains('is-empty')) {
+                drawerInner.classList.remove('is-empty');
+              }
+            }
+            
+            console.log('Collection Bundle Single: Cart drawer updated, opening drawer');
+            
+            // Now open the cart drawer
+            if (cartDrawer && typeof cartDrawer.open === 'function') {
+              setTimeout(() => {
+                cartDrawer.open();
+              }, 150);
+            }
+          } else {
+            // Fallback: just open the drawer
+            console.warn('Collection Bundle Single: Failed to fetch cart drawer section');
+            if (cartDrawer && typeof cartDrawer.open === 'function') {
+              setTimeout(() => {
+                cartDrawer.open();
+              }, 100);
+            }
+          }
+        } catch (error) {
+          console.error('Collection Bundle Single: Error updating cart drawer:', error);
+          // Fallback: just open the drawer
+          if (cartDrawer && typeof cartDrawer.open === 'function') {
+            setTimeout(() => {
+              cartDrawer.open();
+            }, 100);
+          }
+        }
+        
+        // Show popup notification
+        function showCartPopup() {
+          const currentSectionId = '{{ section.id }}';
+          let popup = document.getElementById('bundle-cart-popup-' + currentSectionId);
+          const popupMessage = document.getElementById('bundle-popup-message-' + currentSectionId);
+          const popupClose = document.getElementById('bundle-popup-close-' + currentSectionId);
+          const popupContinue = document.getElementById('bundle-popup-continue-' + currentSectionId);
+          
+          console.log('Collection Bundle Single: Showing popup', { 
+            popup: !!popup, 
+            popupMessage: !!popupMessage,
+            itemsCount: items.length,
+            sectionId: currentSectionId
+          });
+          
+          if (!popup) {
+            console.warn('Collection Bundle Single: Popup not found, creating fallback');
+            createFallbackPopup();
+            popup = document.getElementById('bundle-cart-popup-fallback');
+          }
+          
+          if (!popup) {
+            alert(`Successfully added ${items.length} item${items.length !== 1 ? 's' : ''} to your cart!`);
+            return;
+          }
+          
+          if (popupMessage) {
+            popupMessage.textContent = `Successfully added ${items.length} item${items.length !== 1 ? 's' : ''} to your cart!`;
+          } else {
+            const msgEl = popup.querySelector('.bundle-cart-popup__message');
+            if (msgEl) {
+              msgEl.textContent = `Successfully added ${items.length} item${items.length !== 1 ? 's' : ''} to your cart!`;
+            }
+          }
+          
+          const isMobile = window.innerWidth <= 749;
+          popup.style.display = 'flex';
+          popup.style.visibility = 'visible';
+          popup.style.opacity = '1';
+          if (isMobile) {
+            popup.style.transform = 'translateY(0)';
+          } else {
+            popup.style.transform = 'translateX(0)';
+          }
+          popup.classList.add('show');
+          
+          console.log('Collection Bundle Single: Popup forced to show', popup);
+          
+          let closeTimeout;
+          function closePopup() {
+            if (closeTimeout) {
+              clearTimeout(closeTimeout);
+              closeTimeout = null;
+            }
+            
+            const isMobile = window.innerWidth <= 749;
+            popup.classList.remove('show');
+            popup.style.opacity = '0';
+            if (isMobile) {
+              popup.style.transform = 'translateY(-200px)';
+            } else {
+              popup.style.transform = 'translateX(500px)';
+            }
+            setTimeout(() => {
+              popup.style.display = 'none';
+              popup.style.visibility = 'hidden';
+            }, 400);
+          }
+          
+          if (popupClose) {
+            popupClose.removeEventListener('click', closePopup);
+            popupClose.addEventListener('click', closePopup);
+          } else {
+            const closeBtn = popup.querySelector('.bundle-cart-popup__close');
+            if (closeBtn) {
+              closeBtn.removeEventListener('click', closePopup);
+              closeBtn.addEventListener('click', closePopup);
+            }
+          }
+          
+          if (popupContinue) {
+            popupContinue.removeEventListener('click', closePopup);
+            popupContinue.addEventListener('click', closePopup);
+          } else {
+            const continueBtn = popup.querySelector('.bundle-cart-popup__button--secondary');
+            if (continueBtn) {
+              continueBtn.removeEventListener('click', closePopup);
+              continueBtn.addEventListener('click', closePopup);
+            }
+          }
+          
+          closeTimeout = setTimeout(closePopup, 5000);
+        }
+        
+        function createFallbackPopup() {
+          const popup = document.createElement('div');
+          popup.className = 'bundle-cart-popup';
+          popup.id = 'bundle-cart-popup-fallback';
+          popup.innerHTML = `
+            <div class="bundle-cart-popup__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="bundle-cart-popup__content">
+              <h3 class="bundle-cart-popup__title">Items Added to Cart!</h3>
+              <p class="bundle-cart-popup__message">Successfully added ${items.length} item${items.length !== 1 ? 's' : ''} to your cart!</p>
+              <div class="bundle-cart-popup__actions">
+                <button type="button" class="bundle-cart-popup__button bundle-cart-popup__button--secondary" onclick="this.closest('.bundle-cart-popup').classList.remove('show')">
+                  Continue Shopping
+                </button>
+                <a href="/cart" class="bundle-cart-popup__button bundle-cart-popup__button--primary">
+                  View Cart
+                </a>
+              </div>
+            </div>
+            <button type="button" class="bundle-cart-popup__close" onclick="this.closest('.bundle-cart-popup').classList.remove('show')" aria-label="Close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/>
+              </svg>
+            </button>
+          `;
+          document.body.appendChild(popup);
+          setTimeout(() => {
+            popup.classList.add('show');
+          }, 100);
+          setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => popup.remove(), 500);
+          }, 5000);
+        }
+        
+        showCartPopup();
+        
+        if (!renderContentsCalled) {
+          setTimeout(() => {
+            const drawer = document.querySelector('cart-drawer') || document.querySelector('cart-notification');
+            if (drawer && typeof drawer.open === 'function') {
+              try {
+                drawer.open();
+                console.log('Collection Bundle Single: Cart drawer opened manually (fallback)');
+              } catch (e) {
+                console.warn('Collection Bundle Single: Could not open cart drawer', e);
+                const cartIcon = document.querySelector('#cart-icon-bubble, [data-cart-icon], .cart-icon, [aria-label*="cart" i]');
+                if (cartIcon) {
+                  cartIcon.click();
+                  console.log('Collection Bundle Single: Clicked cart icon as fallback');
+                }
+              }
+            } else {
+              const cartIcon = document.querySelector('#cart-icon-bubble, [data-cart-icon], .cart-icon, [aria-label*="cart" i]');
+              if (cartIcon) {
+                cartIcon.click();
+                console.log('Collection Bundle Single: Clicked cart icon');
+              }
+            }
+          }, 300);
+        }
+        
+      } catch (error) {
+        console.error('Error adding bundle to cart:', error);
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+        
+        let errorMessage = 'An error occurred while adding items to cart. Please try again.';
+        
+        if (error.message) {
+          errorMessage = error.message;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        }
+        
+        showError(errorMessage);
+      } finally {
+        bundleAddAllBtn.disabled = false;
+        bundleAddAllBtn.classList.remove('loading');
+        const buttonText = bundleAddAllBtn.querySelector('.bundle-single-product__button-text');
+        if (buttonText) {
+          buttonText.textContent = 'Add Complete Bundle to Cart';
+        } else {
+          bundleAddAllBtn.textContent = 'Add Complete Bundle to Cart';
+        }
+      }
+    }
+    
+    // Update cart count
+    async function updateCartCount() {
+      try {
+        const response = await fetch('/cart.js');
+        if (!response.ok) {
+          throw new Error('Failed to fetch cart');
+        }
+        
+        const cart = await response.json();
+        
+        const cartCountElements = document.querySelectorAll(
+          '.cart-count-bubble span, #cart-icon-bubble .count, [data-cart-count], .cart-count, .header__icon--cart .count, cart-icon-bubble .count'
+        );
+        cartCountElements.forEach(el => {
+          if (el) {
+            el.textContent = cart.item_count || 0;
+          }
+        });
+        
+        const cartCountAttr = document.querySelector('[data-cart-count]');
+        if (cartCountAttr) {
+          cartCountAttr.setAttribute('data-cart-count', cart.item_count || 0);
+        }
+        
+        return cart;
+      } catch (error) {
+        console.error('Error updating cart count:', error);
+        return null;
+      }
+    }
+    
+    // Show/hide messages
+    function showError(message) {
+      if (!bundleErrorMsg) return;
+      bundleErrorMsg.textContent = message || 'An error occurred. Please try again.';
+      bundleErrorMsg.classList.add('show');
+      if (bundleSuccessMsg) bundleSuccessMsg.classList.remove('show');
+      setTimeout(hideMessages, 5000);
+    }
+    
+    function showSuccess(message) {
+      if (!bundleSuccessMsg) return;
+      bundleSuccessMsg.textContent = message || 'Success!';
+      bundleSuccessMsg.classList.add('show');
+      if (bundleErrorMsg) bundleErrorMsg.classList.remove('show');
+      setTimeout(hideMessages, 5000);
+    }
+    
+    function hideMessages() {
+      if (bundleErrorMsg) bundleErrorMsg.classList.remove('show');
+      if (bundleSuccessMsg) bundleSuccessMsg.classList.remove('show');
+    }
+    
+    // Attach button click handler
+    function handleButtonClick(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('Collection Bundle Single: Button clicked', {
+        button: bundleAddAllBtn,
+        disabled: bundleAddAllBtn.disabled
+      });
+      
+      if (bundleAddAllBtn.disabled) {
+        console.warn('Collection Bundle Single: Button is disabled');
+        return;
+      }
+      
+      console.log('Collection Bundle Single: Calling addBundleToCart');
+      try {
+        addBundleToCart();
+      } catch (error) {
+        console.error('Collection Bundle Single: Error in handleButtonClick', error);
+        showError('An error occurred. Please try again.');
+      }
+    }
+    
+    if (bundleAddAllBtn) {
+      bundleAddAllBtn.addEventListener('click', handleButtonClick);
+      bundleAddAllBtn.addEventListener('keydown', function(e) {
+        if ((e.key === 'Enter' || e.key === ' ') && !bundleAddAllBtn.disabled) {
+          e.preventDefault();
+          handleButtonClick(e);
+        }
+      });
+    }
+    
+    console.log('Collection Bundle Single: Initialized successfully');
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCollectionBundleSingle);
+  } else {
+    // DOM is already ready - initialize immediately
+    initCollectionBundleSingle();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Collection Bundle Single",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Select the collection you want to display as a single bundle product"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Complete Bundle"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading Size"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Add the complete collection bundle to your cart with one click.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Bundle Discount (Optional)"
+    },
+    {
+      "type": "range",
+      "id": "bundle_discount_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Bundle Discount Percentage",
+      "info": "Discount applied when the bundle is added to cart (1% increments)",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Bundle Single"
+    }
+  ]
+}
+{% endschema %}
+

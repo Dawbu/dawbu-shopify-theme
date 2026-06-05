@@ -1,0 +1,188 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "collection_bundle_single_3QeNnH": {
+      "type": "collection-bundle-single",
+      "name": "plants",
+      "settings": {
+        "collection": "plants",
+        "heading": "plants",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_PXTGzk": {
+      "type": "collection-bundle-single",
+      "name": "diamond painting",
+      "settings": {
+        "collection": "diamond-painting-kit-2",
+        "heading": "Diamond painting",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_TXDm9J": {
+      "type": "collection-bundle-single",
+      "name": "All Growing Products",
+      "settings": {
+        "collection": "glowing-products",
+        "heading": "All Glowing Products",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_R73dix": {
+      "type": "collection-bundle-single",
+      "name": "Adorable Pet Farm",
+      "settings": {
+        "collection": "animal-building-blocks",
+        "heading": "Adorable Pet Farm",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_pb8GL8": {
+      "type": "collection-bundle-single",
+      "name": "Cute Playful Pets",
+      "settings": {
+        "collection": "cute-playful-pet",
+        "heading": "Cute Playful Pets",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_ngE3eV": {
+      "type": "collection-bundle-single",
+      "name": "Cute Sea Creatures",
+      "settings": {
+        "collection": "cute-sea-creatures",
+        "heading": "Cute Sea Creatures",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_GCDE9R": {
+      "type": "collection-bundle-single",
+      "name": "Flying Bird Paradise ",
+      "settings": {
+        "collection": "flying-bird-paradise",
+        "heading": "Flying Bird Paradise",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_68fyt4": {
+      "type": "collection-bundle-single",
+      "name": "Christmas Building Blocks",
+      "settings": {
+        "collection": "christmas-building-block",
+        "heading": "Christmas Building Blocks",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_DKrmFP": {
+      "type": "collection-bundle-single",
+      "name": "New collection",
+      "settings": {
+        "collection": "new-collection-of-building-blocks",
+        "heading": "New Collection",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_mhztki": {
+      "type": "collection-bundle-single",
+      "name": "Space Products",
+      "settings": {
+        "collection": "space-products",
+        "heading": "Space Products",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "collection_bundle_single_LkfCGC": {
+      "type": "collection-bundle-single",
+      "name": "Jurassic",
+      "settings": {
+        "collection": "jurassic",
+        "heading": "Jurassic",
+        "heading_size": "h1",
+        "description": "<p>Add the complete collection bundle to your cart with one click.</p>",
+        "bundle_discount_percent": 0,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "main",
+    "collection_bundle_single_PXTGzk",
+    "collection_bundle_single_3QeNnH",
+    "collection_bundle_single_TXDm9J",
+    "collection_bundle_single_R73dix",
+    "collection_bundle_single_pb8GL8",
+    "collection_bundle_single_ngE3eV",
+    "collection_bundle_single_GCDE9R",
+    "collection_bundle_single_68fyt4",
+    "collection_bundle_single_DKrmFP",
+    "collection_bundle_single_mhztki",
+    "collection_bundle_single_LkfCGC"
+  ]
+}

@@ -1,0 +1,93 @@
+{% comment %}
+  Renders recently viewed products
+  
+  Accepts:
+  - section: {Object} Section settings
+  - current_product: {Object} Current product to exclude from the list
+{% endcomment %}
+
+{%- if section.settings.heading != blank -%}
+  <h2 class="recently-viewed__heading {{ section.settings.heading_size }}">
+    {{ section.settings.heading | escape }}
+  </h2>
+{%- endif -%}
+
+<div id="recently-viewed-products" class="recently-viewed-products" data-current-product-id="{{ current_product.id }}">
+  <div class="loading-overlay gradient"></div>
+  <ul class="grid product-grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down">
+    <!-- Products will be loaded here via JavaScript -->
+  </ul>
+</div>
+
+<script>
+  class RecentlyViewedProducts {
+    constructor() {
+      this.productId = document.getElementById('recently-viewed-products').dataset.currentProductId;
+      this.limit = {{ section.settings.products_to_show | default: 4 }};
+      this.initProductTracking();
+      this.loadRecentProducts();
+    }
+
+    initProductTracking() {
+      if (!this.productId) return;
+      
+      // Get existing recently viewed products from localStorage
+      const recentProducts = JSON.parse(localStorage.getItem('recently-viewed-products') || '[]');
+      
+      // Add current product to the start of the array if it's not already there
+      if (!recentProducts.includes(this.productId)) {
+        // Add current product to the beginning
+        recentProducts.unshift(this.productId);
+        
+        // Keep only the most recent products (limit to 20)
+        const updatedProducts = recentProducts.slice(0, 20);
+        
+        // Save back to localStorage
+        localStorage.setItem('recently-viewed-products', JSON.stringify(updatedProducts));
+      }
+    }
+
+    async loadRecentProducts() {
+      const container = document.getElementById('recently-viewed-products');
+      if (!container) return;
+      
+      const recentProducts = JSON.parse(localStorage.getItem('recently-viewed-products') || '[]');
+      
+      // Filter out current product and limit the number
+      const productsToFetch = recentProducts
+        .filter(id => id !== this.productId)
+        .slice(0, this.limit);
+      
+      if (productsToFetch.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      try {
+        // Fetch products data
+        const response = await fetch(`/recommendations/products?product_id=${this.productId}&limit=${this.limit}&section_id=recently-viewed-products`);
+        const html = await response.text();
+        
+        // Replace container content with fetched HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        const productGrid = tempDiv.querySelector('.product-grid');
+        if (productGrid) {
+          container.querySelector('.product-grid').innerHTML = productGrid.innerHTML;
+        }
+        
+        // Remove loading overlay
+        container.querySelector('.loading-overlay').style.display = 'none';
+      } catch (error) {
+        console.error('Error loading recently viewed products:', error);
+        container.style.display = 'none';
+      }
+    }
+  }
+
+  // Initialize when DOM is fully loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new RecentlyViewedProducts();
+  });
+</script>

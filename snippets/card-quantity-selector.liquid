@@ -1,0 +1,140 @@
+{% comment %}
+  Card Quantity Selector for Collection Pages - Matches Homepage Implementation
+  Updated with robust cart sync and 'has-cart' class logic.
+{% endcomment %}
+
+{% style %}
+  .card__quantity-selector .product-form__quantity .quantity::before,
+  .card__quantity-selector .product-form__quantity .quantity::after {
+    content: unset;
+  }
+  .card__quantity-selector .product-form__quantity .quantity {
+    border: 1px solid #dbdbdb !important;
+    border-radius: 50px;
+  }
+{% endstyle %}
+
+{%- liquid
+  assign variant = variant | default: product.selected_or_first_available_variant
+  assign product_form_id = 'card-quantity-' | append: section_id | append: product.id | append: '-' | append: variant.id
+  assign cart_qty = 0
+  for item in cart.items
+    if item.variant_id == variant.id
+      assign cart_qty = item.quantity
+      break
+    endif
+  endfor
+-%}
+
+<div
+  class="card__quantity-selector{% if cart_qty > 0 %} has-cart{% endif %}"
+  data-product-id="{{ product.id }}"
+  data-variant-id="{{ variant.id }}"
+>
+  <div class="product-form__quantity">
+    <label class="visually-hidden" for="Quantity-{{ section_id }}-{{ product.id }}">
+      {{ 'products.product.quantity.label' | t }}
+    </label>
+    <quantity-input class="quantity">
+      <button class="quantity__button" name="minus" type="button">
+        <span class="visually-hidden">
+          {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
+        </span>
+        <span class="svg-wrapper">{{- 'icon-minus.svg' | inline_asset_content -}}</span>
+      </button>
+      <input
+        class="quantity__input"
+        type="number"
+        name="quantity"
+        id="Quantity-{{ section_id }}-{{ product.id }}"
+        data-cart-quantity="{{ cart_qty }}"
+        data-min="{{ variant.quantity_rule.min }}"
+        min="{{ variant.quantity_rule.min }}"
+        {% if variant.quantity_rule.max != null %}
+          data-max="{{ variant.quantity_rule.max }}"
+          max="{{ variant.quantity_rule.max }}"
+        {% endif %}
+        step="{{ variant.quantity_rule.increment | default: 1 }}"
+        value="{% if cart_qty > 0 %}{{ cart_qty }}{% else %}{{ variant.quantity_rule.min }}{% endif %}"
+        form="{{ product_form_id }}"
+      >
+      <button class="quantity__button" name="plus" type="button">
+        <span class="visually-hidden">
+          {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
+        </span>
+        <span class="svg-wrapper">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+      </button>
+    </quantity-input>
+  </div>
+
+  <div class="product-form__buttons">
+    <product-form data-section-id="{{ section_id }}">
+      <form
+        action="{{ routes.cart_add_url }}"
+        method="post"
+        enctype="multipart/form-data"
+        novalidate="novalidate"
+        data-type="add-to-cart-form"
+        id="{{ product_form_id }}"
+      >
+        <input type="hidden" name="id" value="{{ variant.id }}">
+        <input type="hidden" name="quantity" value="{{ variant.quantity_rule.min }}" class="product-form-quantity">
+        <button
+          type="submit"
+          name="add"
+          class="product-form__cart-submit button button--full-width button--secondary"
+          data-available="{{ variant.available }}"
+          {% if variant.available == false %}
+            aria-disabled="true"
+          {% endif %}
+        >
+          <span>
+            {%- if variant.available -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </span>
+          <div class="loading__spinner hidden">
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              class="spinner"
+              viewBox="0 0 66 66"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+            </svg>
+          </div>
+        </button>
+      </form>
+    </product-form>
+  </div>
+</div>
+<script>
+  (function() {
+    function blockSoldOutButtons() {
+      document.querySelectorAll('button[name="add"][data-available="false"]').forEach(function(btn) {
+        // Re-add disabled in case Dawn stripped it
+        btn.setAttribute('disabled', '');
+        btn.setAttribute('aria-disabled', 'true');
+
+        // Block click in capture phase (fires before Dawn's listener)
+        if (!btn.dataset.soldOutBlocked) {
+          btn.dataset.soldOutBlocked = 'true';
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }, true);
+        }
+      });
+    }
+
+    // Run on load
+    document.addEventListener('DOMContentLoaded', blockSoldOutButtons);
+
+    // Re-run if Dawn dynamically modifies DOM (e.g. variant switches, lazy sections)
+    const observer = new MutationObserver(blockSoldOutButtons);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-available'] });
+  })();
+</script>

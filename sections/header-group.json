@@ -1,0 +1,80 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement-bar-0": {
+          "type": "announcement",
+          "settings": {
+            "text": "Cash On Delivery Available!",
+            "link": ""
+          }
+        },
+        "announcement_timgKG": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free Shipping on Orders Above ₹149",
+            "link": ""
+          }
+        },
+        "announcement_aVVecG": {
+          "type": "announcement",
+          "settings": {
+            "text": "Mystery Products Added at Checkout",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement-bar-0",
+        "announcement_timgKG",
+        "announcement_aVVecG"
+      ],
+      "settings": {
+        "auto_rotate": true,
+        "enable_scrolling_ticker": true,
+        "ticker_speed": 9,
+        "change_slides_speed": 3,
+        "color_scheme": "scheme-23456ae8-0953-40fd-a0d9-ccd57bdf296b",
+        "show_line_separator": true,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "middle-left",
+        "mobile_logo_position": "center",
+        "menu": "main-menu",
+        "menu_type_desktop": "dropdown",
+        "sticky_header_type": "on-scroll-up",
+        "show_line_separator": true,
+        "color_scheme": "scheme-1",
+        "menu_color_scheme": "scheme-1",
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "enable_customer_avatar": true,
+        "margin_bottom": 0,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

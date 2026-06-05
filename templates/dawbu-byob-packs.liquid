@@ -1,0 +1,81 @@
+{%- comment -%}
+  =============================================================================
+  snippet: dawbu-byob-packs
+  =============================================================================
+  SINGLE SOURCE OF TRUTH for Build-Your-Own-Bundle packs.
+  Edit the arrays below once — the hub, the builder, and the PDP bridge all
+  pick up the changes.
+
+  Use:    {%- include 'dawbu-byob-packs' -%}    (include, not render — variables leak through)
+
+  Exposes these variables to the parent:
+    pack_count           integer
+    pack_handles         array — also the URL handle for /pages/{handle}
+    pack_titles          array
+    pack_families        array — must match a value in family_handles below
+    pack_quantities      array — integers (qty per bundle)
+    pack_prices          array — integers (rupees, no symbol)
+    pack_collections     array — Shopify collection handle that holds the eligible products
+    pack_images          array — asset filename (e.g. 'pack-mega-box.webp'); blank → fallback
+    pack_badges          array — small ribbon text ('MOST POPULAR'); blank → none
+    pack_subtitles       array — saving copy ('Save 5%'); blank → none
+
+    family_handles, family_titles, family_emojis, family_count
+
+  -----------------------------------------------------------------------------
+  HOW TO EDIT
+  -----------------------------------------------------------------------------
+  • Every parallel array must have the SAME length (currently 14).
+  • Use the same separator throughout each array: "," for handles/families/numbers,
+    "|" for titles/subtitles/badges (because titles can contain commas).
+  • To DISABLE a pack temporarily, prefix its handle with "_" — the consumers
+    skip any handle that starts with "_". (Saves you from re-numbering arrays.)
+  • Add a new pack → append a value to EVERY array, in the same position.
+  =============================================================================
+{%- endcomment -%}
+
+{%- comment -%} -------- PACK HANDLES (also = page URL handle: /pages/{handle}) -------- {%- endcomment -%}
+{%- assign pack_handles = "build-craft-crate,mega-box,block-sets,master-builder-set,collectors-vault,glow-grab-bag,glow-mini-pack,glow-squad-bag,mini-starter-pack,mini-mates-pack,mini-figures,mini-heroes-pack,big-mini-figures,premium-minis" | split: "," -%}
+
+{%- comment -%} -------- TITLES (shown on cards + builder page) -------- {%- endcomment -%}
+{%- assign pack_titles = "Build & Craft Crate|10-in-1 Mega Box|Block Sets|Master Builder Set|Collector's Vault|Glow Grab Bag|Glow Mini Pack|Glow Squad Bag|Mini Starter Pack|Mini Mates Pack|Mini Figures|Mini Heroes Pack|Big Mini Figures|Premium Minis" | split: "|" -%}
+
+{%- comment -%} -------- FAMILIES (groups packs on the hub) -------- {%- endcomment -%}
+{%- assign pack_families = "block,block,block,block,block,mini,mini,mini,mini,mini,mini,mini,mini,mini" | split: "," -%}
+
+{%- comment -%} -------- QUANTITIES (Any N for ₹P) -------- {%- endcomment -%}
+{%- assign pack_quantities = "6,6,6,6,6,25,14,11,9,7,6,6,6,6" | split: "," -%}
+
+{%- comment -%} -------- BUNDLE PRICES (rupees, no symbol) -------- {%- endcomment -%}
+{%- assign pack_prices = "390,450,735,849,1419,199,199,209,210,199,199,220,279,310" | split: "," -%}
+
+{%- comment -%}
+  -------- COLLECTION HANDLES --------
+  Each pack maps to one Shopify collection containing the eligible products.
+  Create these in Shopify Admin → Products → Collections, then add the SKUs
+  from the "Products by Pack" sheet of your xlsx.
+{%- endcomment -%}
+{%- assign pack_collections = "byob-block-69,byob-block-79,byob-block-129,byob-block-149,byob-block-249,byob-mini-bulk,byob-mini-15,byob-mini-20,byob-mini-25,byob-mini-30,byob-mini-35,byob-mini-39,byob-mini-49,byob-mini-55" | split: "," -%}
+
+{%- comment -%}
+  -------- IMAGES --------
+  Asset filename (upload via Online Store → Themes → Edit code → Assets).
+  Leave a position blank to fall back to the collection's featured image.
+{%- endcomment -%}
+{%- assign pack_images = ",,,,,,,,,,,,," | split: "," -%}
+
+{%- comment -%} -------- BADGES (small ribbon on the card) -------- {%- endcomment -%}
+{%- assign pack_badges = "|MOST POPULAR||||VALUE||TRENDING|||||PREMIUM|" | split: "|" -%}
+
+{%- comment -%} -------- SUBTITLES (saving copy under the meta line) -------- {%- endcomment -%}
+{%- assign pack_subtitles = "Save 6%|Save 5% on 6 picks|Save 5%|Save 5%|Save 5%|Bulk grab-bag|Save 5%|Save up to 5%|Save up to 7%|Save up to 5%|Save 5%|Save 6%|Save up to 5%|Save 6%" | split: "|" -%}
+
+{%- assign pack_count = pack_handles | size -%}
+
+{%- comment -%} =============================================================================
+                FAMILIES — groups on the hub page
+                ============================================================================= {%- endcomment -%}
+{%- assign family_handles = "block,mini" | split: "," -%}
+{%- assign family_titles = "Building Blocks|Glow Minis" | split: "|" -%}
+{%- assign family_emojis = "🧱|✨" | split: "|" -%}
+{%- assign family_count = family_handles | size -%}

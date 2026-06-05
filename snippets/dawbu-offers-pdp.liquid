@@ -1,0 +1,234 @@
+{%- liquid
+  assign heading = heading | default: 'Available Offers'
+  assign offer_1 = offer_1 | default: 'Get Rs. 100 off'
+  assign offer_1_tagline = offer_1_tagline | default: 'On carts above Rs. 899'
+  assign offer_1_code = offer_1_code | default: 'SAVE100'
+  assign offer_2 = offer_2 | default: 'Get 9% off'
+  assign offer_2_tagline = offer_2_tagline | default: 'On carts above Rs. 1200'
+  assign offer_2_code = offer_2_code | default: 'SAVE09'
+  assign offer_3 = offer_3 | default: 'Get 15% off'
+  assign offer_3_tagline = offer_3_tagline | default: 'On carts above Rs. 2400'
+  assign offer_3_code = offer_3_code | default: 'SAVE15'
+-%}
+<div class="dawbu-offer-container">
+  <div class="dawbu-offer-title">{{ heading }}</div>
+  <div class="dawbu-offer-cblokwrap">
+    <div class="dawbu-offer-block">
+      <div class="dawbu-offer-header">
+        <div class="offleft">
+          <span class="oftitle">{{ offer_1 }}</span>
+          <span class="tag-lin">{{ offer_1_tagline }}</span>
+        </div>
+      </div>
+      <div class="dawbu-offer-bottom">
+        <p class="offer-text">Code: <span class="offer-code">{{ offer_1_code }}</span></p>
+        <div class="copysvg" role="button" tabindex="0" aria-label="Copy code">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.9993 6.66699H8.33268C7.89065 6.66699 7.46673 6.84259 7.15417 7.15515C6.84161 7.46771 6.66602 7.89163 6.66602 8.33366V15.0003C6.66602 15.4424 6.84161 15.8663 7.15417 16.1788C7.46673 16.4914 7.89065 16.667 8.33268 16.667H14.9993C15.4414 16.667 15.8653 16.4914 16.1779 16.1788C16.4904 15.8663 16.666 15.4424 16.666 15.0003V8.33366C16.666 7.89163 16.4904 7.46771 16.1779 7.15515C15.8653 6.84259 15.4414 6.66699 14.9993 6.66699Z" stroke="#121212" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.334 6.66634V4.99967C13.334 4.55765 13.1584 4.13372 12.8458 3.82116C12.5333 3.5086 12.1093 3.33301 11.6673 3.33301H5.00065C4.55862 3.33301 4.1347 3.5086 3.82214 3.82116C3.50958 4.13372 3.33398 4.55765 3.33398 4.99967V11.6663C3.33398 12.1084 3.50958 12.5323 3.82214 12.8449C4.1347 13.1574 4.55862 13.333 5.00065 13.333H6.66732" stroke="#121212" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="dawbu-offer-block">
+      <div class="dawbu-offer-header">
+        <div class="offleft">
+          <span class="oftitle">{{ offer_2 }}</span>
+          <span class="tag-lin">{{ offer_2_tagline }}</span>
+        </div>
+      </div>
+      <div class="dawbu-offer-bottom">
+        <p class="offer-text">Code: <span class="offer-code">{{ offer_2_code }}</span></p>
+        <div class="copysvg" role="button" tabindex="0" aria-label="Copy code">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.9993 6.66699H8.33268C7.89065 6.66699 7.46673 6.84259 7.15417 7.15515C6.84161 7.46771 6.66602 7.89163 6.66602 8.33366V15.0003C6.66602 15.4424 6.84161 15.8663 7.15417 16.1788C7.46673 16.4914 7.89065 16.667 8.33268 16.667H14.9993C15.4414 16.667 15.8653 16.4914 16.1779 16.1788C16.4904 15.8663 16.666 15.4424 16.666 15.0003V8.33366C16.666 7.89163 16.4904 7.46771 16.1779 7.15515C15.8653 6.84259 15.4414 6.66699 14.9993 6.66699Z" stroke="#121212" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.334 6.66634V4.99967C13.334 4.55765 13.1584 4.13372 12.8458 3.82116C12.5333 3.5086 12.1093 3.33301 11.6673 3.33301H5.00065C4.55862 3.33301 4.1347 3.5086 3.82214 3.82116C3.50958 4.13372 3.33398 4.55765 3.33398 4.99967V11.6663C3.33398 12.1084 3.50958 12.5323 3.82214 12.8449C4.1347 13.1574 4.55862 13.333 5.00065 13.333H6.66732" stroke="#121212" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="dawbu-offer-block">
+      <div class="dawbu-offer-header">
+        <div class="offleft">
+          <span class="oftitle">{{ offer_3 }}</span>
+          <span class="tag-lin">{{ offer_3_tagline }}</span>
+        </div>
+      </div>
+      <div class="dawbu-offer-bottom">
+        <p class="offer-text">Code: <span class="offer-code">{{ offer_3_code }}</span></p>
+        <div class="copysvg" role="button" tabindex="0" aria-label="Copy code">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.9993 6.66699H8.33268C7.89065 6.66699 7.46673 6.84259 7.15417 7.15515C6.84161 7.46771 6.66602 7.89163 6.66602 8.33366V15.0003C6.66602 15.4424 6.84161 15.8663 7.15417 16.1788C7.46673 16.4914 7.89065 16.667 8.33268 16.667H14.9993C15.4414 16.667 15.8653 16.4914 16.1779 16.1788C16.4904 15.8663 16.666 15.4424 16.666 15.0003V8.33366C16.666 7.89163 16.4904 7.46771 16.1779 7.15515C15.8653 6.84259 15.4414 6.66699 14.9993 6.66699Z" stroke="#121212" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.334 6.66634V4.99967C13.334 4.55765 13.1584 4.13372 12.8458 3.82116C12.5333 3.5086 12.1093 3.33301 11.6673 3.33301H5.00065C4.55862 3.33301 4.1347 3.5086 3.82214 3.82116C3.50958 4.13372 3.33398 4.55765 3.33398 4.99967V11.6663C3.33398 12.1084 3.50958 12.5323 3.82214 12.8449C4.1347 13.1574 4.55862 13.333 5.00065 13.333H6.66732" stroke="#121212" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dawbu-offer-container { margin: 0 0 24px; font-family: inherit; }
+  .dawbu-offer-title {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.4;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: #121212;
+    margin-bottom: 12px;
+  }
+  .dawbu-offer-cblokwrap {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .dawbu-offer-block {
+    flex: 1 1 220px;
+    padding: 14px 16px;
+    background: #f7f7f7;
+    border: 1px solid #ebebeb;
+    border-left: 3px solid #ed1c24;
+    position: relative;
+    border-radius: 0;
+    min-width: 0;
+  }
+  .dawbu-offer-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .dawbu-offer-block .offleft {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dawbu-offer-block .oftitle {
+    color: #121212;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.2;
+  }
+  .dawbu-offer-block .tag-lin {
+    margin-top: 6px;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.35;
+    color: #555;
+  }
+  .dawbu-offer-bottom {
+    display: flex;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #c8c1bb;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dawbu-offer-bottom .copysvg {
+    line-height: 1;
+    cursor: pointer;
+    position: relative;
+  }
+  .dawbu-offer-block p.offer-text {
+    color: #121212;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: .02em;
+  }
+  .dawbu-offer-block .offer-code {
+    color: #ed1c24;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .dawbu-offer-copied {
+    position: absolute;
+    right: 24px;
+    bottom: 6px;
+    font-size: 11px;
+    color: #ed1c24;
+    font-weight: 700;
+    pointer-events: none;
+    animation: dawbu-offer-fade 1.6s ease;
+  }
+  @keyframes dawbu-offer-fade {
+    0%   { opacity: 0; transform: translateY(4px); }
+    15%  { opacity: 1; transform: translateY(0); }
+    80%  { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-4px); }
+  }
+  @media (max-width: 749px) {
+    .dawbu-offer-cblokwrap {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+    }
+    .dawbu-offer-block {
+      flex: 0 0 78%;
+      scroll-snap-align: start;
+    }
+    .dawbu-offer-title { font-size: 14px; }
+    .dawbu-offer-block .oftitle { font-size: 14px; }
+    .dawbu-offer-block .tag-lin { font-size: 11px; margin-top: 4px; }
+    .dawbu-offer-block p.offer-text { font-size: 12px; }
+    .dawbu-offer-bottom .copysvg svg { width: 16px; height: 16px; }
+  }
+</style>
+
+<script>
+  (function () {
+    function init() {
+      var btns = document.querySelectorAll('.dawbu-offer-block .copysvg');
+      btns.forEach(function (btn) {
+        if (btn.dataset.dawbuBound) return;
+        btn.dataset.dawbuBound = '1';
+        var copy = function () {
+          var block = btn.closest('.dawbu-offer-block');
+          if (!block) return;
+          var codeEl = block.querySelector('.offer-code');
+          if (!codeEl) return;
+          var code = codeEl.innerText.trim();
+          var done = function () {
+            var msg = document.createElement('span');
+            msg.className = 'dawbu-offer-copied';
+            msg.innerText = 'Copied!';
+            block.appendChild(msg);
+            setTimeout(function () { msg.remove(); }, 1500);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(done).catch(function () {
+              var ta = document.createElement('textarea');
+              ta.value = code;
+              document.body.appendChild(ta);
+              ta.select();
+              try { document.execCommand('copy'); done(); } catch (e) {}
+              document.body.removeChild(ta);
+            });
+          } else {
+            var ta = document.createElement('textarea');
+            ta.value = code;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); done(); } catch (e) {}
+            document.body.removeChild(ta);
+          }
+        };
+        btn.addEventListener('click', copy);
+        btn.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copy(); }
+        });
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

@@ -1,0 +1,2694 @@
+{%- comment -%}
+  TAO Bundle Bridge
+  Pushes BYOB bundles whenever a customer engages a single product.
+  Touchpoints:
+    1. PDP quantity ladder (inline)
+    2. ATC popup (Bundle Bridge)
+    3. Cart drawer Living Coach
+    4. Cart page last-call bar
+  Eligibility: only fires when product is in at least one bundle collection.
+  Recommendations: Shopify /recommendations/products.json?intent=complementary, falls back to related, then bestsellers.
+{%- endcomment -%}
+
+{%- liquid
+  assign bundle_collections = "byob-block-69,byob-block-79,byob-block-129,byob-block-149,byob-block-249,byob-mini-bulk,byob-mini-15,byob-mini-20,byob-mini-25,byob-mini-30,byob-mini-35,byob-mini-39,byob-mini-49,byob-mini-55" | split: ","
+-%}
+
+<style>
+/* === Social Proof on PDP === */
+/* Hide the theme's built-in sold-product / live-view blocks — we render a single combined version below.
+   Use :has() to also hide the surrounding flex wrapper that includes the orphan fire-icon SVG. */
+.live_view,
+sold-product,
+.flex:has(> sold-product),
+.review_sold > .flex:has(sold-product),
+.product-detail__sold-product, .product__sold-row, .product-sold-row { display:none !important }
+
+/* === PDP product-info column: vertical rhythm ===
+   Tag rule: BREATHING space above (title → tag), MINOR space below (tag → price). */
+.product-detail__title{margin-bottom:18px !important;line-height:1.18}
+.product-tag,
+.product-detail__tag,
+.product-detail__tags,
+.product-detail__title-tag{margin:0 !important;padding:4px 12px !important}
+.product-detail__price{margin-top:8px !important;margin-bottom:6px !important}
+.tax-include{font-size:12px;color:#888;margin-top:2px;margin-bottom:10px !important;line-height:1.3}
+.product-detail__price + .tax-include{margin-top:0}
+.review_sold{margin-bottom:8px !important}
+.product-detail__short-description{margin-top:8px !important;margin-bottom:12px !important;line-height:1.45}
+.product-addons{padding-bottom:14px !important;margin-bottom:14px !important}
+.product-detail__variant-picker{margin-bottom:12px !important}
+.product-detail__buy-buttons{margin-top:6px !important;margin-bottom:12px !important}
+/* Collapse any block-wrapper that ends up empty after we hide theme blocks */
+.product-detail__container > *:empty,
+.product-detail__info > *:empty{display:none}
+@media(max-width:560px){
+  .product-detail__title{font-size:24px;margin-bottom:6px !important}
+  .product-detail__price{margin-bottom:4px !important}
+  .tax-include{margin-bottom:8px !important}
+  .product-addons{padding-bottom:12px !important;margin-bottom:12px !important;gap:18px !important}
+  .product-detail__variant-picker{margin-bottom:10px !important}
+  .product-detail__buy-buttons{margin-top:5px !important;margin-bottom:10px !important}
+}
+
+/* === Native +/- qty input HIDDEN on PDP — chip selector replaces it ===
+   We keep the input in the DOM (form submission needs it) but visually hide.
+   ATC stays full-width on its own row. */
+form[action*="/cart/add"] .product-form__quantity{
+  position:absolute !important;width:0 !important;height:0 !important;
+  overflow:hidden !important;padding:0 !important;margin:0 !important;clip:rect(0,0,0,0);visibility:hidden
+}
+.product__submit-form-cart{display:flex !important;flex-wrap:wrap;gap:10px !important}
+.product__submit-form-cart .button_buy-now{flex:1 1 100% !important;width:100% !important}
+
+/* === PDP qty chips (1 · 2 · 5 · 10) === */
+.tao-qty-chips{margin:8px 0 10px;font-family:inherit}
+.tao-qty-chips .tao-qty-label{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#666;margin-bottom:8px;display:flex;align-items:baseline;gap:8px}
+.tao-qty-chips .tao-qty-label .tao-qty-max{font-size:10px;font-weight:600;color:#999;letter-spacing:.02em;text-transform:none}
+.tao-qty-chips .tao-qty-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* Custom qty input — sits inline as a 5th option, accepts numbers up to max */
+.tao-qty-chips .tao-qty-custom{
+  position:relative;display:inline-flex;align-items:center;
+  flex:1 1 auto;min-width:80px;height:46px;
+  border:1.5px dashed #ede9df;border-radius:999px;
+  padding:0 14px 0 16px;background:#fff;
+  transition:border-color .15s,background .15s
+}
+.tao-qty-chips .tao-qty-custom:hover{border-color:#c6e1cc;background:#f4f9f5}
+.tao-qty-chips .tao-qty-custom.active{border-color:#0e855b;border-style:solid;background:#fff;box-shadow:0 2px 6px rgba(14,133,91,.18)}
+.tao-qty-chips .tao-qty-custom .tao-qty-custom-prefix{
+  font-size:11px;font-weight:700;color:#999;
+  letter-spacing:.04em;text-transform:uppercase;
+  padding-right:4px;flex-shrink:0
+}
+.tao-qty-chips .tao-qty-custom.active .tao-qty-custom-prefix{color:#0e855b}
+.tao-qty-chips .tao-qty-custom input{
+  flex:1;min-width:0;width:100%;height:100%;
+  border:0;background:transparent;outline:none;
+  font-size:15px;font-weight:700;color:#1a1a1a;
+  font-variant-numeric:tabular-nums;
+  text-align:center;padding:0;
+  font-family:inherit;
+  -moz-appearance:textfield
+}
+.tao-qty-chips .tao-qty-custom input::-webkit-inner-spin-button,
+.tao-qty-chips .tao-qty-custom input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.tao-qty-chips .tao-qty-custom input::placeholder{color:#bbb;font-weight:500}
+@media(max-width:560px){
+  .tao-qty-chips .tao-qty-custom{height:44px;min-width:74px;padding:0 12px 0 14px}
+  .tao-qty-chips .tao-qty-custom .tao-qty-custom-prefix{font-size:10px}
+  .tao-qty-chips .tao-qty-custom input{font-size:14px}
+}
+.tao-qty-chip{
+  flex:1 1 0;min-width:56px;
+  height:46px;padding:0 16px;
+  border:1.5px solid #ede9df;background:#fff;color:#1a1a1a;
+  border-radius:999px;font-size:15px;font-weight:700;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .08s,box-shadow .15s;
+  font-family:inherit
+}
+.tao-qty-chip:hover{background:#f4f9f5;border-color:#c6e1cc}
+.tao-qty-chip:active{transform:scale(.96)}
+.tao-qty-chip.active{
+  background:#0e855b;color:#fff;border-color:#0e855b;
+  box-shadow:0 2px 6px rgba(14,133,91,.22)
+}
+.tao-qty-chip:focus-visible{outline:2px solid #0e855b;outline-offset:2px}
+@media(max-width:560px){
+  .tao-qty-chip{height:44px;font-size:14px;padding:0 14px;min-width:50px}
+}
+
+/* === Secondary "Build a X-pack" CTA — only for BYOB-eligible products === */
+.tao-build-bundle-cta{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;margin:0 0 16px;padding:13px 18px;
+  background:#fff;color:#0a6e4a;
+  border:1.5px solid #0e855b;border-radius:999px;
+  font-size:14px;font-weight:700;letter-spacing:.04em;
+  cursor:pointer;transition:background .12s,transform .08s,box-shadow .12s;
+  font-family:inherit;text-align:center;line-height:1.2
+}
+.tao-build-bundle-cta:hover{background:#f4f9f5;box-shadow:0 3px 12px rgba(14,133,91,.18)}
+.tao-build-bundle-cta:active{transform:scale(.97)}
+.tao-build-bundle-cta strong{color:#0a6e4a;font-weight:800}
+.tao-build-bundle-cta .tao-bb-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;
+  background:#0e855b;color:#fff;font-size:14px;font-weight:800;line-height:1
+}
+.tao-build-bundle-cta .tao-bb-arrow{color:#0a6e4a;font-weight:800;transition:transform .15s}
+.tao-build-bundle-cta:hover .tao-bb-arrow{transform:translateX(3px)}
+@media(max-width:560px){
+  .tao-build-bundle-cta{padding:12px 16px;font-size:13px}
+  .tao-build-bundle-cta .tao-bb-icon{width:18px;height:18px;font-size:12px}
+}
+
+/* Old ladder — dormant; if any cached page still renders it, hide. */
+.tao-bb-ladder{display:none !important}
+
+.tao-sp{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:6px 0 8px;padding:0;background:#fff;border:1px solid #e9e3d3;border-radius:14px;font-family:inherit;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.tao-sp-row{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13px;color:#3a3a3a;line-height:1.3}
+.tao-sp-row + .tao-sp-row{border-left:1px solid #f1ede2}
+.tao-sp-row .count{color:#111;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.tao-sp-row .label{color:#666;font-size:12px}
+.tao-sp .icon{flex-shrink:0;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+.tao-sp .icon.fire{background:#fef3f3;color:#e63946}
+.tao-sp .icon.fire::before{content:'\1F525'}
+.tao-sp .icon.eye{background:#f1f8f3;color:#0e855b;position:relative}
+.tao-sp .icon.eye::before{content:'\1F441';font-size:13px}
+.tao-sp .icon.eye::after{content:'';position:absolute;top:2px;right:2px;width:7px;height:7px;background:#0e855b;border:2px solid #fff;border-radius:50%;animation:tao-sp-pulse 2s ease-in-out infinite}
+@keyframes tao-sp-pulse{0%,100%{box-shadow:0 0 0 0 rgba(14,133,91,.55)}50%{box-shadow:0 0 0 5px rgba(14,133,91,0)}}
+.tao-sp .stack{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+@media(max-width:560px){
+  .tao-sp{grid-template-columns:1fr;gap:0}
+  .tao-sp-row + .tao-sp-row{border-left:0;border-top:1px solid #f1ede2}
+  .tao-sp-row{padding:10px 13px;font-size:12.5px}
+  .tao-sp .icon{width:26px;height:26px}
+  .tao-sp-row .label{font-size:11.5px}
+}
+
+
+
+/* Hide theme's built-in free-ship/threshold bar — we render our own */
+.free-ship-progress-bar,
+[class*="free-ship-progress" i],
+[class*="cart_threshold" i],
+[class*="cart_shipping" i]:not(.cart-shipping-amount):not([class*="form"]),
+.cart-progress.cart-shipping-progress,
+.free-shipping-progress-bar,
+.cart__shipping-progress,
+.shipping-progress-bar { display: none !important; }
+
+/* Hide the theme's bulky sticky add-to-cart bar on PDPs — we render our own slim bar instead */
+sticky-add-cart{display:none !important}
+
+/* === Standalone fixed-bottom progress bar (replaces sticky-add-cart on PDP) === */
+.tao-sticky-progress{position:fixed;left:0;right:0;bottom:0;z-index:11;padding:9px 16px 10px;background:#faf8f3;border-top:1px solid #ede9df;box-shadow:0 -4px 14px -8px rgba(0,0,0,.12);font-family:inherit;font-size:12.5px;color:#3a3a3a;line-height:1.25;transform:translateY(100%);transition:transform .25s ease,opacity .2s ease;opacity:0;pointer-events:none}
+.tao-sticky-progress.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.tao-sticky-progress .msg{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;font-weight:600}
+.tao-sticky-progress .msg strong{color:#0e855b;font-weight:800}
+.tao-sticky-progress .msg .unlocked{color:#0e855b}
+.tao-sticky-progress .msg .pct{color:#999;font-weight:700;flex-shrink:0;font-variant-numeric:tabular-nums}
+.tao-sticky-progress .bar{height:5px;background:#ebebeb;border-radius:999px;overflow:hidden}
+.tao-sticky-progress .bar i{display:block;height:100%;background:linear-gradient(90deg,#ffc107 0%,#0e855b 100%);border-radius:999px;transition:width .4s cubic-bezier(.4,1.4,.6,1)}
+@media(max-width:560px){.tao-sticky-progress{padding:8px 14px 9px;font-size:12px}.tao-sticky-progress .msg{margin-bottom:5px}}
+
+/* === PDP Quantity Ladder === */
+.tao-bb-ladder{margin:14px 0 18px;border:1px solid #ede9df;border-radius:12px;overflow:hidden;background:#fff;font-family:inherit}
+.tao-bb-ladder__row{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:13px 16px;border-bottom:1px solid #f1ede2;cursor:pointer;transition:background .12s}
+.tao-bb-ladder__row:last-child{border-bottom:0}
+.tao-bb-ladder__row:hover{background:#fafaf5}
+.tao-bb-ladder__row.selected{background:#f4f9f5}
+.tao-bb-ladder__radio{width:18px;height:18px;border:2px solid #cfcbb8;border-radius:50%;position:relative;flex-shrink:0}
+.tao-bb-ladder__row.selected .tao-bb-ladder__radio{border-color:#0e855b}
+.tao-bb-ladder__row.selected .tao-bb-ladder__radio::after{content:'';position:absolute;inset:3px;background:#0e855b;border-radius:50%}
+.tao-bb-ladder__label{font-size:14px;font-weight:600;color:#111;display:flex;flex-direction:column;gap:2px}
+.tao-bb-ladder__label .save{margin-left:8px;font-size:12px;font-weight:700;color:#0e855b}
+.tao-bb-ladder__label .pop{display:inline-block;font-size:9px;font-weight:800;background:#0e855b;color:#fff;padding:2px 6px;border-radius:4px;margin-left:8px;letter-spacing:.06em;vertical-align:middle}
+.tao-bb-ladder__label .per{font-size:11px;font-weight:500;color:#666;margin-top:2px}
+.tao-bb-ladder__price{font-size:14px;font-weight:700;color:#111;font-variant-numeric:tabular-nums}
+
+/* === Bundle Bridge Popup === */
+.tao-bb{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9998;display:none;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(2px)}
+.tao-bb.open{display:flex;animation:tao-bb-fade .14s ease}
+@keyframes tao-bb-fade{from{opacity:0}to{opacity:1}}
+.tao-bb-card{position:relative;width:100%;max-width:520px;max-height:92vh;background:#fff;border-radius:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 24px 60px -16px rgba(0,0,0,.4);animation:tao-bb-rise .16s ease}
+/* Close button — large tap target, always visible at top-right */
+.tao-bb-close{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.95);color:#111;font-size:24px;line-height:1;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:10;padding:0;transition:background .12s,transform .08s;-webkit-tap-highlight-color:transparent}
+.tao-bb-close:hover{background:#fff;transform:scale(1.05)}
+.tao-bb-close:active{transform:scale(.95)}
+@media(max-width:560px){.tao-bb-close{top:8px;right:8px;width:32px;height:32px;font-size:22px}}
+@keyframes tao-bb-rise{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+
+.tao-bb-head{padding:24px 24px 8px}
+.tao-bb-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0e855b;margin:0 0 6px}
+.tao-bb-title{font-size:22px;line-height:1.22;margin:0 0 6px;font-weight:700;color:#111;letter-spacing:-.012em}
+.tao-bb-sub{font-size:14px;color:#666;margin:0}
+.tao-bb-slots{display:flex;gap:8px;padding:16px 24px 8px;flex-wrap:wrap}
+.tao-bb-slot{width:64px;height:64px;border-radius:10px;background:#faf8f3;border:2px dashed #d4d0bf;display:flex;align-items:center;justify-content:center;font-size:24px;color:#a09b85;position:relative;overflow:hidden;flex-shrink:0;transition:border-color .15s,transform .15s}
+.tao-bb-slot.filled{border-style:solid;border-color:#0e855b;background:#fff;cursor:pointer}
+.tao-bb-slot.filled img{width:100%;height:100%;object-fit:cover}
+.tao-bb-slot.locked::after{content:'\2713';position:absolute;top:2px;right:4px;color:#fff;background:#0e855b;width:14px;height:14px;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.tao-bb-slot .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;width:18px;height:18px;border-radius:50%;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1}
+.tao-bb-slot.filled:not(.locked):hover .rm{display:flex}
+.tao-bb-progress{padding:0 24px 14px}
+.tao-bb-progress .label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:6px}
+.tao-bb-progress .label .done{color:#0e855b}
+.tao-bb-progress .label .left{color:#666}
+.tao-bb-progress .bar{height:6px;background:#ebebeb;border-radius:999px;overflow:hidden}
+.tao-bb-progress .bar i{display:block;height:100%;background:linear-gradient(90deg,#ffc107,#0e855b);width:0;transition:width .35s cubic-bezier(.4,1.4,.6,1);border-radius:999px}
+.tao-bb-progress .save{margin-top:8px;font-size:12px;color:#0e855b;font-weight:700;text-align:center}
+.tao-bb-progress .save:empty{display:none}
+.tao-bb-picks{padding:8px 24px 14px}
+.tao-bb-picks h4{margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#666}
+.tao-bb-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:480px){.tao-bb-grid{grid-template-columns:repeat(2,1fr)}}
+.tao-bb-pick{border:1px solid #ede9df;border-radius:12px;padding:6px 6px 8px;background:#fff;cursor:pointer;text-align:left;transition:all .15s ease;position:relative;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.tao-bb-pick:hover{border-color:#0e855b;box-shadow:0 6px 14px -6px rgba(14,133,91,.25);transform:translateY(-1px)}
+.tao-bb-pick img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;background:#faf8f3;display:block}
+.tao-bb-pick .t{font-size:11.5px;font-weight:600;color:#111;line-height:1.3;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding:0 2px;min-height:28px}
+.tao-bb-pick .prow{display:flex;align-items:center;gap:5px;padding:0 2px;margin-top:2px;flex-wrap:wrap}
+.tao-bb-pick .p{font-size:12.5px;color:#111;font-weight:800}
+.tao-bb-pick .pwas{font-size:10.5px;color:#999;text-decoration:line-through;text-decoration-color:#e63946}
+.tao-bb-pick .ppct{font-size:9.5px;font-weight:800;background:#fef3f3;color:#e63946;padding:1px 5px;border-radius:3px;letter-spacing:.04em;margin-left:auto}
+/* Selected state — whole tile is the toggle; checkmark badge signals "tap again to remove" */
+.tao-bb-pick.added{border-color:#0e855b;background:#f4f9f5}
+.tao-bb-pick.added::after{content:'\2713';position:absolute;top:6px;right:6px;width:22px;height:22px;background:#0e855b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-shadow:0 2px 6px rgba(14,133,91,.35)}
+.tao-bb-pick.added:hover{box-shadow:0 6px 14px -6px rgba(230,57,70,.25);border-color:#e63946}
+.tao-bb-pick.added:hover::after{content:'\00d7';background:#e63946;box-shadow:0 2px 6px rgba(230,57,70,.35)}
+/* Grey-out non-selected tiles once the bundle is full so the picker reads as "done" */
+.tao-bb-grid.full .tao-bb-pick:not(.added){opacity:.35;pointer-events:none;filter:grayscale(.6)}
+.tao-bb-grid.full .tao-bb-pick:not(.added):hover{transform:none;border-color:#ede9df;box-shadow:none}
+.tao-bb-foot{position:sticky;bottom:0;background:#fff;padding:14px 24px 18px;border-top:1px solid #ebebeb;box-shadow:0 -8px 20px -10px rgba(0,0,0,.1)}
+.tao-bb-cta{display:block;width:100%;background:#0e855b;color:#fff;border:none;padding:14px;font-size:15px;font-weight:800;border-radius:12px;cursor:pointer;letter-spacing:.02em;transition:background .12s,transform .08s;box-shadow:0 4px 14px rgba(14,133,91,.3)}
+.tao-bb-cta:hover{background:#0a6e4a}
+.tao-bb-cta:active{transform:scale(.99)}
+.tao-bb-cta:disabled{background:#bdb9a8;cursor:not-allowed;box-shadow:none}
+.tao-bb-no{display:block;width:100%;margin-top:10px;padding:12px;background:#fafaf5;color:#444;border:1px solid #ede9df;border-radius:10px;font-size:13.5px;font-weight:600;letter-spacing:.02em;cursor:pointer;text-decoration:none;text-align:center;transition:all .14s ease;font-family:inherit}
+.tao-bb-no:hover{background:#fff;color:#111;border-color:#cfcbb8}
+.tao-bb-no:active{transform:scale(.99)}
+.tao-bb-no.loading{background:#fff8e1;color:#5a4500;border-color:#f4e4a3}
+.tao-bb-no.error{background:#fdecec;color:#8a1b13;border-color:#e63946}
+body.tao-bb-open{overflow:hidden}
+@media(max-width:560px){.tao-bb{padding:16px;align-items:center}.tao-bb-card{max-height:75vh;max-width:340px;border-radius:18px;animation:tao-bb-rise .16s ease}.tao-bb-head{padding:18px 18px 4px}.tao-bb-title{font-size:17px;line-height:1.25}.tao-bb-sub{font-size:12.5px}.tao-bb-eyebrow{font-size:10px}.tao-bb-slots{padding:12px 18px 4px;gap:5px}.tao-bb-slot{width:48px;height:48px;font-size:18px}.tao-bb-progress{padding:0 18px 10px}.tao-bb-progress .label{font-size:11px}.tao-bb-progress .save{font-size:11px}.tao-bb-picks{padding:4px 18px 12px}.tao-bb-picks h4{font-size:10px;margin-bottom:6px}.tao-bb-grid{gap:6px}.tao-bb-pick{padding:6px}.tao-bb-pick .t{font-size:10px;margin:4px 0 1px}.tao-bb-pick .p{font-size:10px}.tao-bb-foot{padding:10px 18px 14px}.tao-bb-cta{padding:12px;font-size:13.5px}.tao-bb-no{font-size:11.5px;margin-top:8px}}}.tao-bb-head{padding:20px 18px 6px;padding-top:24px}.tao-bb-title{font-size:18px;line-height:1.25}.tao-bb-sub{font-size:13px}.tao-bb-slots{padding:14px 18px 6px;gap:6px}.tao-bb-slot{width:56px;height:56px}.tao-bb-progress{padding:0 18px 12px}.tao-bb-picks{padding:6px 18px 14px}.tao-bb-picks h4{font-size:11px;margin-bottom:8px}.tao-bb-pick .t{font-size:10.5px}.tao-bb-pick .p{font-size:10.5px}.tao-bb-foot{padding:12px 18px 14px}.tao-bb-cta{padding:13px;font-size:14px}.tao-bb-no{font-size:12px}.tao-bb-card::before{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:40px;height:4px;background:#dad4c2;border-radius:2px;z-index:6}}
+
+
+.tao-bb-skeleton{border:1px solid #ede9df;border-radius:12px;padding:6px 6px 8px;background:#fff;overflow:hidden;display:flex;flex-direction:column;gap:6px}
+.tao-bb-skeleton .tao-bb-sk-img{width:100%;aspect-ratio:1/1;border-radius:8px;background:linear-gradient(90deg,#f1ede2 0%,#faf8f3 50%,#f1ede2 100%);background-size:200% 100%;animation:tao-bb-shimmer 1.1s linear infinite}
+.tao-bb-skeleton .tao-bb-sk-line{height:10px;border-radius:4px;background:linear-gradient(90deg,#f1ede2 0%,#faf8f3 50%,#f1ede2 100%);background-size:200% 100%;animation:tao-bb-shimmer 1.1s linear infinite;margin:2px 4px 0}
+.tao-bb-skeleton .tao-bb-sk-line.short{width:50%}
+@keyframes tao-bb-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* === Cart page last-call bar === */
+.tao-bb-lastcall{margin:0 auto 14px;max-width:1170px;padding:14px 18px;background:linear-gradient(135deg,#fff8e1,#fff3cd);border:1px solid #f4e4a3;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:inherit;animation:tao-bb-rise .2s ease}
+.tao-bb-lastcall .msg{font-size:14px;color:#5a4500;font-weight:600;line-height:1.4}
+.tao-bb-lastcall .msg strong{color:#0e855b;font-weight:800}
+.tao-bb-lastcall a{background:#0e855b;color:#fff;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;white-space:nowrap;letter-spacing:.04em;transition:background .12s}
+.tao-bb-lastcall a:hover{background:#0a6e4a}
+
+/* === Cart drawer Living Coach pill === */
+.tao-bb-coach{margin:10px 14px;padding:10px 12px;background:#f4f9f5;border:1px solid #d3e9d8;border-radius:10px;font-size:12px;color:#274d31;line-height:1.35;display:flex;align-items:center;gap:10px}
+.tao-bb-coach .icon{flex-shrink:0;width:22px;height:22px;background:#0e855b;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px}
+.tao-bb-coach .text{flex:1}
+.tao-bb-coach .text strong{display:block;color:#0e855b;font-weight:800;margin-bottom:2px}
+.tao-bb-coach a{color:#0e855b;font-weight:700;text-decoration:underline;white-space:nowrap}
+</style>
+
+<script>
+  // Pull editable copy from theme settings (Theme settings → Cart → "Trust line above progress bar")
+  // so non-technical edits don't require touching this file.
+  window.TAO_BB_THEME = {
+    cartTrustLine: {{ settings.cart_trust_line | default: '' | json }}
+  };
+</script>
+<script>
+(function(){
+  'use strict';
+
+  // ╔═══════════════════════════════════════════════════════════════╗
+  // ║  EDIT BELOW TO CHANGE COPY, TIERS, AND BEHAVIOUR              ║
+  // ║  Anyone can change the numbers/text inside the quotes.        ║
+  // ║  Do not change the structure or remove commas.                ║
+  // ╚═══════════════════════════════════════════════════════════════╝
+  // Defaults — overridden by window.TAO_BB_CONFIG if the TAO Bundle Bridge section is installed in the theme
+  var BB_DEFAULTS = {
+    bbEnabled: true,
+    bbEyebrow: 'Bundle & save',
+    bbSkipMultiQty: true,
+    ladderEnabled: true,
+    spEnabled: true,
+    spMinSold: 10,
+    spSoldSuffix: 'sold in the last 6 hours',
+    spViewersSuffix: 'people are viewing this right now',
+    cartProgressEnabled: true,
+    cartMaxAmountCents: 0,
+    cartTrustLine: '<p>🎁 <strong>Mystery gift inside</strong> · 🇮🇳 trusted by 6 lakh+ gardeners · ⚡ ships within 24 hrs</p>',
+    cartQuickAddsEnabled: true,
+    cartQuickAddsCollection: '',
+    tiers: [
+      { cents: 15000, label: 'Free shipping',        short: 'Free ship' },
+      { cents: 25000, label: 'Free mystery gift',    short: 'Gift 1'    },
+      { cents: 36900, label: 'Second mystery gift',  short: 'Gift 2'    }
+    ],
+    coupons: [
+      { cents: 37900,  code: 'SAVE20',  label: '₹20 off'  },
+      { cents: 49900,  code: 'SAVE30',  label: '₹30 off'  },
+      { cents: 64900,  code: 'SAVE100', label: '₹100 off' },
+      { cents: 120000, code: 'SAVE09',  label: '9% off'   },
+      { cents: 240000, code: 'SAVE15',  label: '15% off'  }
+    ]
+  };
+  var CFG = (window.TAO_BB_CONFIG && typeof window.TAO_BB_CONFIG === 'object') ? window.TAO_BB_CONFIG : {};
+  var SETTINGS = {
+    bbEnabled:        (CFG.bbEnabled != null ? CFG.bbEnabled : BB_DEFAULTS.bbEnabled),
+    bbEyebrow:        CFG.bbEyebrow || BB_DEFAULTS.bbEyebrow,
+    bbSkipMultiQty:   (CFG.bbSkipMultiQty != null ? CFG.bbSkipMultiQty : BB_DEFAULTS.bbSkipMultiQty),
+    ladderEnabled:    (CFG.ladderEnabled != null ? CFG.ladderEnabled : BB_DEFAULTS.ladderEnabled),
+    spEnabled:        (CFG.spEnabled != null ? CFG.spEnabled : BB_DEFAULTS.spEnabled),
+    spMinSold:        (CFG.spMinSold != null ? CFG.spMinSold : BB_DEFAULTS.spMinSold),
+    spSoldSuffix:     CFG.spSoldSuffix || BB_DEFAULTS.spSoldSuffix,
+    spViewersSuffix:  CFG.spViewersSuffix || BB_DEFAULTS.spViewersSuffix,
+    cartProgressEnabled: (CFG.cartProgressEnabled != null ? CFG.cartProgressEnabled : BB_DEFAULTS.cartProgressEnabled),
+    cartMaxAmountCents:  (CFG.cartMaxAmountCents > 0 ? CFG.cartMaxAmountCents : 0),
+    cartTrustLine:       (window.TAO_BB_THEME && window.TAO_BB_THEME.cartTrustLine)
+                          || (CFG.cartTrustLine != null && CFG.cartTrustLine !== '' ? CFG.cartTrustLine : BB_DEFAULTS.cartTrustLine),
+    cartQuickAddsEnabled: (CFG.cartQuickAddsEnabled != null ? CFG.cartQuickAddsEnabled : BB_DEFAULTS.cartQuickAddsEnabled),
+    cartQuickAddsCollection: CFG.cartQuickAddsCollection || BB_DEFAULTS.cartQuickAddsCollection
+  };
+  var CART_TIERS = (CFG.tiers && CFG.tiers.length)
+    ? CFG.tiers.filter(function(t){ return t.cents > 0; })
+    : BB_DEFAULTS.tiers;
+  var CART_COUPONS = (CFG.cartCoupons && CFG.cartCoupons.length)
+    ? CFG.cartCoupons.filter(function(c){ return c.cents > 0 && c.code; }).sort(function(a,b){ return a.cents - b.cents; })
+    : (BB_DEFAULTS.coupons || []);
+
+  // ── Attribution tracking (line item properties so orders show source) ──
+  function taoSessionId(){
+    try {
+      var k = 'tao_bb_session';
+      var s = sessionStorage.getItem(k);
+      if (!s){
+        s = 'bb-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,7);
+        sessionStorage.setItem(k, s);
+      }
+      return s;
+    } catch(_){ return 'bb-anon'; }
+  }
+  function taoTrackingProps(source, extra){
+    // Returns line item properties Shopify will store on the order.
+    // Underscore prefix hides them from cart UI but they appear in admin order detail.
+    var props = {
+      '_tao_source': source || 'direct',
+      '_tao_session': taoSessionId(),
+      '_tao_at': new Date().toISOString().slice(0,16)
+    };
+    if (extra){
+      if (extra.anchorProductId) props['_tao_anchor_product'] = String(extra.anchorProductId);
+      if (extra.bundleCollection) props['_tao_bundle_collection'] = String(extra.bundleCollection);
+      if (extra.bundleSize)      props['_tao_bundle_size'] = String(extra.bundleSize);
+    }
+    return props;
+  }
+  function taoFireEvent(name, data){
+    // Custom DOM event for analytics layers (GA4, Meta Pixel, etc. can listen)
+    try { document.dispatchEvent(new CustomEvent('tao:' + name, { detail: data || {} })); } catch(_){}
+    // Also push to dataLayer if present (GA4)
+    if (window.dataLayer && window.dataLayer.push){
+      window.dataLayer.push(Object.assign({ event: 'tao_' + name }, data || {}));
+    }
+  }
+
+  // ── Bundle config (the offers we actively push) ───────────────────────────
+  // Each bundle = a customer-facing BYOB picker page + the collection of eligible products.
+  var BUNDLES = [
+    { page: "/pages/build-craft-crate",  collection: "byob-block-69",   size: 6,  priceCents: 39000,  label: "Build & Craft Crate · 6 for Rs.390" },
+    { page: "/pages/mega-box",           collection: "byob-block-79",   size: 6,  priceCents: 45000,  label: "10-in-1 Mega Box · 6 for Rs.450" },
+    { page: "/pages/block-sets",         collection: "byob-block-129",  size: 6,  priceCents: 73500,  label: "Block Sets · 6 for Rs.735" },
+    { page: "/pages/master-builder-set", collection: "byob-block-149",  size: 6,  priceCents: 84900,  label: "Master Builder · 6 for Rs.849" },
+    { page: "/pages/collectors-vault",   collection: "byob-block-249",  size: 6,  priceCents: 141900, label: "Collector's Vault · 6 for Rs.1419" },
+    { page: "/pages/glow-grab-bag",      collection: "byob-mini-bulk",  size: 25, priceCents: 19900,  label: "Glow Grab Bag · 25 for Rs.199" },
+    { page: "/pages/glow-mini-pack",     collection: "byob-mini-15",    size: 14, priceCents: 19900,  label: "Glow Mini Pack · 14 for Rs.199" },
+    { page: "/pages/glow-squad-bag",     collection: "byob-mini-20",    size: 11, priceCents: 20900,  label: "Glow Squad Bag · 11 for Rs.209" },
+    { page: "/pages/mini-starter-pack",  collection: "byob-mini-25",    size: 9,  priceCents: 21000,  label: "Mini Starter · 9 for Rs.210" },
+    { page: "/pages/mini-mates-pack",    collection: "byob-mini-30",    size: 7,  priceCents: 19900,  label: "Mini Mates · 7 for Rs.199" },
+    { page: "/pages/mini-figures",       collection: "byob-mini-35",    size: 6,  priceCents: 19900,  label: "Mini Figures · 6 for Rs.199" },
+    { page: "/pages/mini-heroes-pack",   collection: "byob-mini-39",    size: 6,  priceCents: 22000,  label: "Mini Heroes · 6 for Rs.220" },
+    { page: "/pages/big-mini-figures",   collection: "byob-mini-49",    size: 6,  priceCents: 27900,  label: "Big Mini Figures · 6 for Rs.279" },
+    { page: "/pages/premium-minis",      collection: "byob-mini-55",    size: 6,  priceCents: 31000,  label: "Premium Minis · 6 for Rs.310" }
+  ];
+
+  // Server-emitted product IDs per bundle collection (which products are eligible for which bundle)
+  var COLLECTION_PRODUCTS = {
+    {%- for handle in bundle_collections -%}
+      {%- assign coll = collections[handle] -%}
+      "{{ handle }}": [{%- for product in coll.products -%}{{ product.id }}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  };
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  var currentProduct = null;  // { id, title, handle, price, image, variantId }
+  var activeBundle = null;    // bundle config object
+  var slots = [];             // array of selected product items; slot 0 = anchor product
+  var bbEl = null;
+  var DISMISS_KEY = 'tao_bb_dismissed_';
+  var pendingForm = null;     // form that was intercepted, for re-submit on skip
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function fmt(cents){
+    var c = (typeof cents === 'number' && isFinite(cents)) ? cents : 0;
+    return 'Rs. ' + (c/100).toFixed(0);
+  }
+
+  // Normalize product shape across Shopify endpoints
+  function normalize(p){
+    if (!p) return null;
+    var priceCents = 0;
+    if (typeof p.price === 'number' && isFinite(p.price)) priceCents = p.price;
+    else if (typeof p.price === 'string' && p.price) priceCents = Math.round(parseFloat(p.price) * 100);
+    else if (p.variants && p.variants[0]){
+      var vp = p.variants[0].price;
+      if (typeof vp === 'number' && isFinite(vp)) priceCents = vp >= 1000 ? vp : Math.round(vp * 100);
+      else if (typeof vp === 'string' && vp) priceCents = Math.round(parseFloat(vp) * 100);
+    }
+    var compareCents = 0;
+    var cap = p.compare_at_price;
+    if ((cap == null || cap === '') && p.variants && p.variants[0]) cap = p.variants[0].compare_at_price;
+    if (typeof cap === 'number' && isFinite(cap)) compareCents = cap >= 1000 ? cap : Math.round(cap * 100);
+    else if (typeof cap === 'string' && cap) compareCents = Math.round(parseFloat(cap) * 100);
+    var image = '';
+    if (typeof p.featured_image === 'string') image = p.featured_image;
+    else if (p.featured_image && p.featured_image.src) image = p.featured_image.src;
+    else if (Array.isArray(p.images) && p.images.length){
+      var i0 = p.images[0];
+      image = typeof i0 === 'string' ? i0 : (i0.src || '');
+    }
+    if (image && image.indexOf('//') === 0) image = 'https:' + image;
+    // Prefer the first AVAILABLE variant; fall back to first variant if no availability data is exposed.
+    var variantId = null;
+    if (p.variants && p.variants.length){
+      for (var vi = 0; vi < p.variants.length; vi++){
+        var v = p.variants[vi];
+        if (v && v.id && (v.available === true || v.available === undefined)){
+          variantId = v.id;
+          break;
+        }
+      }
+      if (!variantId && p.variants[0] && p.variants[0].id) variantId = p.variants[0].id;
+    }
+    // Roll up availability. Treat product as available if explicitly true, OR any variant is available,
+    // OR no availability info is exposed (be permissive — the cart-add API is the source of truth).
+    var available = null;
+    if (p.available === true) available = true;
+    else if (p.available === false) available = false;
+    else if (p.variants && p.variants.length){
+      available = p.variants.some(function(v){ return v && v.available === true; });
+      // If no variant reports availability at all, leave as null (unknown → treat as available)
+      if (!available && p.variants.every(function(v){ return !v || v.available === undefined; })) available = null;
+    }
+    return {
+      id: p.id,
+      title: p.title || '',
+      handle: p.handle || '',
+      price: priceCents,
+      compare_at_price: compareCents || null,
+      featured_image: image,
+      available: available,
+      _variantId: variantId
+    };
+  }
+
+  // Deterministic-drifting RNG for social proof
+  function _hash(s){
+    var h = 0; s = String(s);
+    for (var i = 0; i < s.length; i++){ h = ((h<<5) - h + s.charCodeAt(i)) | 0; }
+    return Math.abs(h);
+  }
+  function dayHash(pid){
+    var d = new Date();
+    return _hash(pid + '-' + d.getUTCFullYear() + '-' + d.getUTCMonth() + '-' + d.getUTCDate());
+  }
+  function hourHash(pid){
+    var d = new Date();
+    return _hash(pid + '-' + d.getUTCFullYear() + '-' + d.getUTCMonth() + '-' + d.getUTCDate() + '-' + d.getUTCHours());
+  }
+
+  // Smoothly tween a counter element from its current value to `target` over `duration` ms.
+  function _tweenCount(el, target, duration){
+    if (!el) return;
+    var start = parseInt(el.textContent, 10);
+    if (isNaN(start)) start = target;
+    var diff = target - start;
+    if (diff === 0) return;
+    var startedAt = performance.now();
+    function step(now){
+      var t = Math.min(1, (now - startedAt) / duration);
+      // easeOutQuad for a settle-down feel
+      var eased = 1 - (1 - t) * (1 - t);
+      el.textContent = Math.round(start + diff * eased);
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function renderSocialProof(product){
+    if (!product || !product.id) return;
+    // Sold count — ~3x the previous range; deterministic per day so it's stable across reloads.
+    var sold = 96 + (dayHash(product.id) % 234);   // 96–329
+    // Viewers — anchored above 100; deterministic per hour so it doesn't reset every refresh.
+    var viewersBase = 112 + (hourHash(product.id) % 168);  // 112–279
+    var viewers = viewersBase;
+    if (sold < SETTINGS.spMinSold) return;
+
+    var inserted = false;
+    function tryInsert(){
+      if (inserted) return true;
+      if (document.querySelector('.tao-sp')) { inserted = true; return true; }
+      // Prefer to anchor above the buy buttons. Try several known mount points.
+      var form = document.querySelector('form[action*="/cart/add"]');
+      var atc = form && form.querySelector('[name="add"], button[type="submit"]');
+      var anchor = atc || document.querySelector('.product-detail__buy-buttons, .button-trigger__sticky');
+      if (!anchor) return false;
+      var wrap = document.createElement('div');
+      wrap.className = 'tao-sp';
+      wrap.innerHTML =
+        '<div class="tao-sp-row tao-sp-sold">' +
+          '<span class="icon fire" aria-hidden="true"></span>' +
+          '<span class="stack"><strong class="count">' + sold + '</strong>' +
+          '<span class="label">' + SETTINGS.spSoldSuffix + '</span></span>' +
+        '</div>' +
+        '<div class="tao-sp-row tao-sp-view">' +
+          '<span class="icon eye" aria-hidden="true"></span>' +
+          '<span class="stack"><strong class="count">' + viewers + '</strong>' +
+          '<span class="label">' + SETTINGS.spViewersSuffix + '</span></span>' +
+        '</div>';
+      anchor.parentNode.insertBefore(wrap, anchor);
+      inserted = true;
+      startTicks(wrap);
+      return true;
+    }
+
+    // Try immediately, then retry a few times to outwait theme hydration.
+    if (!tryInsert()){
+      var attempts = 0;
+      var iv = setInterval(function(){
+        attempts++;
+        if (tryInsert() || attempts >= 20) clearInterval(iv);
+      }, 250);
+      // Also watch the DOM in case the form appears later via SPA-style navigation.
+      var mo = new MutationObserver(function(){ if (tryInsert()) mo.disconnect(); });
+      mo.observe(document.body, { childList: true, subtree: true });
+      setTimeout(function(){ mo.disconnect(); }, 12000);
+    }
+
+    function startTicks(wrap){
+      // Viewer count: faster, more visible movement. Drift ±3 over 3–7s, smoothed via tween.
+      (function tickView(){
+        var delay = 3000 + Math.random() * 4000;  // 3–7s
+        setTimeout(function(){
+          var el = wrap.querySelector('.tao-sp-view .count');
+          if (!el) return;
+          var cur = parseInt(el.textContent, 10) || viewers;
+          var driftToward = (cur < viewersBase ? 1 : -1) * (Math.random() < 0.55 ? 1 : 0);
+          var delta = (Math.floor(Math.random() * 7) - 3) + driftToward;  // -3..+3 plus soft pull
+          var next = Math.max(100, Math.min(viewersBase + 90, cur + delta));
+          _tweenCount(el, next, 550 + Math.random() * 450);
+          tickView();
+        }, delay);
+      })();
+
+      // Sold count: slow trickle, +2 or +3 per increment.
+      (function tickSale(){
+        var delay = 90000 + Math.random() * 90000;  // 90–180s
+        setTimeout(function(){
+          if (Math.random() < 0.55){
+            var el = wrap.querySelector('.tao-sp-sold .count');
+            if (el){
+              var cur = parseInt(el.textContent, 10) || sold;
+              var bump = Math.random() < 0.5 ? 2 : 3;
+              _tweenCount(el, cur + bump, 700);
+            }
+          }
+          tickSale();
+        }, delay);
+      })();
+    }
+  }
+
+  
+  function attachGlobalAtcInterceptor(){
+    // DISABLED until proven safe across all theme variants. Only PDP form is intercepted.
+    return;
+    // Original code below — re-enable by removing the early return.
+    
+    // Catch ATC clicks anywhere on the site (collection pages, search, recommendations).
+    // Uses event capture so we beat the theme's own handlers.
+    document.addEventListener('click', function(e){
+      if (!SETTINGS.bbEnabled) return;
+      var btn = e.target.closest('.product__add-cart, .card-add-btn, [data-add-to-cart], button[name="add"]:not(form[action*="/cart/add"] button), .product-item__add-cart');
+      if (!btn) return;
+      // Skip if this button is inside our own bundle bridge UI
+      if (e.target.closest('.tao-bb, .tao-bb-ladder, .bundle-section')) return;
+      // Find the product ID from nearest data attribute or wrapper
+      var card = btn.closest('[data-product-id], .product-item, .product-card, .grid__item');
+      var pid = null;
+      if (card){
+        pid = parseInt(card.getAttribute('data-product-id') || (card.querySelector('[data-product-id]')||{}).getAttribute && card.querySelector('[data-product-id]').getAttribute('data-product-id'), 10);
+      }
+      // Read qty from the card's qty selector (buttons or inputs). Default 1.
+      var scope = card || btn.parentElement || document;
+      var qty = 1;
+      var qtyInput = scope.querySelector('[name="quantity"]');
+      if (qtyInput && qtyInput.value){
+        qty = parseInt(qtyInput.value, 10) || 1;
+      } else {
+        // Look for any "active/selected" qty button — common patterns
+        var activeBtn = scope.querySelector('.active[data-qty], .selected[data-qty], .is-active[data-qty], button.active[data-quantity], [class*="qty"][class*="active" i], [class*="qty"].selected, [class*="quantity"].active, [class*="quantity"].selected');
+        if (activeBtn){
+          var v = activeBtn.getAttribute('data-qty') || activeBtn.getAttribute('data-quantity') || (activeBtn.textContent||'').trim();
+          var parsed = parseInt(v, 10);
+          if (!isNaN(parsed) && parsed > 0) qty = parsed;
+        }
+      }
+      // Honor "skip on multi-qty" setting
+      if (SETTINGS.bbSkipMultiQty && qty > 1){
+        return;  // customer picked volume — respect it, let the theme add it
+      }
+      if (!pid){
+        // Try to read from form id input
+        var form = btn.closest('form');
+        if (form){
+          var idInput = form.querySelector('[name="id"]');
+          // id is variant, not product; skip — we don't have product id reliably here
+        }
+        return;  // can't determine product
+      }
+      var eligible = findEligibleBundles(pid);
+      if (eligible.length === 0) return;
+      if (sessionDismissed(pid)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      // Fetch product data, then open popup
+      var handleLink = btn.closest('a[href*="/products/"]') || (card && card.querySelector('a[href*="/products/"]'));
+      var handle = null;
+      if (handleLink){
+        var m = handleLink.getAttribute('href').match(/\/products\/([^/?#]+)/);
+        if (m) handle = m[1];
+      }
+      if (!handle) return;
+      fetch('/products/' + handle + '.js').then(function(r){return r.json();}).then(function(productJson){
+        currentProduct = {
+          id: productJson.id,
+          title: productJson.title,
+          handle: productJson.handle,
+          priceCents: productJson.price,
+          compareCents: productJson.compare_at_price || productJson.price,
+          image: productJson.featured_image || (productJson.images && productJson.images[0]) || '',
+          variantId: (productJson.variants && productJson.variants[0] && productJson.variants[0].id) || null
+        };
+        activeBundle = pickBestBundle(eligible);
+        slots = new Array(activeBundle.size);
+        slots[0] = currentProduct;
+        openModal();
+        getRecommendations(productJson.id, activeBundle).then(renderPicks);
+      }).catch(function(){});
+    }, true);
+  }
+
+  function findEligibleBundles(productId){
+    return BUNDLES.filter(function(b){
+      var prods = COLLECTION_PRODUCTS[b.collection] || [];
+      return prods.indexOf(productId) !== -1;
+    });
+  }
+
+  
+  // Returns the bundle to push IF and only IF there's actual savings scope.
+  // Skips if customer has already met or exceeded the smallest eligible bundle size.
+  function findBundleWithScope(productId, qty, cartItems){
+    var eligible = findEligibleBundles(productId);
+    if (eligible.length === 0) return null;
+    // Count how many bundle-eligible items the customer already has (or is about to add)
+    var existingCount = qty || 1;
+    if (cartItems && cartItems.length){
+      cartItems.forEach(function(it){
+        // Only count non-bundle items that share at least one bundle collection with the new product
+        if (it.properties && it.properties._bundle) return;
+        if (findEligibleBundles(it.product_id).length > 0){
+          existingCount += (it.quantity || 0);
+        }
+      });
+    }
+    // Filter eligible bundles to ones the customer hasn't already met by item count
+    var stillUseful = eligible.filter(function(b){ return existingCount < b.size; });
+    if (stillUseful.length === 0) return null;
+    // Of those, pick the one closest to where they are (smallest tier they haven't hit)
+    return stillUseful.sort(function(a, b){ return a.size - b.size; })[0];
+  }
+
+  function pickBestBundle(eligibleBundles, currentCartItems){
+    // Prefer smallest bundle (entry-tier) for first-time customers
+    return eligibleBundles.slice().sort(function(a,b){ return a.priceCents - b.priceCents; })[0];
+  }
+
+  function unitSavingsPercent(bundle){
+    // assume each eligible product sells around bundle.priceCents/size at "regular" prices
+    return 0; // computed live from cart/json
+  }
+
+  function sessionDismissed(productId){
+    try { return sessionStorage.getItem(DISMISS_KEY + productId) === '1'; } catch(e){ return false; }
+  }
+  function markDismissed(productId){
+    try { sessionStorage.setItem(DISMISS_KEY + productId, '1'); } catch(e){}
+  }
+
+  // ── Recommendations: complementary → related → collection bestsellers ─────
+  function getRecommendations(productId, bundle){
+    var allowed = COLLECTION_PRODUCTS[bundle.collection] || [];
+    var attempts = [
+      '/recommendations/products.json?product_id=' + productId + '&limit=14&intent=complementary',
+      '/recommendations/products.json?product_id=' + productId + '&limit=14&intent=related',
+      '/collections/' + bundle.collection + '/products.json?limit=24'
+    ];
+    return attempts.reduce(function(p, url){
+      return p.then(function(result){
+        if (result && result.length >= 6) return result;
+        return fetch(url).then(function(r){ return r.ok ? r.json() : { products: [] }; }).then(function(d){
+          var prods = (d.products || []).map(normalize).filter(function(p){
+            // Drop products that are explicitly out of stock. Keep ones where availability is unknown.
+            if (!p || p.id === productId) return false;
+            if (allowed.indexOf(p.id) === -1) return false;
+            if (p.available === false) return false;
+            return true;
+          });
+          // Merge unique
+          var ids = new Set((result||[]).map(function(p){return p.id;}));
+          prods.forEach(function(p){ if(!ids.has(p.id)){ result.push(p); ids.add(p.id); } });
+          return result;
+        }).catch(function(){ return result; });
+      });
+    }, Promise.resolve([])).then(function(list){ return list.slice(0, 12); });
+  }
+
+  // Recommendations cache so the popup opens with products already loaded
+  var taoRecCache = {};
+  function prefetchRecs(productId, bundle){
+    var key = productId + ':' + bundle.collection;
+    if (taoRecCache[key]) return taoRecCache[key];
+    var promise = getRecommendations(productId, bundle);
+    taoRecCache[key] = promise;
+    promise.then(function(list){ taoRecCache[key] = list; }).catch(function(){ delete taoRecCache[key]; });
+    return promise;
+  }
+  function getRecsFromCache(productId, bundle){
+    var key = productId + ':' + bundle.collection;
+    return taoRecCache[key];
+  }
+
+
+  // ── Modal markup ───────────────────────────────────────────────────────────
+  function ensureModal(){
+    if (bbEl) return bbEl;
+    bbEl = document.createElement('div');
+    bbEl.className = 'tao-bb';
+    bbEl.id = 'taoBundleBridge';
+    bbEl.innerHTML = ''
+      + '<div class="tao-bb-card">'
+      + '  <button class="tao-bb-close" type="button" aria-label="Close" data-bb-close>&times;</button>'
+      + '  <div class="tao-bb-head">'
+      + '    <p class="tao-bb-eyebrow">Bundle &amp; save</p>'
+      + '    <h2 class="tao-bb-title"></h2>'
+      + '    <p class="tao-bb-sub"></p>'
+      + '  </div>'
+      + '  <div class="tao-bb-slots"></div>'
+      + '  <div class="tao-bb-progress">'
+      + '    <div class="label"><span class="done">0 of 0</span><span class="left"></span></div>'
+      + '    <div class="bar"><i></i></div>'
+      + '    <div class="save"></div>'
+      + '  </div>'
+      + '  <div class="tao-bb-picks">'
+      + '    <h4>Often bought together</h4>'
+      + '    <div class="tao-bb-grid"></div>'
+      + '  </div>'
+      + '  <div class="tao-bb-foot">'
+      + '    <button class="tao-bb-cta" type="button">Add bundle &mdash; ' + '</button>'
+      + '    <button class="tao-bb-no" type="button" data-bb-skip>No thanks, continue with just one</button>'
+      + '  </div>'
+      + '</div>';
+    document.body.appendChild(bbEl);
+    return bbEl;
+  }
+
+  // ── Open / close / render ─────────────────────────────────────────────────
+  function openModal(){
+    ensureModal();
+    bbEl.classList.add('open');
+    document.body.classList.add('tao-bb-open');
+    renderModal();
+    taoFireEvent('popup_shown', { anchor: currentProduct && currentProduct.id, bundle: activeBundle && activeBundle.collection });
+  }
+  function closeModal(skipped){
+    if (!bbEl) return;
+    if (!skipped){
+      // X / backdrop / Esc — just close, no cart add
+      bbEl.classList.remove('open');
+      document.body.classList.remove('tao-bb-open');
+      pendingForm = null; currentProduct = null; activeBundle = null; slots = [];
+      return;
+    }
+    // skipped = true means "No thanks" clicked — add single product to cart, keep modal visible
+    if (!currentProduct){
+      bbEl.classList.remove('open');
+      document.body.classList.remove('tao-bb-open');
+      return;
+    }
+    markDismissed(currentProduct.id);
+    var vid = currentProduct.variantId || (pendingForm && (pendingForm.querySelector('[name="id"]')||{}).value);
+    var noBtn = bbEl.querySelector('.tao-bb-no');
+    if (!vid){
+      console.warn('[TAO BB] No variantId for skip-add; submitting native form.');
+      if (pendingForm){ pendingForm.submit(); return; }
+      bbEl.classList.remove('open');
+      document.body.classList.remove('tao-bb-open');
+      return;
+    }
+    // Visual loading state on the button
+    if (noBtn){ noBtn.classList.add('loading'); noBtn.textContent = 'Adding to cart\u2026'; noBtn.disabled = true; }
+    // Single-item add when customer skips the bundle pitch — one tag, that's it.
+    var addBody = { items: [{ id: parseInt(vid, 10), quantity: 1, properties: { _tao_source: 'popup_skip_single' } }] };
+    console.log('[TAO BB] No thanks → adding single item:', addBody);
+    taoFireEvent('popup_skipped', { anchor: currentProduct.id });
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(addBody)
+    }).then(function(r){
+      if (!r.ok){
+        return r.json().then(function(err){
+          throw new Error('Shopify cart/add error: ' + (err.description || err.message || r.status));
+        });
+      }
+      return r.json();
+    }).then(function(d){
+      console.log('[TAO BB] Single item added.', d);
+      if (noBtn){ noBtn.classList.remove('loading'); noBtn.textContent = 'Added \u2713'; }
+      // Now close modal and open the side cart
+      setTimeout(function(){
+        bbEl.classList.remove('open');
+        document.body.classList.remove('tao-bb-open');
+        ['cart:refresh','cart:open','cart:build','cart-drawer:open','ajaxCart:afterCartLoad','cart:added','cart-notification:show'].forEach(function(ev){
+          try { document.dispatchEvent(new CustomEvent(ev, { detail: d })); } catch(_){}
+        });
+        // Force open if no drawer responded
+        setTimeout(function(){
+          var visible = document.querySelector('cart-drawer.active, cart-drawer[open], .cart-drawer.is-open, .cart-notification.active, .minicart.is-open, #minicart_wrapper.active');
+          if (visible) return;
+          var trigger = document.querySelector('[data-cart-toggle], [aria-controls*="cart" i], a[href="/cart"], .header__icon--cart, .header-cart, button[class*="cart"]:not([class*="open"])');
+          if (trigger){ trigger.click(); }
+        }, 400);
+        pendingForm = null; currentProduct = null; activeBundle = null; slots = [];
+      }, 350);
+    }).catch(function(err){
+      console.error('[TAO BB] Single-item add failed:', err);
+      if (noBtn){
+        noBtn.classList.remove('loading');
+        noBtn.classList.add('error');
+        noBtn.textContent = 'Could not add — tap to retry';
+        noBtn.disabled = false;
+      }
+    });
+  }
+
+  function renderTitle(){
+    if (!bbEl || !activeBundle) return;
+    var title = bbEl.querySelector('.tao-bb-title');
+    if (!title) return;
+    var filled = slots.filter(Boolean).length;
+    var remaining = activeBundle.size - filled;
+    if (remaining <= 0){
+      title.textContent = 'Bundle ready — ' + fmt(activeBundle.priceCents);
+    } else {
+      title.textContent = 'Add ' + remaining + ' more, get the bundle for ' + fmt(activeBundle.priceCents);
+    }
+  }
+
+  function renderModal(){
+    if (!bbEl || !activeBundle) return;
+    var sub = bbEl.querySelector('.tao-bb-sub');
+    // Honor the customizer-set eyebrow text
+    var eyebrowEl = bbEl.querySelector('.tao-bb-eyebrow');
+    if (eyebrowEl) eyebrowEl.textContent = SETTINGS.bbEyebrow;
+    if (sub) sub.textContent = activeBundle.label;
+    renderTitle();
+    renderSlots();
+    renderProgress();
+    renderCta();
+  }
+
+  function renderSlots(){
+    var wrap = bbEl.querySelector('.tao-bb-slots');
+    wrap.innerHTML = '';
+    for (var i = 0; i < activeBundle.size; i++){
+      var s = document.createElement('div');
+      s.className = 'tao-bb-slot';
+      var item = slots[i];
+      if (item){
+        s.classList.add('filled');
+        if (i === 0) s.classList.add('locked');
+        var img = document.createElement('img');
+        img.src = item.image || '';
+        img.alt = item.title || '';
+        s.appendChild(img);
+        if (i > 0){
+          var rm = document.createElement('button');
+          rm.className = 'rm';
+          rm.type = 'button';
+          rm.textContent = '×';
+          rm.setAttribute('data-bb-rm', i);
+          s.appendChild(rm);
+        }
+      } else {
+        s.textContent = '+';
+      }
+      wrap.appendChild(s);
+    }
+  }
+
+  // After any slot mutation, push the filled slots toward the start (slot 0 stays anchored)
+  // so the picker doesn't show gaps in the middle after a deselect.
+  function compactSlots(){
+    if (!activeBundle) return;
+    var anchor = slots[0];
+    var rest = [];
+    for (var i = 1; i < slots.length; i++){ if (slots[i]) rest.push(slots[i]); }
+    slots = [anchor];
+    for (var j = 0; j < rest.length; j++) slots.push(rest[j]);
+    while (slots.length < activeBundle.size) slots.push(undefined);
+  }
+
+  function renderProgress(){
+    compactSlots();
+    var filled = slots.filter(Boolean).length;
+    var size = activeBundle.size;
+    var pct = Math.min(100, Math.round((filled/size)*100));
+    bbEl.querySelector('.tao-bb-progress .done').textContent = filled + ' of ' + size + ' added';
+    bbEl.querySelector('.tao-bb-progress .left').textContent = filled >= size ? 'Bundle ready' : (size - filled) + ' to go';
+    bbEl.querySelector('.tao-bb-progress .bar i').style.width = pct + '%';
+    // Toggle the "full" state on the picks grid so non-selected tiles grey out
+    var grid = bbEl.querySelector('.tao-bb-grid');
+    if (grid){ grid.classList.toggle('full', filled >= size); }
+    // Savings estimate: sum of regular prices vs bundle price
+    var regularSum = slots.reduce(function(sum, s){ return sum + ((s && s.compareCents && s.compareCents > s.priceCents) ? s.compareCents : (s ? s.priceCents : 0)); }, 0);
+    var save = bbEl.querySelector('.tao-bb-progress .save');
+    if (filled === size && regularSum > activeBundle.priceCents){
+      var saved = regularSum - activeBundle.priceCents;
+      var pctOff = Math.round((saved/regularSum)*100);
+      save.innerHTML = 'You save <strong>' + fmt(saved) + '</strong> (' + pctOff + '% off)';
+    } else if (filled > 0){
+      save.innerHTML = filled === size ? '' : 'Pick ' + (size - filled) + ' more to unlock the bundle';
+    } else {
+      save.innerHTML = '';
+    }
+  }
+
+  
+  function renderSkeletons(){
+    var grid = bbEl.querySelector('.tao-bb-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    var cols = window.matchMedia('(max-width:480px)').matches ? 2 : 4;
+    for (var i = 0; i < cols; i++){
+      var el = document.createElement('div');
+      el.className = 'tao-bb-skeleton';
+      el.innerHTML = '<div class="tao-bb-sk-img"></div><div class="tao-bb-sk-line"></div><div class="tao-bb-sk-line short"></div>';
+      grid.appendChild(el);
+    }
+  }
+
+  function renderPicks(picks){
+    console.log('[TAO BB] Rendering picks:', picks && picks.length, picks);
+    var grid = bbEl.querySelector('.tao-bb-grid');
+    grid.innerHTML = '';
+    if (!picks || picks.length === 0){
+      grid.innerHTML = '<p style="grid-column:1/-1;color:#999;font-size:12px;text-align:center;padding:12px 0">No suggestions right now. Open the bundle picker to choose.</p>';
+      return;
+    }
+    var pickedIds = new Set(slots.filter(Boolean).map(function(s){return s.id;}));
+    picks.forEach(function(p){
+      var el = document.createElement('div');
+      el.className = 'tao-bb-pick' + (pickedIds.has(p.id) ? ' added' : '');
+      el.setAttribute('data-bb-pick', p.id);
+      var img = (p.featured_image || (p.images && p.images[0]) || '');
+      if (typeof img !== 'string') img = (img && img.src) || '';
+      // If image is missing, use Shopify's CDN placeholder pattern so the card still renders
+      if (!img){
+        img = 'https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-product-1_medium.png';
+      }
+      var priceHtml = '<span class="p">' + fmt(p.price) + '</span>';
+      if (p.compare_at_price && p.compare_at_price > p.price){
+        var pct = Math.round((1 - p.price / p.compare_at_price) * 100);
+        priceHtml += '<span class="pwas">' + fmt(p.compare_at_price) + '</span>';
+        priceHtml += '<span class="ppct">-' + pct + '%</span>';
+      }
+      el.innerHTML = '<img src="' + img + '" alt="' + (p.title||'') + '" onerror="this.style.display=\'none\'">' +
+                     '<div class="t">' + (p.title||'') + '</div>' +
+                     '<div class="prow">' + priceHtml + '</div>';
+      el.addEventListener('click', function(){ togglePick(p, el); });
+      grid.appendChild(el);
+    });
+  }
+
+  function renderCta(){
+    var btn = bbEl.querySelector('.tao-bb-cta');
+    var filled = slots.filter(Boolean).length;
+    var size = activeBundle.size;
+    if (filled >= size){
+      btn.disabled = false;
+      btn.textContent = 'Add bundle to cart — ' + fmt(activeBundle.priceCents);
+    } else {
+      btn.disabled = true;
+      btn.textContent = 'Pick ' + (size - filled) + ' more to continue';
+    }
+  }
+
+  // Tile click: if this product already occupies a (non-anchor) slot, remove it; otherwise add it.
+  function togglePick(p, cardEl){
+    var existingIdx = -1;
+    for (var i = 0; i < slots.length; i++){
+      if (slots[i] && slots[i].id === p.id){ existingIdx = i; break; }
+    }
+    if (existingIdx > 0){
+      slots[existingIdx] = undefined;
+      renderSlots(); renderProgress(); renderCta(); renderTitle();
+      if (cardEl) cardEl.classList.remove('added');
+      return;
+    }
+    // existingIdx === 0 → it's the anchor product, can't remove. Just no-op.
+    if (existingIdx === 0) return;
+    addPick(p);
+  }
+
+  function addPick(p){
+    var firstEmpty = -1;
+    for (var i = 0; i < activeBundle.size; i++){ if (!slots[i]){ firstEmpty = i; break; } }
+    if (firstEmpty === -1) return;
+    var vid = p._variantId || (p.variants && p.variants[0] && p.variants[0].id) || null;
+    slots[firstEmpty] = {
+      id: p.id,
+      title: p.title,
+      handle: p.handle,
+      priceCents: p.price,
+      compareCents: p.compare_at_price || p.price,
+      image: (typeof p.featured_image === 'string' ? p.featured_image : (p.featured_image && p.featured_image.src) || '') || (p.images && p.images[0] && (typeof p.images[0] === 'string' ? p.images[0] : p.images[0].src)) || '',
+      variantId: vid
+    };
+    renderSlots();
+    renderProgress();
+    renderCta();
+    renderTitle();
+    var card = bbEl.querySelector('[data-bb-pick="' + p.id + '"]');
+    if (card) card.classList.add('added');
+    // Recovery: if we couldn't resolve a variantId from the recommendations response,
+    // fetch the full product.js so addBundleToCart isn't blocked.
+    if (!vid && p.handle){
+      var slotIdx = firstEmpty;
+      fetch('/products/' + p.handle + '.js')
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(full){
+          if (!full || !full.variants) return;
+          var pickVar = null;
+          for (var i = 0; i < full.variants.length; i++){
+            var v = full.variants[i];
+            if (v && v.id && (v.available === true || v.available === undefined)){ pickVar = v; break; }
+          }
+          if (!pickVar) pickVar = full.variants[0];
+          if (slots[slotIdx] && slots[slotIdx].id === p.id && pickVar){
+            slots[slotIdx].variantId = pickVar.id;
+          }
+        }).catch(function(){});
+    }
+  }
+
+  // ── Add bundle to cart ─────────────────────────────────────────────────────
+  function addBundleToCart(){
+    var filled = slots.filter(Boolean);
+    // Validate every slot has a variantId
+    var missing = filled.filter(function(s){ return !s.variantId; });
+    var ctaBtn = bbEl.querySelector('.tao-bb-cta');
+    if (missing.length > 0){
+      console.error('[TAO BB] Cannot add bundle — these slots are missing variantId:', missing);
+      if (ctaBtn){ ctaBtn.disabled = false; ctaBtn.textContent = 'Could not add. Tap a slot to retry.'; }
+      return Promise.resolve();
+    }
+    // Line item properties — bundle title + source + anchor product + slot.
+    var bundleTitle = activeBundle.label || ('Pick ' + activeBundle.size + ' for Rs.' + Math.round(activeBundle.priceCents/100));
+    var anchorPid = (currentProduct && currentProduct.id) ? String(currentProduct.id) : null;
+    var baseProps = {
+      _bundleTitle: bundleTitle,
+      _bundle:      bundleTitle,
+      _tao_source:  'popup_bundle',
+      _tao_at:      new Date().toISOString().slice(0,16)
+    };
+    if (anchorPid) baseProps._tao_anchor_product = anchorPid;
+    var items = filled.map(function(s, idx){
+      return {
+        id: parseInt(s.variantId, 10),
+        quantity: 1,
+        properties: Object.assign({}, baseProps, {
+          _bundle_slot: (idx + 1) + ' of ' + filled.length
+        })
+      };
+    });
+    taoFireEvent('bundle_add', { collection: activeBundle.collection, size: activeBundle.size, items: items.length });
+    console.log('[TAO BB] Adding bundle to cart:', items);
+    if (ctaBtn){ ctaBtn.disabled = true; ctaBtn.textContent = 'Adding to cart…'; }
+    // Ask Shopify to also return the freshly-rendered minicart-form section so we can update the
+    // side cart contents immediately. (Glozin's `<cart-notification>` only updates its DOM when
+    // its own ATC handler runs — bypassing that means we have to inject the new HTML ourselves.)
+    return fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ items: items, sections: ['minicart-form'], sections_url: window.location.pathname })
+    }).then(function(r){
+      if (!r.ok){
+        return r.json().then(function(err){
+          throw new Error('Shopify cart/add error: ' + (err.description || err.message || r.status));
+        });
+      }
+      return r.json();
+    }).then(function(d){
+      bbEl.classList.remove('open');
+      document.body.classList.remove('tao-bb-open');
+
+      // Tag cart with bundle metadata (fire-and-forget, one call)
+      try {
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            attributes: {
+              tao_bundle:         bundleTitle,
+              tao_bundle_type:    'byob_popup',
+              tao_bundle_source:  'popup_bundle',
+              tao_bundle_size:    String(activeBundle.size),
+              tao_bundle_revenue: String(activeBundle.priceCents)
+            }
+          })
+        }).catch(function(){});
+      } catch(_){}
+
+      // Mirror the theme's normal ATC flow:
+      //   1) Replace #minicart-form innerHTML  → side cart shows bundle items + fresh upsell
+      //   2) Fetch /cart.json for item_count   → header badge + free-ship bar update correctly
+      //   3) cart.cartAction()                  → re-wire addon / giftwrap button listeners
+      //   4) cart.open()                        → slide the drawer in
+
+      // (1) Section replace
+      try {
+        var sectionHtml = d && d.sections && d.sections['minicart-form'];
+        if (sectionHtml){
+          var holder = document.getElementById('minicart-form');
+          var parsed = new DOMParser().parseFromString(sectionHtml, 'text/html');
+          var fresh = parsed.querySelector('#minicart-form');
+          if (holder && fresh){ holder.innerHTML = fresh.innerHTML; }
+        }
+      } catch(_){}
+
+      var notif = document.querySelector('cart-notification');
+
+      // (2) Pull real cart state from /cart.json — /cart/add response does NOT include item_count
+      fetch('/cart.json').then(function(r){ return r.json(); }).then(function(cart){
+        if (typeof cart.item_count !== 'undefined'){
+          document.querySelectorAll('.cart-count').forEach(function(el){
+            if (el.classList.contains('cart-count-drawer')){
+              el.innerHTML = '(' + cart.item_count + ')';
+            } else {
+              el.innerHTML = cart.item_count > 100 ? '~' : cart.item_count;
+            }
+          });
+          var headerTotal = document.querySelector('header-total-price');
+          if (headerTotal && typeof headerTotal.updateTotal === 'function') headerTotal.updateTotal(cart);
+          var freeShip = document.querySelector('free-ship-progress-bar');
+          if (freeShip && typeof freeShip.init === 'function') freeShip.init(cart.items_subtotal_price);
+        }
+      }).catch(function(){});
+
+      // (3) Re-wire button listeners after section replace
+      if (notif && typeof notif.cartAction === 'function'){
+        try { notif.cartAction(); } catch(_){}
+      }
+
+      // (4) Open the drawer
+      var opened = false;
+      if (notif && typeof notif.open === 'function'){
+        try { notif.open(); opened = true; } catch(_){}
+      }
+      // Fallback: simulate cart-icon click if .open() didn't fire
+      if (!opened){
+        setTimeout(function(){
+          var visible = document.querySelector('cart-notification.open, .cart-notification.active, .minicart.is-open, #minicart_wrapper.active');
+          if (visible) return;
+          var trigger = document.querySelector('[data-cart-toggle], [aria-controls*="cart" i], a[href="/cart"], .header__icon--cart, .header-cart, button[class*="cart"]');
+          if (trigger){ trigger.click(); }
+        }, 250);
+      }
+
+      // Slim PDP bar refresh (lives outside the cart, fed by our own state)
+      if (typeof scheduleCartProgress === 'function') scheduleCartProgress(80);
+
+      // Fire common cart events for any third-party listeners
+      ['cart:refresh','cart:open','cart-drawer:open','cart:added','cart-notification:show'].forEach(function(ev){
+        try { document.dispatchEvent(new CustomEvent(ev, { detail: d })); } catch(_){}
+      });
+
+      pendingForm = null; currentProduct = null; activeBundle = null; slots = [];
+    }).catch(function(err){
+      console.error('[TAO BB] Bundle add failed:', err);
+      var btn = bbEl.querySelector('.tao-bb-cta');
+      if (btn){
+        btn.disabled = false;
+        btn.textContent = 'Could not add — tap to retry';
+        btn.style.background = '#e63946';
+        setTimeout(function(){
+          if (btn) btn.style.background = '';
+        }, 2000);
+      }
+    });
+  }
+
+  // ── PDP Quantity Ladder ────────────────────────────────────────────────────
+  function renderLadder(productId){
+    var eligible = findEligibleBundles(productId);
+    if (eligible.length === 0) return;
+    var form = document.querySelector('form[action*="/cart/add"]');
+    if (!form || form.querySelector('.tao-bb-ladder')) return;
+    var addBtn = form.querySelector('[name="add"], button[type="submit"]');
+    if (!addBtn) return;
+
+    var ladder = document.createElement('div');
+    ladder.className = 'tao-bb-ladder';
+    // Build rows
+    var rows = '';
+    rows += '<div class="tao-bb-ladder__row selected" data-bb-tier="single">' +
+      '<span class="tao-bb-ladder__radio"></span>' +
+      '<span class="tao-bb-ladder__label">Just this one</span>' +
+      '<span class="tao-bb-ladder__price">As-is</span>' +
+    '</div>';
+    eligible.sort(function(a,b){return a.priceCents - b.priceCents;}).slice(0,3).forEach(function(b, idx){
+      var pop = idx === 1 ? ' <span class="pop">Most popular</span>' : '';
+      var perUnit = Math.round(b.priceCents / b.size / 100);
+      rows += '<div class="tao-bb-ladder__row" data-bb-tier-page="' + b.page + '">' +
+        '<span class="tao-bb-ladder__radio"></span>' +
+        '<span class="tao-bb-ladder__label">Build a ' + b.size + '-pack' + pop +
+          '<span class="per">Rs.' + perUnit + ' each</span>' +
+        '</span>' +
+        '<span class="tao-bb-ladder__price">' + fmt(b.priceCents) + '</span>' +
+      '</div>';
+    });
+    ladder.innerHTML = rows;
+    // Insert before the ATC button
+    addBtn.parentNode.insertBefore(ladder, addBtn);
+    ladder.addEventListener('click', function(e){
+      var row = e.target.closest('.tao-bb-ladder__row');
+      if (!row) return;
+      ladder.querySelectorAll('.tao-bb-ladder__row').forEach(function(r){ r.classList.remove('selected'); });
+      row.classList.add('selected');
+      var page = row.getAttribute('data-bb-tier-page');
+      if (page){
+        try {
+          sessionStorage.setItem('tao_bb_anchor_product_id', String(productId));
+          sessionStorage.setItem('tao_bb_source', 'ladder_redirect');
+          sessionStorage.setItem('tao_bb_session', taoSessionId());
+        } catch(_){}
+        taoFireEvent('ladder_click', { product: productId, target: page });
+        // Append ?anchor=<pid> as a fallback so prefill works even if sessionStorage is blocked
+        var sep = page.indexOf('?') === -1 ? '?' : '&';
+        window.location.href = page + sep + 'anchor=' + encodeURIComponent(productId) + '&tao_src=ladder';
+      }
+    });
+  }
+
+  // ── Bundle Bridge — intercept PDP form submit ──────────────────────────────
+  // ── PDP qty chip selector (replaces native +/- input) ────────────────────────
+  function renderQtyChips(productJson){
+    var form = document.querySelector('form[action*="/cart/add"]');
+    if (!form) return;
+    if (form.querySelector('.tao-qty-chips')) return; // idempotent
+    var qtyInput = form.querySelector('[name="quantity"]');
+    if (!qtyInput) return;
+
+    // Variant max enforcement. We cap at 20 OR the variant's own max — whichever is smaller.
+    var variantMax = parseInt(qtyInput.getAttribute('max'), 10);
+    if (!isFinite(variantMax) || variantMax <= 0) variantMax = Infinity;
+    var hardMax = Math.min(20, variantMax);
+    var values = [1, 2, 5, 10].filter(function(v){ return v <= hardMax; });
+    if (values.length < 2 && hardMax < 2) return; // qty=1 only — no point
+
+    var wrap = document.createElement('div');
+    wrap.className = 'tao-qty-chips';
+    wrap.setAttribute('role', 'radiogroup');
+    wrap.setAttribute('aria-label', 'Quantity');
+    var label = document.createElement('div');
+    label.className = 'tao-qty-label';
+    label.innerHTML = 'Quantity <span class="tao-qty-max">(max ' + hardMax + ')</span>';
+    wrap.appendChild(label);
+    var row = document.createElement('div');
+    row.className = 'tao-qty-row';
+    values.forEach(function(v){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tao-qty-chip' + (v === 1 ? ' active' : '');
+      btn.setAttribute('data-qty', String(v));
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', v === 1 ? 'true' : 'false');
+      btn.textContent = String(v);
+      row.appendChild(btn);
+    });
+
+    // Custom qty input — accepts any number 1..hardMax. Sits inline as the 5th option.
+    var customBox = document.createElement('div');
+    customBox.className = 'tao-qty-custom';
+    var prefix = document.createElement('span');
+    prefix.className = 'tao-qty-custom-prefix';
+    prefix.textContent = 'Other';
+    var customInput = document.createElement('input');
+    customInput.type = 'number';
+    customInput.min = '1';
+    customInput.max = String(hardMax);
+    customInput.step = '1';
+    customInput.placeholder = '—';
+    customInput.setAttribute('aria-label', 'Custom quantity (max ' + hardMax + ')');
+    customInput.setAttribute('inputmode', 'numeric');
+    customBox.appendChild(prefix);
+    customBox.appendChild(customInput);
+    row.appendChild(customBox);
+
+    wrap.appendChild(row);
+
+    // Mount above the cart submit row, falling back to before the ATC button.
+    var submitWrap = form.querySelector('.product__submit-form-cart, .product-form__buttons');
+    if (submitWrap && submitWrap.parentNode){
+      submitWrap.parentNode.insertBefore(wrap, submitWrap);
+    } else {
+      var atcBtn = form.querySelector('[name="add"]');
+      if (atcBtn && atcBtn.parentNode) atcBtn.parentNode.insertBefore(wrap, atcBtn);
+    }
+
+    if (qtyInput.value !== '1') qtyInput.value = '1';
+
+    function applyQty(v, fromCustom){
+      if (!v || v < 1) return;
+      if (v > hardMax) v = hardMax;
+      qtyInput.value = String(v);
+      try {
+        qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+        qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
+      } catch(_){}
+      // Visual sync
+      var matchedChip = false;
+      wrap.querySelectorAll('.tao-qty-chip').forEach(function(b){
+        var bv = parseInt(b.getAttribute('data-qty'), 10);
+        var isMatch = (!fromCustom && bv === v);
+        b.classList.toggle('active', isMatch);
+        b.setAttribute('aria-checked', isMatch ? 'true' : 'false');
+        if (isMatch) matchedChip = true;
+      });
+      customBox.classList.toggle('active', fromCustom && !matchedChip);
+      if (!fromCustom) customInput.value = ''; // clear the input when chip wins
+      if (typeof taoFireEvent === 'function'){
+        taoFireEvent(fromCustom ? 'pdp_qty_custom_input' : 'pdp_qty_chip_select', {
+          product: productJson.id, qty: v
+        });
+      }
+    }
+
+    wrap.addEventListener('click', function(e){
+      var btn = e.target.closest('.tao-qty-chip');
+      if (!btn) return;
+      e.preventDefault();
+      var v = parseInt(btn.getAttribute('data-qty'), 10);
+      applyQty(v, false);
+    });
+
+    // Custom input — clamp on the fly, never let the user submit > hardMax
+    customInput.addEventListener('input', function(){
+      var raw = customInput.value.replace(/[^0-9]/g, '');
+      if (raw === ''){ customInput.value = ''; return; }
+      var v = parseInt(raw, 10);
+      if (isNaN(v)) return;
+      if (v > hardMax){ v = hardMax; customInput.value = String(v); }
+      if (v < 1){ v = 1; customInput.value = '1'; }
+      applyQty(v, true);
+    });
+    customInput.addEventListener('focus', function(){ customBox.classList.add('active'); });
+    customInput.addEventListener('blur', function(){
+      var v = parseInt(customInput.value, 10);
+      if (!v || v < 1){ customInput.value = ''; customBox.classList.remove('active'); }
+    });
+  }
+
+  // ── Secondary CTA: "Build a {size}-pack — save Rs.{Y}" ───────────────────────
+  function renderBuildBundleCta(productJson, bundle){
+    var form = document.querySelector('form[action*="/cart/add"]');
+    if (!form) return;
+    if (form.querySelector('.tao-build-bundle-cta')) return; // idempotent
+
+    var unitPrice = productJson.price || 0;
+    var rawTotal = bundle.size * unitPrice;
+    var savings = Math.max(0, rawTotal - bundle.priceCents);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tao-build-bundle-cta';
+    btn.setAttribute('data-bundle-page', bundle.page);
+    btn.setAttribute('data-bundle-size', String(bundle.size));
+    var savingsHtml = savings > 0
+      ? ' &mdash; save <strong>Rs.' + (savings/100).toFixed(0) + '</strong>'
+      : '';
+    btn.innerHTML = '<span class="tao-bb-icon">+</span> Build a ' + bundle.size + '-pack' + savingsHtml + ' <span class="tao-bb-arrow">&rarr;</span>';
+
+    // Mount AFTER the cart submit row (below the ATC button).
+    var submitWrap = form.querySelector('.product-form__buttons') || form.querySelector('.product__submit-form-cart');
+    if (submitWrap && submitWrap.parentNode){
+      submitWrap.parentNode.insertBefore(btn, submitWrap.nextSibling);
+    } else {
+      var atcBtn = form.querySelector('[name="add"]');
+      if (atcBtn && atcBtn.parentNode) atcBtn.parentNode.appendChild(btn);
+    }
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      try {
+        sessionStorage.setItem('tao_bb_anchor_product_id', String(productJson.id));
+        sessionStorage.setItem('tao_bb_source', 'pdp_build_bundle');
+      } catch(_){}
+      if (typeof taoFireEvent === 'function'){
+        taoFireEvent('pdp_build_bundle_click', {
+          product: productJson.id,
+          target: bundle.page,
+          collection: bundle.collection,
+          size: bundle.size,
+          savings: savings
+        });
+      }
+      window.location.href = bundle.page;
+    });
+  }
+
+  function attachAtcInterceptor(productJson){
+    // POPUP KILLED — PDP ATC now adds silently. The chip selector + secondary BYOB CTA
+    // replaces this interruption pattern.
+    return;
+    var form = document.querySelector('form[action*="/cart/add"]');
+    if (!form) return;
+    form.addEventListener('submit', function(e){
+      var pid = productJson.id;
+      var eligible = findEligibleBundles(pid);
+      if (eligible.length === 0) return;
+      if (sessionDismissed(pid)) return;
+      // Read quantity
+      var qtyInput = form.querySelector('[name="quantity"]');
+      var qty = qtyInput ? Math.max(1, parseInt(qtyInput.value, 10) || 1) : 1;
+      // Customer manually picked a higher quantity → respect that. No popup, normal ATC.
+      if (SETTINGS.bbSkipMultiQty && qty > 1) return;
+      // Check live cart context so we don't pitch if they already have enough eligible items
+      e.preventDefault();
+      e.stopPropagation();
+      pendingForm = form;
+      fetch('/cart.js', { headers: { 'Accept': 'application/json' } }).then(function(r){return r.json();}).then(function(cart){
+        var bundle = findBundleWithScope(pid, qty, cart.items || []);
+        if (!bundle){
+          // No scope to upsell — just let the original add proceed silently
+          markDismissed(pid);
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ items: [{ id: (form.querySelector('[name="id"]')||{}).value, quantity: qty }] })
+          }).then(function(){
+            document.dispatchEvent(new CustomEvent('cart:refresh'));
+            document.dispatchEvent(new CustomEvent('cart:open'));
+          });
+          return;
+        }
+        var variantInput = form.querySelector('[name="id"]');
+        var variantId = (variantInput && variantInput.value) || (productJson.variants && productJson.variants[0] && productJson.variants[0].id) || null;
+        currentProduct = {
+          id: pid,
+          title: productJson.title,
+          handle: productJson.handle,
+          priceCents: productJson.price,
+          compareCents: productJson.compare_at_price || productJson.price,
+          image: productJson.featured_image || (productJson.images && productJson.images[0]) || '',
+          variantId: variantId
+        };
+        activeBundle = bundle;
+        slots = new Array(activeBundle.size);
+        slots[0] = currentProduct;
+        openModal();
+        // Try cache first for instant render
+        var cached = getRecsFromCache(pid, activeBundle);
+        if (cached && Array.isArray(cached)){
+          renderPicks(cached);
+        } else {
+          // Show skeletons immediately, real data when it arrives
+          renderSkeletons();
+          (cached && cached.then ? cached : getRecommendations(pid, activeBundle)).then(renderPicks);
+        }
+      }).catch(function(){
+        // Cart fetch failed — fall back to simple eligibility logic
+        activeBundle = pickBestBundle(eligible);
+        slots = new Array(activeBundle.size);
+        slots[0] = currentProduct = {
+          id: pid, title: productJson.title, handle: productJson.handle,
+          priceCents: productJson.price, compareCents: productJson.compare_at_price || productJson.price,
+          image: productJson.featured_image || (productJson.images && productJson.images[0]) || '',
+          variantId: (productJson.variants && productJson.variants[0] && productJson.variants[0].id) || null
+        };
+        openModal();
+        // Try cache first for instant render
+        var cached = getRecsFromCache(pid, activeBundle);
+        if (cached && Array.isArray(cached)){
+          renderPicks(cached);
+        } else {
+          // Show skeletons immediately, real data when it arrives
+          renderSkeletons();
+          (cached && cached.then ? cached : getRecommendations(pid, activeBundle)).then(renderPicks);
+        }
+      });
+    }, true);
+  }
+
+  // ── Cart drawer Living Coach ───────────────────────────────────────────────
+  
+  // ── Cart progress bar (free shipping / freebies / discount) ───────────────
+
+
+  // Compute tier state once and share between the two bars.
+  function computeProgress(total){
+    var nextTier = null;
+    for (var j = 0; j < CART_TIERS.length; j++){
+      if (total < CART_TIERS[j].cents){ nextTier = CART_TIERS[j]; break; }
+    }
+    var maxCents = SETTINGS.cartMaxAmountCents > 0 ? SETTINGS.cartMaxAmountCents : CART_TIERS[CART_TIERS.length-1].cents;
+    var pct = maxCents > 0 ? Math.min(100, Math.round((total / maxCents) * 100)) : 0;
+    return { nextTier: nextTier, pct: pct, total: total };
+  }
+
+  // Track the highest tier unlocked across the session so we can play a celebration
+  // when a NEW tier just crossed (not on every paint).
+  var _lastUnlockedTierCents = 0;
+  try { _lastUnlockedTierCents = parseInt(sessionStorage.getItem('tao_last_unlocked') || '0', 10) || 0; } catch(_){}
+  // Track whether the customer has expanded the coupon ladder, so cart re-renders preserve it.
+  var _couponsExpanded = false;
+  try { _couponsExpanded = sessionStorage.getItem('tao_coupons_expanded') === '1'; } catch(_){}
+
+  // ---------- Progress card: built ONCE, updated in-place to avoid flicker ----------
+  // Build the static skeleton (trust line + body shells) on first call. After that, we
+  // only mutate text content / class lists / inline width so the DOM never gets recreated.
+  function _buildCartProgressSkeleton(){
+    var pb = document.createElement('div');
+    pb.className = 'tao-cart-progress';
+    var trustHtml = SETTINGS.cartTrustLine
+      ? '<div class="trust">' + SETTINGS.cartTrustLine + '</div>'
+      : '';
+    var tiersHtml = CART_TIERS.map(function(t){
+      return '<span data-tier="' + t.cents + '">' + t.short + '</span>';
+    }).join('');
+    var couponChipsHtml = (CART_COUPONS || []).map(function(c){
+      return '<div class="c" data-coupon="' + c.cents + '">' +
+        '<span class="code">' + c.code + '</span>' +
+        '<span class="sub" data-sub-for="' + c.cents + '"></span>' +
+      '</div>';
+    }).join('');
+    pb.innerHTML = trustHtml +
+      '<div class="body">' +
+        '<div class="msg"><span class="msg-text"></span><span class="badge-near" hidden>So close!</span></div>' +
+        '<div class="bar"><i></i></div>' +
+        '<div class="tiers">' + tiersHtml + '</div>' +
+        '<div class="best" data-bb-coupons-toggle hidden>' +
+          '<span class="badge"></span>' +
+          '<span class="text"></span>' +
+          '<span class="chev">▾</span>' +
+        '</div>' +
+        '<div class="push" hidden>' +
+          '<span class="arrow">→</span>' +
+          '<span class="ptxt"></span>' +
+        '</div>' +
+        ((CART_COUPONS && CART_COUPONS.length) ? (
+          '<div class="coupons">' +
+            '<div class="hint">💡 Apply ONE coupon at checkout — only one counts</div>' +
+            '<div class="row">' + couponChipsHtml + '</div>' +
+            '<div class="hint">💡 Tap "Apply coupon" at checkout to use</div>' +
+          '</div>'
+        ) : '');
+    return pb;
+  }
+
+  function _ensureCartProgressMounted(drawer){
+    var existing = drawer.querySelector('.tao-cart-progress');
+    if (existing) return existing;
+    var pb = _buildCartProgressSkeleton();
+    var form = drawer.querySelector('#minicart-form');
+    var wrapper = drawer.querySelector('.minicart__wrapper');
+    if (wrapper && form && form.parentElement === wrapper){
+      wrapper.insertBefore(pb, form);
+    } else {
+      var inner = drawer.querySelector('.minicart__wrapper,.cart-drawer__inner,.cart__items,.drawer__inner,.minicart__content') || drawer;
+      inner.insertBefore(pb, inner.firstChild);
+    }
+    return pb;
+  }
+
+  // === Sticky mini progress strip — appears below the header once the full card scrolls out ===
+  function _ensureMiniProgress(drawer){
+    var wrapper = drawer.querySelector('.minicart__wrapper');
+    if (!wrapper) return null;
+    var existing = wrapper.querySelector(':scope > .tao-mini-progress');
+    if (existing) return existing;
+    var mini = document.createElement('div');
+    mini.className = 'tao-mini-progress';
+    mini.innerHTML = '<span class="text"></span><span class="bar"><i></i></span><span class="pct"></span>';
+    var header = wrapper.querySelector('.minicart__header');
+    if (header && header.parentElement === wrapper){
+      header.insertAdjacentElement('afterend', mini);
+    } else {
+      wrapper.insertBefore(mini, wrapper.firstChild);
+    }
+    // Tap → smooth-scroll back to the full card
+    mini.addEventListener('click', function(){
+      var card = wrapper.querySelector('.tao-cart-progress');
+      if (card && typeof card.scrollIntoView === 'function'){
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    return mini;
+  }
+
+  function _updateMiniProgress(state){
+    var mini = document.querySelector('.tao-mini-progress');
+    if (!mini) return;
+    var text = mini.querySelector('.text');
+    var barFill = mini.querySelector('.bar i');
+    var pctEl = mini.querySelector('.pct');
+    if (!state.nextTier){
+      text.innerHTML = '<span style="color:#0e855b">🎉 All rewards unlocked</span>';
+    } else {
+      var remaining = state.nextTier.cents - state.total;
+      text.innerHTML = 'Add <strong>Rs.' + (remaining/100).toFixed(0) + '</strong> &rarr; ' + state.nextTier.label;
+    }
+    if (barFill) barFill.style.width = state.pct + '%';
+    if (pctEl) pctEl.textContent = state.pct + '%';
+  }
+
+  function _wireMiniProgressVisibility(drawer){
+    if (window.__taoMiniIO) return;
+    var wrapper = drawer.querySelector('.minicart__wrapper');
+    var card = drawer.querySelector('.tao-cart-progress');
+    var mini = drawer.querySelector('.tao-mini-progress');
+    if (!wrapper || !card || !mini) return;
+    if (typeof IntersectionObserver === 'undefined') return;
+    window.__taoMiniIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        // When the full card is mostly out of view, surface the mini strip
+        mini.classList.toggle('show', e.intersectionRatio < 0.15);
+      });
+    }, { root: wrapper, threshold: [0, 0.15, 0.5, 1] });
+    window.__taoMiniIO.observe(card);
+  }
+
+  function paintCartProgress(state){
+    // ORDER MATTERS: this theme's actual cart drawer is <cart-notification id="minicart_wrapper">.
+    // The old .minicart-form selector was matching the inner form and breaking mount.
+    var drawerSelectors = [
+      'cart-notification', '#minicart_wrapper', '.minicart .minicart__wrapper', '.minicart',
+      'cart-drawer','.cart-drawer','.cart-drawer__items','.cart-notification__inner',
+      '#cart-notification',
+      '[id*="CartDrawer"]','[data-cart-drawer]','.cart__items','.cart-page'
+    ];
+    var drawer = null;
+    for (var i = 0; i < drawerSelectors.length && !drawer; i++){
+      drawer = document.querySelector(drawerSelectors[i]);
+    }
+    if (!drawer) return;
+    var pb = _ensureCartProgressMounted(drawer);
+    _ensureMiniProgress(drawer);
+    _updateMiniProgress(state);
+    _wireMiniProgressVisibility(drawer);
+
+    // Hero message
+    var remainingCents = state.nextTier ? (state.nextTier.cents - state.total) : 0;
+    var msgEl = pb.querySelector('.msg-text');
+    var nearEl = pb.querySelector('.badge-near');
+    if (!state.nextTier){
+      msgEl.innerHTML = '<span class="unlocked">🎉 All rewards unlocked — check out now</span>';
+    } else {
+      msgEl.innerHTML = 'Add <strong>Rs.' + (remainingCents/100).toFixed(0) + '</strong> &rarr; <strong>' + state.nextTier.label + '</strong>';
+    }
+    nearEl.hidden = !(state.nextTier && remainingCents > 0 && remainingCents <= 5000);
+
+    // Bar fill
+    var barFill = pb.querySelector('.bar i');
+    if (barFill) barFill.style.width = state.pct + '%';
+
+    // Tier chips
+    var nextTierCents = state.nextTier ? state.nextTier.cents : -1;
+    pb.querySelectorAll('.tiers [data-tier]').forEach(function(span){
+      var cents = parseInt(span.getAttribute('data-tier'), 10);
+      var cls = state.total >= cents ? 'hit' : (cents === nextTierCents ? 'next' : '');
+      span.className = cls;
+    });
+
+    // Best-coupon picker
+    var bestActive = null, bestNext = null;
+    if (CART_COUPONS && CART_COUPONS.length){
+      for (var ci = 0; ci < CART_COUPONS.length; ci++){
+        var c = CART_COUPONS[ci];
+        if (state.total >= c.cents) bestActive = c;
+        else if (!bestNext) bestNext = c;
+      }
+    }
+    var bestEl = pb.querySelector('.best');
+    if (bestEl){
+      if (bestActive || bestNext){
+        bestEl.hidden = false;
+        var badge = bestEl.querySelector('.badge');
+        var text = bestEl.querySelector('.text');
+        if (bestActive){
+          badge.textContent = 'USE';
+          badge.className = 'badge';
+          text.innerHTML = 'Apply <strong>' + bestActive.code + '</strong> at checkout · ' + bestActive.label;
+        } else {
+          badge.textContent = 'NEXT';
+          badge.className = 'badge locked';
+          text.innerHTML = 'Rs.' + ((bestNext.cents - state.total)/100).toFixed(0) + ' more → unlock <strong>' + bestNext.code + '</strong> · ' + bestNext.label;
+        }
+      } else {
+        bestEl.hidden = true;
+      }
+    }
+
+    // Push-to-next row
+    var pushEl = pb.querySelector('.push');
+    if (pushEl){
+      if (bestNext){
+        var pushNeeded = bestNext.cents - state.total;
+        pushEl.hidden = false;
+        pushEl.querySelector('.ptxt').innerHTML =
+          'Add <strong>Rs.' + (pushNeeded/100).toFixed(0) + '</strong> more to unlock <strong>' + bestNext.code + '</strong> · ' + bestNext.label;
+      } else {
+        pushEl.hidden = true;
+      }
+    }
+
+    // Coupon ladder state (chips already exist — only update class + sub text)
+    if (CART_COUPONS && CART_COUPONS.length){
+      pb.querySelectorAll('.coupons .c').forEach(function(chip){
+        var cents = parseInt(chip.getAttribute('data-coupon'), 10);
+        var coupon = null;
+        for (var k = 0; k < CART_COUPONS.length; k++){ if (CART_COUPONS[k].cents === cents){ coupon = CART_COUPONS[k]; break; } }
+        if (!coupon) return;
+        var unlocked = state.total >= coupon.cents;
+        var isBest = bestActive && coupon.code === bestActive.code;
+        var isNext = bestNext && coupon.code === bestNext.code;
+        chip.className = 'c' + (isBest ? ' active' : (unlocked ? ' available' : (isNext ? ' next' : '')));
+        var subEl = chip.querySelector('.sub');
+        if (subEl){
+          subEl.textContent = unlocked
+            ? (isBest ? 'Use this code' : 'Available — use newer code')
+            : 'at Rs.' + (coupon.cents/100).toFixed(0) + ' · ' + coupon.label;
+        }
+      });
+    }
+
+    // Expanded state — applied once, never reset on update
+    pb.classList.toggle('expanded', _couponsExpanded);
+
+    // Celebrate ONLY when a tier just crossed (not every paint)
+    var highestHit = 0;
+    for (var ti = 0; ti < CART_TIERS.length; ti++){
+      if (state.total >= CART_TIERS[ti].cents && CART_TIERS[ti].cents > highestHit) highestHit = CART_TIERS[ti].cents;
+    }
+    if (highestHit > _lastUnlockedTierCents){
+      pb.classList.add('celebrating');
+      setTimeout(function(){ pb.classList.remove('celebrating'); }, 1500);
+      _lastUnlockedTierCents = highestHit;
+      try { sessionStorage.setItem('tao_last_unlocked', String(highestHit)); } catch(_){}
+    } else if (highestHit < _lastUnlockedTierCents){
+      _lastUnlockedTierCents = highestHit;
+      try { sessionStorage.setItem('tao_last_unlocked', String(highestHit)); } catch(_){}
+    }
+
+    // Fallback: if the theme's cart-recommend is missing OR empty, render our own Quick Adds.
+    // This guarantees the customer always sees an upsell.
+    try {
+      var themeUpsell = drawer.querySelector('.cart-recommend');
+      var themeHasItems = themeUpsell && themeUpsell.querySelector('.swiper-slide, .cart-upsell-item, .product-item');
+      if (!themeHasItems && SETTINGS.cartQuickAddsEnabled && typeof renderQuickAdds === 'function'){
+        renderQuickAdds(state, drawer);
+      }
+    } catch(_){}
+  }
+
+  // Tap the "best coupon" row to expand / collapse the full coupon ladder.
+  // Persist the choice across re-renders so it doesn't snap shut on every cart update.
+  document.addEventListener('click', function(e){
+    var toggle = e.target.closest('[data-bb-coupons-toggle]');
+    if (!toggle) return;
+    e.stopPropagation();
+    var card = toggle.closest('.tao-cart-progress');
+    if (!card) return;
+    _couponsExpanded = !card.classList.contains('expanded');
+    card.classList.toggle('expanded', _couponsExpanded);
+    try { sessionStorage.setItem('tao_coupons_expanded', _couponsExpanded ? '1' : '0'); } catch(_){}
+  });
+
+  // === Analytics: fire taoFireEvent for cart-upsell ("You may also like") interactions ===
+  // Click = intent. We also listen for the theme's successful-add via /cart/add to fire an 'added' event.
+  document.addEventListener('click', function(e){
+    // Match any ATC trigger inside the cart-recommend slider (theme renders multiple variants)
+    var upsellBtn = e.target.closest(
+      '.cart-recommend .swiper-cart-upsell .product-item__button-submit,' +
+      '.cart-recommend .swiper-cart-upsell .product-item__select-options,' +
+      '.cart-recommend .swiper-cart-upsell .bls-add-cart-list,' +
+      '.cart-recommend .swiper-cart-upsell button[name="add"]'
+    );
+    if (!upsellBtn) return;
+    var card = upsellBtn.closest('.swiper-slide, .product-item');
+    var info = { source: 'cart_upsell' };
+    if (card){
+      var link = card.querySelector('a[href*="/products/"]');
+      if (link){
+        var m = (link.getAttribute('href') || '').match(/\/products\/([^/?#]+)/);
+        if (m) info.handle = m[1];
+      }
+      var titleEl = card.querySelector('.product-item__name, .product-item__title, .product-item__title a');
+      if (titleEl) info.title = (titleEl.textContent || '').trim();
+      var priceEl = card.querySelector('.product-item__price, .price, .product-price');
+      if (priceEl) info.priceText = (priceEl.textContent || '').replace(/\s+/g, ' ').trim();
+      var pid = card.getAttribute('data-product-id') || (card.querySelector('[data-product-id]') || {}).getAttribute && card.querySelector('[data-product-id]').getAttribute('data-product-id');
+      if (pid) info.productId = pid;
+    }
+    if (typeof taoFireEvent === 'function') taoFireEvent('cart_upsell_click', info);
+    // Tag the next /cart/add request so we can correlate the success event
+    window.__taoLastUpsell = info;
+  }, true);
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // === Analytics Tier 1: universal funnel events ===
+  //   Fires: pdp_view, add_to_cart_click, add_to_cart_success, add_to_cart_fail,
+  //          cart_open, cart_close_no_checkout, checkout_click
+  //   Every event carries `source` attribution so you can slice by where the
+  //   customer came from (pdp / collection:X / home:featured / search:Q / etc.).
+  //   All events route through taoFireEvent → DOM CustomEvent + window.dataLayer.
+  //   Non-invasive: passive listeners, capture-phase, no preventDefault on any flow.
+  // ════════════════════════════════════════════════════════════════════════════
+
+  function _taoDetectSource(btn){
+    var path = location.pathname;
+    if (btn && btn.closest){
+      if (btn.closest('.cart-recommend, .swiper-cart-upsell, [class*="cart-upsell"]')) return 'cart_upsell';
+      if (btn.closest('.product-recommendations, .related-products, [class*="related"]')) return 'related_products';
+      if (btn.closest('.recently-viewed, .rvp, [class*="recently-viewed" i]')) return 'recently_viewed';
+      if (btn.closest('.quickview, [data-quickview], .product-quick-view')) return 'quickview';
+      if (btn.closest('.tao-bb-pick')) return 'bundle_popup_pick';
+      if (btn.closest('.bundle-section')) return 'bundle_picker';
+    }
+    if (path.indexOf('/products/') === 0){
+      if (btn && btn.closest && btn.closest('.product-detail__buy-buttons, form[action*="/cart/add"]')) return 'pdp';
+      return 'pdp:other';
+    }
+    if (path.indexOf('/collections/') === 0){
+      var m = path.match(/\/collections\/([^/?#]+)/);
+      return 'collection:' + (m ? m[1] : 'unknown');
+    }
+    if (path === '/search' || path.indexOf('/search?') === 0){
+      var q = '';
+      try { q = (new URLSearchParams(location.search).get('q') || '').toLowerCase().slice(0, 40).replace(/[^a-z0-9 -]/g, ''); } catch(_){}
+      return 'search' + (q ? ':' + q : '');
+    }
+    if (path === '/' || path === '/index'){
+      if (btn && btn.closest){
+        if (btn.closest('[class*="bestseller" i], [id*="bestseller" i]')) return 'home:bestsellers';
+        if (btn.closest('[class*="new-arrival" i], [class*="newest" i]')) return 'home:new_arrivals';
+        if (btn.closest('[class*="featured" i]'))                          return 'home:featured';
+        if (btn.closest('section[class*="hero" i]'))                       return 'home:hero';
+      }
+      return 'home:other';
+    }
+    return 'unknown:' + path;
+  }
+
+  function _taoExtractProductInfo(btn){
+    var info = {};
+    var card = btn.closest('[data-product-id], .product-item, .product-card, form[action*="/cart/add"], .swiper-slide');
+    if (!card) return info;
+    var pid = card.getAttribute && card.getAttribute('data-product-id');
+    if (!pid){
+      var pidEl = card.querySelector && card.querySelector('[data-product-id]');
+      if (pidEl) pid = pidEl.getAttribute('data-product-id');
+    }
+    if (pid) info.product_id = String(pid);
+    var titleEl = card.querySelector && card.querySelector('.product-item__name, .product-item__title, .product-detail__title');
+    if (titleEl) info.title = (titleEl.textContent || '').trim().slice(0, 80);
+    var link = card.querySelector && card.querySelector('a[href*="/products/"]');
+    if (link){
+      var hm = (link.getAttribute('href') || '').match(/\/products\/([^/?#]+)/);
+      if (hm) info.handle = hm[1];
+    }
+    var qtyEl = card.querySelector && card.querySelector('[name="quantity"]');
+    if (qtyEl && qtyEl.value) info.qty = parseInt(qtyEl.value, 10) || 1;
+    var variantEl = card.querySelector && card.querySelector('[name="id"]');
+    if (variantEl && variantEl.value) info.variant_id = String(variantEl.value);
+    return info;
+  }
+
+  // Universal ATC click listener — fires add_to_cart_click for every ATC anywhere on the site.
+  // Capture phase so we record intent even if theme stopPropagation()s downstream.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest([
+      'button[name="add"]',
+      '[data-add-to-cart]',
+      '.product__add-cart',
+      '.product-item__button-submit',
+      '.product-item__select-options',
+      '.bls-add-cart-list',
+      '.btn-add-cart',
+      '.card-add-btn'
+    ].join(','));
+    if (!btn) return;
+    // Skip our own dedicated CTAs (they have specialized events)
+    if (btn.closest('.tao-bb-cta, .tao-build-bundle-cta, .tao-bb-pick, .bundle-section')) return;
+    var source = _taoDetectSource(btn);
+    var info = Object.assign({ source: source, page_path: location.pathname }, _taoExtractProductInfo(btn));
+    if (typeof taoFireEvent === 'function') taoFireEvent('add_to_cart_click', info);
+    window.__taoLastAtcSource = info;
+  }, true);
+
+  // Cart icon click — sets the trigger for the next cart_open event.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.header__icon--cart, .header-cart, [data-cart-toggle], a[href="/cart"]:not(.btn-checkout), a[href$="/cart"]:not(.btn-checkout)');
+    if (btn) window.__taoLastCartOpenTrigger = 'icon_click';
+  }, true);
+
+  // Checkout click — anywhere (drawer, cart page, sticky bar).
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest([
+      '.btn-checkout',
+      'button[name="checkout"]',
+      'a[href="/checkout"]',
+      'a[href*="/checkout"]',
+      '[data-checkout]'
+    ].join(','));
+    if (!btn) return;
+    var location_ = btn.closest('cart-notification, .minicart, .minicart__wrapper') ? 'drawer' :
+                    (location.pathname === '/cart' || location.pathname.endsWith('/cart')) ? 'cart_page' :
+                    'other';
+    window.__taoSawCheckoutBeforeClose = true;
+    fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(c){
+        var d = { location: location_ };
+        if (c){ d.item_count = c.item_count; d.total = c.total_price; }
+        if (typeof taoFireEvent === 'function') taoFireEvent('checkout_click', d);
+      }).catch(function(){
+        if (typeof taoFireEvent === 'function') taoFireEvent('checkout_click', { location: location_ });
+      });
+  }, true);
+
+  // Cart open/close detection — MutationObserver on documentElement classlist.
+  (function(){
+    var lastOpen = (document.documentElement.classList.contains('open-drawer') ||
+                    document.documentElement.classList.contains('open-minicart'));
+    var openObs = new MutationObserver(function(){
+      var isOpen = (document.documentElement.classList.contains('open-drawer') ||
+                    document.documentElement.classList.contains('open-minicart'));
+      if (isOpen === lastOpen) return;
+      if (isOpen){
+        window.__taoCartOpenedAt = Date.now();
+        window.__taoSawCheckoutBeforeClose = false;
+        var trigger = window.__taoLastCartOpenTrigger || 'auto_after_add';
+        window.__taoLastCartOpenTrigger = null;
+        fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .then(function(c){
+            if (typeof taoFireEvent === 'function') taoFireEvent('cart_open', {
+              trigger: trigger,
+              item_count: c ? c.item_count : null,
+              total: c ? c.total_price : null
+            });
+          }).catch(function(){});
+      } else {
+        var openedAt = window.__taoCartOpenedAt;
+        var sawCheckout = window.__taoSawCheckoutBeforeClose;
+        var seconds = openedAt ? Math.round((Date.now() - openedAt)/1000) : 0;
+        window.__taoCartOpenedAt = null;
+        if (!sawCheckout){
+          fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+            .then(function(r){ return r.ok ? r.json() : null; })
+            .then(function(c){
+              if (typeof taoFireEvent === 'function') taoFireEvent('cart_close_no_checkout', {
+                item_count: c ? c.item_count : null,
+                total: c ? c.total_price : null,
+                seconds_open: seconds
+              });
+            }).catch(function(){});
+        }
+      }
+      lastOpen = isOpen;
+    });
+    openObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  })();
+
+  // === Auto-tag cart with bundle metadata when a NATIVE Shopify bundle is added ===
+  // Fully non-invasive: reads /cart.js after a successful /cart/add, looks for line items
+  // tagged by Shopify Bundles app (_isShopifyBundle / merged_bundle / _bundleTitle), and
+  // sets cart attributes IF not already set. One /cart.js + at most one /cart/update.js
+  // per bundle add. Idempotent — won't re-tag the same cart. Errors silently swallowed.
+  function _taoAutoTagNativeBundle(){
+    fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(cart){
+        if (!cart || !cart.items || !cart.items.length) return;
+        // Already tagged this cart? Skip.
+        if (cart.attributes && cart.attributes.tao_bundle) return;
+        // Find a bundle item (Shopify Bundles app stamps these)
+        var bundleItem = null;
+        for (var i = 0; i < cart.items.length; i++){
+          var props = cart.items[i].properties || {};
+          if (props._isShopifyBundle === 'true' || props.merged_bundle === 'true' || props._bundleTitle){
+            bundleItem = cart.items[i];
+            break;
+          }
+        }
+        if (!bundleItem) return;
+        var p = bundleItem.properties || {};
+        var title = p._bundleTitle || bundleItem.product_title || 'Bundle';
+        // Skip the generic Shopify default — wait for a real title (user may not have renamed yet)
+        if (title === 'Shopify Bundle' && bundleItem.product_title){
+          title = bundleItem.product_title;
+        }
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            attributes: {
+              tao_bundle:         title,
+              tao_bundle_type:    'shopify_native',
+              tao_bundle_source:  'native_bundle_add',
+              tao_bundle_revenue: String(p._finalBundlePrice ? (parseFloat(p._finalBundlePrice) * 100) : bundleItem.line_price)
+            }
+          })
+        }).catch(function(){});
+      })
+      .catch(function(){});
+  }
+
+  // Wrap window.fetch ONCE. Two responsibilities:
+  //   (a) Fire `cart_upsell_added` when a /cart/add originated from an upsell click
+  //   (b) Auto-tag native Shopify bundles after any /cart/add
+  // The wrap forwards the original call untouched — request body, headers, response all pass through.
+  (function(){
+    if (window.__taoFetchPatched) return;
+    window.__taoFetchPatched = true;
+    var origFetch = window.fetch;
+    if (typeof origFetch !== 'function') return;
+    window.fetch = function(input, init){
+      var url = (typeof input === 'string') ? input : (input && input.url) || '';
+      var isCartAdd = /\/cart\/add(\.js)?(\?|$)/.test(url);
+
+      // ── Universal _tao_source stamping on every /cart/add request ──
+      // Reads source from the last click. Modifies the request body in-place ONLY when:
+      //   (a) it's a cart/add request, AND
+      //   (b) the body is parseable JSON or FormData, AND
+      //   (c) the item doesn't already have a _tao_source set (don't overwrite our bundle stamps)
+      // Failure is silent — if parsing throws, we pass through unmodified.
+      try {
+        if (isCartAdd && init && init.body){
+          var src = (window.__taoLastAtcSource && window.__taoLastAtcSource.source) || null;
+          var ts  = new Date().toISOString().slice(0,16);
+          if (typeof init.body === 'string' && init.body.length){
+            var parsed;
+            try { parsed = JSON.parse(init.body); } catch(_){ parsed = null; }
+            if (parsed){
+              if (parsed.items && parsed.items.length){
+                parsed.items.forEach(function(it){
+                  it.properties = it.properties || {};
+                  if (src && !it.properties._tao_source) it.properties._tao_source = src;
+                  if (!it.properties._tao_at) it.properties._tao_at = ts;
+                });
+              } else if (parsed.id){
+                parsed.properties = parsed.properties || {};
+                if (src && !parsed.properties._tao_source) parsed.properties._tao_source = src;
+                if (!parsed.properties._tao_at) parsed.properties._tao_at = ts;
+              }
+              init.body = JSON.stringify(parsed);
+            }
+          } else if (typeof FormData !== 'undefined' && init.body instanceof FormData){
+            if (src && !init.body.has('properties[_tao_source]')){
+              init.body.set('properties[_tao_source]', src);
+            }
+            if (!init.body.has('properties[_tao_at]')){
+              init.body.set('properties[_tao_at]', ts);
+            }
+          }
+        }
+      } catch(_){}
+
+      var p = origFetch.apply(this, arguments);
+      if (isCartAdd){
+        // (a) Upsell-add correlation (legacy, kept for back-compat)
+        if (window.__taoLastUpsell){
+          var pending = window.__taoLastUpsell;
+          window.__taoLastUpsell = null;
+          p.then(function(resp){
+            if (resp && resp.ok && typeof taoFireEvent === 'function'){
+              taoFireEvent('cart_upsell_added', pending);
+            }
+          }).catch(function(){});
+        }
+        // (b) Universal add_to_cart_success / add_to_cart_fail
+        if (window.__taoLastAtcSource){
+          var atc = window.__taoLastAtcSource;
+          window.__taoLastAtcSource = null;
+          p.then(function(resp){
+            if (typeof taoFireEvent !== 'function') return;
+            if (resp && resp.ok){
+              taoFireEvent('add_to_cart_success', atc);
+              // After a successful ATC the cart usually auto-opens — pre-stamp the trigger
+              if (!window.__taoLastCartOpenTrigger) window.__taoLastCartOpenTrigger = 'auto_after_add';
+            } else {
+              var info = Object.assign({}, atc, { status: resp ? resp.status : 0 });
+              taoFireEvent('add_to_cart_fail', info);
+            }
+          }).catch(function(){
+            if (typeof taoFireEvent === 'function'){
+              taoFireEvent('add_to_cart_fail', Object.assign({}, atc, { status: 0, error: 'network' }));
+            }
+          });
+        }
+        // (c) Native bundle auto-tag — runs 250ms after success
+        p.then(function(resp){
+          if (!resp || !resp.ok) return;
+          setTimeout(function(){ try { _taoAutoTagNativeBundle(); } catch(_){} }, 250);
+        }).catch(function(){});
+      }
+      return p;
+    };
+  })();
+
+  // === Quick-adds: 'add this product to cross the next tier' ===
+  var _quickAddsCache = null;
+  function _fetchQuickAddPool(){
+    if (_quickAddsCache) return Promise.resolve(_quickAddsCache);
+    var url = SETTINGS.cartQuickAddsCollection
+      ? '/collections/' + encodeURIComponent(SETTINGS.cartQuickAddsCollection) + '/products.json?limit=30'
+      : '/products.json?limit=50';
+    return fetch(url).then(function(r){ return r.ok ? r.json() : { products: [] }; }).then(function(d){
+      _quickAddsCache = (d.products || []).map(normalize).filter(function(p){
+        return p && p.available !== false && p._variantId && p.price > 0;
+      });
+      return _quickAddsCache;
+    }).catch(function(){ return []; });
+  }
+
+  function renderQuickAdds(state, drawer){
+    var existing = drawer.querySelector('.tao-quickadds');
+    // Hide if no next tier (already at top) — nothing to drive toward
+    if (!state.nextTier){
+      if (existing) existing.remove();
+      return;
+    }
+    var remainingCents = state.nextTier.cents - state.total;
+    if (remainingCents <= 0){
+      if (existing) existing.remove();
+      return;
+    }
+    fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.json(); })
+      .then(function(cart){
+        var inCart = {};
+        (cart.items || []).forEach(function(i){ inCart[i.product_id] = true; });
+        _fetchQuickAddPool().then(function(pool){
+          // Score: prefer products whose price brings the cart JUST over the next tier;
+          // fallback to anything affordable enough to nudge forward.
+          var candidates = pool
+            .filter(function(p){ return !inCart[p.id]; })
+            .map(function(p){
+              var newTotal = state.total + p.price;
+              var unlocksTier = newTotal >= state.nextTier.cents;
+              // Distance from "just past the tier" — closer is better
+              var overshoot = newTotal - state.nextTier.cents;
+              var score = unlocksTier ? Math.abs(overshoot) : (remainingCents - p.price) * 1.5 + 100000;
+              return { p: p, unlocks: unlocksTier, score: score };
+            })
+            .filter(function(x){ return x.p.price <= remainingCents + 30000; })  // within Rs.300 of needed amount
+            .sort(function(a, b){ return a.score - b.score; })
+            .slice(0, 3)
+            .map(function(x){ return x; });
+
+          // Replace existing quick-adds (regardless of whether candidates exist)
+          var prev = drawer.querySelector('.tao-quickadds');
+          if (prev) prev.remove();
+          if (candidates.length === 0) return;
+
+          var rowHtml = candidates.map(function(x){
+            var p = x.p;
+            var img = (typeof p.featured_image === 'string') ? p.featured_image : '';
+            return '<div class="qa-card">' +
+              '<img src="' + img + '" alt="' + (p.title || '').replace(/"/g, '&quot;') + '" loading="lazy" onerror="this.style.display=\'none\'">' +
+              '<div class="qa-t">' + (p.title || '') + '</div>' +
+              '<div class="qa-p">' + fmt(p.price) + '</div>' +
+              (x.unlocks ? '<div class="qa-unlocks">✓ Unlocks ' + state.nextTier.label + '</div>' : '<div class="qa-unlocks" style="color:#888">Nudges you forward</div>') +
+              '<button class="qa-add" type="button" data-variant="' + p._variantId + '">+ Add</button>' +
+            '</div>';
+          }).join('');
+
+          var node = document.createElement('div');
+          node.className = 'tao-quickadds';
+          node.innerHTML =
+            '<div class="qa-head">' +
+              '<span class="qa-title">⚡ Add to unlock ' + state.nextTier.label + '</span>' +
+              '<span class="qa-hint">Rs.' + (remainingCents/100).toFixed(0) + ' to go</span>' +
+            '</div>' +
+            '<div class="qa-row">' + rowHtml + '</div>';
+
+          // Mount directly below the progress bar (same parent — outside the section that re-renders)
+          var bar = drawer.querySelector('.tao-cart-progress');
+          if (bar && bar.parentElement){
+            bar.parentElement.insertBefore(node, bar.nextSibling);
+          }
+        });
+      }).catch(function(){});
+  }
+
+  // Click delegation for quick-add buttons (works even after rerenders)
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.tao-quickadds .qa-add');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (btn.disabled) return;
+    var vid = parseInt(btn.getAttribute('data-variant'), 10);
+    if (!vid) return;
+    var orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        items: [{ id: vid, quantity: 1 }],
+        sections: ['minicart-form'],
+        sections_url: window.location.pathname
+      })
+    }).then(function(r){ return r.ok ? r.json() : Promise.reject(r); }).then(function(d){
+      // Inject fresh minicart HTML so the new item shows up immediately
+      try {
+        var html = d && d.sections && d.sections['minicart-form'];
+        if (html){
+          var holder = document.getElementById('minicart-form');
+          var parsed = new DOMParser().parseFromString(html, 'text/html');
+          var fresh = parsed.querySelector('#minicart-form');
+          if (holder && fresh){ holder.innerHTML = fresh.innerHTML; }
+        }
+      } catch(_){}
+      // Update header count badges
+      if (typeof d.item_count !== 'undefined'){
+        document.querySelectorAll('.cart-count').forEach(function(el){
+          el.innerHTML = el.classList.contains('cart-count-drawer')
+            ? '(' + d.item_count + ')'
+            : (d.item_count > 100 ? '~' : d.item_count);
+        });
+      }
+      // Refresh free-ship bar + our tao bars
+      try {
+        var bar = document.querySelector('free-ship-progress-bar');
+        if (bar && typeof bar.init === 'function'){
+          var subtotal = (typeof d.items_subtotal_price !== 'undefined') ? d.items_subtotal_price : null;
+          if (subtotal != null) bar.init(subtotal);
+        }
+      } catch(_){}
+      scheduleCartProgress(60);
+      // Tiny success state, then re-enable
+      btn.textContent = '✓ Added';
+      btn.style.background = '#0a6e4a';
+      setTimeout(function(){
+        btn.textContent = orig;
+        btn.style.background = '';
+        btn.disabled = false;
+      }, 1100);
+    }).catch(function(){
+      btn.textContent = 'Try again';
+      setTimeout(function(){
+        btn.textContent = orig;
+        btn.disabled = false;
+      }, 1400);
+    });
+  });
+
+  function paintStickyPdpProgress(state){
+    // Only show on PDPs
+    if (window.location.pathname.indexOf('/products/') !== 0) return;
+    var msg;
+    var cartTxt = '<span style="color:#666">🛒 Rs.' + (state.total/100).toFixed(0) + '</span>';
+    if (!state.nextTier){
+      msg = cartTxt + ' · <span class="unlocked">🎉 All rewards unlocked</span>';
+    } else {
+      var remaining = state.nextTier.cents - state.total;
+      msg = cartTxt + ' · Add <strong>Rs.' + (remaining/100).toFixed(0) + '</strong> &rarr; <strong>' + state.nextTier.label + '</strong>';
+    }
+    var bar = document.body.querySelector(':scope > .tao-sticky-progress');
+    if (!bar){
+      bar = document.createElement('div');
+      bar.className = 'tao-sticky-progress';
+      document.body.appendChild(bar);
+    }
+    bar.innerHTML = '<div class="msg"><span>' + msg + '</span><span class="pct">' + state.pct + '%</span></div>' +
+      '<div class="bar"><i style="width:' + state.pct + '%"></i></div>';
+    // Trigger slide-in on next frame so the transition runs even on first paint
+    requestAnimationFrame(function(){ bar.classList.add('show'); });
+  }
+
+  // Backwards-compatible aliases — other call sites may still reference these.
+  function renderCartProgress(){
+    if (!SETTINGS.cartProgressEnabled || !CART_TIERS || !CART_TIERS.length) return;
+    fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.json(); })
+      .then(function(cart){ paintCartProgress(computeProgress(cart.total_price || 0)); })
+      .catch(function(){});
+  }
+  function renderStickyPdpProgress(){
+    if (!SETTINGS.cartProgressEnabled || !CART_TIERS || !CART_TIERS.length) return;
+    fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.json(); })
+      .then(function(cart){ paintStickyPdpProgress(computeProgress(cart.total_price || 0)); })
+      .catch(function(){});
+  }
+
+  // Debounced wrapper. Cart-side UI injection is DISABLED — only the slim PDP bar runs.
+  var _cartProgressTimer = null;
+  function scheduleCartProgress(delay){
+    if (!SETTINGS.cartProgressEnabled || !CART_TIERS || !CART_TIERS.length) return;
+    if (_cartProgressTimer) clearTimeout(_cartProgressTimer);
+    _cartProgressTimer = setTimeout(function(){
+      fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+        .then(function(r){ return r.json(); })
+        .then(function(cart){
+          var state = computeProgress(cart.total_price || 0);
+          // paintCartProgress(state);  // disabled — side cart left untouched
+          paintStickyPdpProgress(state);
+        }).catch(function(){});
+    }, delay || 120);
+  }
+
+  // Watch the form section the theme replaces on every cart change.
+  // Because the bar lives OUTSIDE this element, re-rendering it won't retrigger the observer.
+  function watchCartUpdates(){
+    var form = document.querySelector('#minicart-form');
+    if (form && !form._taoCartObs){
+      form._taoCartObs = new MutationObserver(function(){ scheduleCartProgress(120); });
+      form._taoCartObs.observe(form, { childList: true, subtree: true });
+    }
+    // Re-render when the drawer becomes visible (theme adds .open-drawer on <html>)
+    if (!document.documentElement._taoDrawerObs){
+      var lastOpen = document.documentElement.classList.contains('open-drawer');
+      document.documentElement._taoDrawerObs = new MutationObserver(function(){
+        var isOpen = document.documentElement.classList.contains('open-drawer');
+        if (isOpen && !lastOpen) scheduleCartProgress(180);
+        lastOpen = isOpen;
+      });
+      document.documentElement._taoDrawerObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
+
+  function injectCoach(){
+    fetch('/cart.js').then(function(r){return r.json();}).then(function(cart){
+      if (!cart.items || cart.items.length === 0) return;
+      // STRICT: skip if ANY item in cart is already part of a bundle
+      var hasBundleItem = cart.items.some(function(it){ return it.properties && it.properties._bundle; });
+      if (hasBundleItem) return;
+      var lastItem = cart.items[cart.items.length - 1];
+      var eligible = findEligibleBundles(lastItem.product_id);
+      if (eligible.length === 0) return;
+      // STRICT: use scope-aware bundle picker (skips if customer already has enough eligible items)
+      var bundle = findBundleWithScope(lastItem.product_id, 0, cart.items);
+      if (!bundle) return;
+      var existing = document.querySelector('.tao-bb-coach');
+      if (existing) existing.remove();
+      var coach = document.createElement('div');
+      coach.className = 'tao-bb-coach';
+      var coachUrl = bundle.page + (bundle.page.indexOf('?') === -1 ? '?' : '&') + 'tao_src=coach&anchor=' + encodeURIComponent(lastItem.product_id);
+    coach.innerHTML = '<span class="icon">!</span><span class="text"><strong>Save by bundling</strong>Add ' + (bundle.size - 1) + ' more and pay only ' + fmt(bundle.priceCents) + '. <a href="' + coachUrl + '" data-tao-coach>Pick now &rarr;</a></span>';
+    var coachA = coach.querySelector('a');
+    if (coachA){
+      coachA.addEventListener('click', function(){
+        try {
+          sessionStorage.setItem('tao_bb_anchor_product_id', String(lastItem.product_id));
+          sessionStorage.setItem('tao_bb_source', 'coach_redirect');
+        } catch(_){}
+        taoFireEvent('coach_click', { product: lastItem.product_id, target: bundle.page });
+      });
+    }
+      // Inject into cart drawer container if exists (broad selector list across themes)
+      var drawerSelectors = [
+        'cart-notification',
+        '#minicart_wrapper',
+        '.minicart .minicart__wrapper',
+        '.minicart',
+        'cart-drawer',
+        '.cart-drawer',
+        '.cart-drawer__items',
+        '.cart-notification__inner',
+        '#cart-notification',
+        '[id*="CartDrawer"]',
+        '[data-cart-drawer]'
+      ];
+      var drawer = null;
+      for (var i = 0; i < drawerSelectors.length && !drawer; i++){
+        drawer = document.querySelector(drawerSelectors[i]);
+      }
+      if (drawer){
+        // Inject near the top, after any header element
+        var inner = drawer.querySelector('.cart-drawer__inner, .cart__items, .drawer__inner, form, .minicart__content') || drawer;
+        inner.insertBefore(coach, inner.firstChild);
+      }
+    }).catch(function(){});
+  }
+
+  // ── Cart page last-call ────────────────────────────────────────────────────
+  function injectLastCall(){
+    if (window.location.pathname !== '/cart' && !window.location.pathname.endsWith('/cart')) return;
+    fetch('/cart.js').then(function(r){return r.json();}).then(function(cart){
+      if (!cart.items || cart.items.length === 0) return;
+      // Find first item whose product is bundle-eligible and whose tier isn't yet hit
+      var nudge = null;
+      for (var i = 0; i < cart.items.length; i++){
+        var item = cart.items[i];
+        if (item.properties && item.properties._bundle) continue;
+        var elig = findEligibleBundles(item.product_id);
+        if (elig.length === 0) continue;
+        nudge = { item: item, bundle: pickBestBundle(elig) };
+        break;
+      }
+      if (!nudge) return;
+      var anchor = document.querySelector('.cart, [class*="cart-page"], main, #MainContent');
+      if (!anchor) return;
+      var bar = document.createElement('div');
+      bar.className = 'tao-bb-lastcall';
+      var lcUrl = nudge.bundle.page + (nudge.bundle.page.indexOf('?') === -1 ? '?' : '&') + 'tao_src=lastcall&anchor=' + encodeURIComponent(nudge.item.product_id);
+      bar.innerHTML = '<div class="msg">Almost there. Add <strong>' + (nudge.bundle.size - 1) + ' more plants</strong> and save with the <strong>' + nudge.bundle.label + '</strong> bundle.</div><a href="' + lcUrl + '" data-tao-lc>Build bundle &rarr;</a>';
+      var lcA = bar.querySelector('a');
+      if (lcA){
+        lcA.addEventListener('click', function(){
+          try {
+            sessionStorage.setItem('tao_bb_anchor_product_id', String(nudge.item.product_id));
+            sessionStorage.setItem('tao_bb_source', 'lastcall_redirect');
+          } catch(_){}
+          taoFireEvent('lastcall_click', { product: nudge.item.product_id, target: nudge.bundle.page });
+        });
+      }
+      anchor.insertBefore(bar, anchor.firstChild);
+    }).catch(function(){});
+  }
+
+  // ── Global click handlers (delegation) ────────────────────────────────────
+  document.addEventListener('click', function(e){
+    if (e.target.closest('[data-bb-close]')){ closeModal(false); return; }
+    if (e.target.closest('[data-bb-skip]')){ closeModal(true); return; }
+    var rm = e.target.closest('[data-bb-rm]');
+    if (rm){
+      var idx = parseInt(rm.getAttribute('data-bb-rm'),10);
+      if (idx > 0 && slots[idx]){
+        var removedId = slots[idx].id;
+        slots[idx] = undefined;
+        renderSlots(); renderProgress(); renderCta(); renderTitle();
+        // Un-mark the corresponding pick tile so it can be re-added
+        var tile = bbEl.querySelector('[data-bb-pick="' + removedId + '"]');
+        if (tile) tile.classList.remove('added');
+      }
+      return;
+    }
+    if (e.target.closest('.tao-bb-cta')){
+      var filled = slots.filter(Boolean).length;
+      if (filled >= activeBundle.size){ addBundleToCart(); }
+      return;
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && bbEl && bbEl.classList.contains('open')) closeModal(false);
+  });
+  // Backdrop click closes — any tap outside the card (anywhere in the dimmed area) dismisses.
+  document.addEventListener('click', function(e){
+    if (!bbEl || !bbEl.classList.contains('open')) return;
+    if (e.target.closest('.tao-bb-card')) return;  // tapped inside the card → keep open
+    if (bbEl.contains(e.target) || e.target === bbEl) closeModal(false);
+  });
+
+  // ── Init by page type ──────────────────────────────────────────────────────
+  function init(){
+    // Site-wide ATC interceptor (catches collection pages, search, recommendations)
+    attachGlobalAtcInterceptor();
+    var path = window.location.pathname;
+    if (path.indexOf('/products/') === 0){
+      // PDP
+      var m = path.match(/\/products\/([^/?#]+)/);
+      if (!m) return;
+      fetch('/products/' + m[1] + '.js').then(function(r){return r.json();}).then(function(p){
+        // Fire pdp_view as soon as we have product JSON (funnel entry point)
+        if (typeof taoFireEvent === 'function') taoFireEvent('pdp_view', {
+          product_id: String(p.id),
+          handle: p.handle,
+          title: (p.title || '').slice(0, 80),
+          price: p.price,
+          compare_at_price: p.compare_at_price,
+          available: p.available !== false,
+          in_byob: findEligibleBundles(p.id).length > 0,
+          page_path: location.pathname
+        });
+        if (SETTINGS.spEnabled) renderSocialProof(p);
+        // Always render qty chips on the PDP (replaces the native +/- input).
+        renderQtyChips(p);
+        // Only BYOB-eligible products get the secondary "Build a X-pack" CTA.
+        var eligible = findEligibleBundles(p.id);
+        if (eligible.length > 0){
+          var bestBundle = pickBestBundle(eligible);
+          if (bestBundle){
+            renderBuildBundleCta(p, bestBundle);
+            setTimeout(function(){ prefetchRecs(p.id, bestBundle); }, 100);
+          }
+        }
+      }).catch(function(){});
+    } else if (path === '/cart' || path.endsWith('/cart')){
+      injectLastCall();
+    } else if (path.indexOf('/pages/buy-') === 0){
+      // Arrived on a bundle picker (ladder, popup, coach, last-call, or direct) — auto-fill slot 1
+      var anchorId = null;
+      try { anchorId = sessionStorage.getItem('tao_bb_anchor_product_id'); } catch(_){}
+      // Also accept anchor via query param ?anchor=<product_id> for shareable bundle links
+      var qpAnchor = (new URL(window.location.href)).searchParams.get('anchor');
+      if (qpAnchor) anchorId = qpAnchor;
+      console.log('[TAO BB] Bundle picker init. anchorId=', anchorId);
+      if (anchorId){
+        // IMPORTANT: do NOT remove sessionStorage here — addBundleToCart (in bundle-5-products) needs it
+        // to attach attribution properties. It clears them after the cart-add fires.
+        var attempts = 0;
+        var maxAttempts = 40;  // ~10 seconds — enough for slow networks
+        var tryAdd = function(){
+          attempts++;
+          var card = document.querySelector('.bundle-product-card[data-product-id="' + anchorId + '"]');
+          if (!card){
+            // Card not in DOM yet — bundle section still rendering
+            if (attempts < maxAttempts) return setTimeout(tryAdd, 250);
+            console.warn('[TAO BB] Auto-prefill: no card with product_id=', anchorId, 'found after', attempts, 'attempts. Probably not in this bundle\'s collection.');
+            return;
+          }
+          var addBtn = card.querySelector('.card-add-btn');
+          if (!addBtn){
+            if (attempts < maxAttempts) return setTimeout(tryAdd, 250);
+            console.warn('[TAO BB] Auto-prefill: card found but no add button.');
+            return;
+          }
+          if (addBtn.disabled){
+            // Button might still be hydrating; retry briefly
+            if (attempts < maxAttempts) return setTimeout(tryAdd, 250);
+            console.warn('[TAO BB] Auto-prefill: add button disabled, giving up.');
+            return;
+          }
+          console.log('[TAO BB] Auto-prefill: clicking add for product', anchorId);
+          addBtn.click();
+          var slotsEl = document.querySelector('.bundle-slots');
+          if (slotsEl){
+            slotsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            var firstSlot = slotsEl.querySelector('.bundle-slot');
+            if (firstSlot){
+              firstSlot.style.transition = 'box-shadow .4s ease';
+              firstSlot.style.boxShadow = '0 0 0 4px rgba(14,133,91,.4)';
+              setTimeout(function(){ firstSlot.style.boxShadow = ''; }, 1600);
+            }
+          }
+          taoFireEvent('bundle_picker_autoprefill', { product: anchorId, attempts: attempts });
+        };
+        setTimeout(tryAdd, 200);
+      }
+    }
+    // Cart drawer: listen for cart change events fired by the theme
+    ['cart:refresh','cart:open','cart:build','cart-drawer:open','ajaxCart.afterCartLoad','cart:added','cart-notification:show'].forEach(function(ev){
+      document.addEventListener(ev, function(){
+        setTimeout(injectCoach, 250);
+        scheduleCartProgress(250);
+      });
+    });
+    // Also poll once after page load to inject coach if drawer is already on screen
+    setTimeout(injectCoach, 800);
+    scheduleCartProgress(800);
+    // Observe the cart-form section (replaced on every add/remove/qty change) and
+    // the drawer-open class. The bar lives outside the observed section, so updating it
+    // does not retrigger the observer.
+    watchCartUpdates();
+  }
+
+  // INP win: defer init to idle time so the main thread is free for first-paint + early taps.
+  // Falls back to setTimeout when rIC is unavailable (Safari < 17).
+  function _scheduleInit(){
+    if ('requestIdleCallback' in window){
+      requestIdleCallback(init, { timeout: 1500 });
+    } else {
+      setTimeout(init, 200);
+    }
+  }
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _scheduleInit, { passive: true });
+  } else {
+    _scheduleInit();
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  // Link prefetcher — speeds up perceived nav (PDP → BYOB, home → collection,
+  // any internal link). Prefetches on first hover / touchstart so the next
+  // page is already in the browser cache by the time the user actually clicks.
+  // Skips repeated targets, external links, and noisy URLs.
+  // ════════════════════════════════════════════════════════════════════════
+  (function setupPrefetcher(){
+    if (window.__taoPrefetcherWired) return;
+    window.__taoPrefetcherWired = true;
+    var seen = new Set();
+    function prefetch(url){
+      if (!url || seen.has(url)) return;
+      // Same-origin only
+      try {
+        var u = new URL(url, location.href);
+        if (u.origin !== location.origin) return;
+        // Skip non-HTML routes that pollute the prefetch cache
+        if (/\.(jpe?g|png|webp|gif|svg|css|js|json|woff2?)(\?|$)/i.test(u.pathname)) return;
+        if (/\/cart(\/|$|\?)/.test(u.pathname)) return;
+        if (/\/checkout/.test(u.pathname)) return;
+        if (/\/account/.test(u.pathname)) return;
+        seen.add(url);
+        var link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = u.href;
+        link.as = 'document';
+        document.head.appendChild(link);
+      } catch(_){}
+    }
+    function onIntent(e){
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a) return;
+      if (a.target && a.target === '_blank') return;
+      if (a.hasAttribute('download')) return;
+      prefetch(a.getAttribute('href'));
+    }
+    // Hover (desktop) + touchstart (mobile) — both passive so we never block scroll
+    document.addEventListener('mouseover', onIntent, { passive: true, capture: true });
+    document.addEventListener('touchstart', onIntent, { passive: true, capture: true });
+    // Idle-prefetch the bundle picker pages — these are the highest-intent next hops
+    if ('requestIdleCallback' in window){
+      requestIdleCallback(function(){
+        ['/pages/buy-any-5','/pages/buy-5-399','/pages/buy-5-599','/pages/buy-4-429','/pages/buy-3-529','/pages/buy-4-579'].forEach(prefetch);
+      }, { timeout: 3000 });
+    }
+  })();
+})();
+</script>

@@ -1,0 +1,107 @@
+<script type="application/javascript">
+checkoutBuyer = "https://fastrr-boost-ui.pickrr.com/";
+</script>
+<input type="hidden" value="dawbu.com" id="sellerDomain"/>
+<link rel="stylesheet" href="https://fastrr-boost-ui.pickrr.com/assets/styles/shopify.css">
+{{ 'shiprocket-custom.css' | asset_url | stylesheet_tag }}
+<script src="https://fastrr-boost-ui.pickrr.com/assets/js/channels/shopify.js" defer></script>
+<script src="https://fastrr-boost-ui.pickrr.com/assets/js/channels/shiprocketMarketing.js"></script>
+<input type="hidden" value="rz" id="template"/>
+<!-- <input type="hidden" value="percent" id="discountType"/>
+<input type="hidden" value="5" id="discValue"/> -->
+<style>
+ .sr-headless-checkout {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 0px;
+  height: 47px;
+  {% comment %} letter-spacing: 1.4px;
+  background-color:rgb(29, 77, 65) !important ; {% endcomment %}
+  /* margin-top:3px;*/
+ }
+ .shiprocket-headless{
+  width:100%;
+ }
+/* .sr-discount-label{
+ font-size:0px !important;
+}
+ .sr-discount-label:before{
+  content:"EXTRA 5% OFF on PERFUMES";
+  font-size: 9px;
+  color: #000;
+  text-transform: none;
+  top: -8px;
+  left: 6px;
+  background-color: #53FF73;
+  border-radius: 3px;
+  padding: 0 10px;
+} */
+</style>
+
+<script>
+// Fix Shiprocket text display issues
+function fixShiprocketText() {
+  // Wait for Shiprocket elements to load
+  setTimeout(function() {
+    const shiprocketElements = document.querySelectorAll('.shiprocket-headless, .sr-headless-checkout');
+    
+    shiprocketElements.forEach(function(element) {
+      // Fix COD text
+      const codElements = element.querySelectorAll('*');
+      codElements.forEach(function(el) {
+        if (el.textContent && el.textContent.toLowerCase().includes('cod') && !el.textContent.includes('Cash on Delivery')) {
+          el.textContent = el.textContent.replace(/\bcod\b/gi, 'Cash on Delivery');
+        }
+        if (el.textContent && el.textContent.toLowerCase().includes('free') && !el.textContent.includes('Free Shipping')) {
+          el.textContent = el.textContent.replace(/\bfree\b/gi, 'Free Shipping');
+        }
+        if (el.textContent && el.textContent.toLowerCase().includes('express') && !el.textContent.includes('Express Delivery')) {
+          el.textContent = el.textContent.replace(/\bexpress\b/gi, 'Express Delivery');
+        }
+        if (el.textContent && el.textContent.toLowerCase().includes('express') && !el.textContent.includes('Express Delivery')) {
+          el.textContent = el.textContent.replace(/\bexpress\b/gi, 'Express Delivery');
+        }
+      });
+    });
+  }, 1000);
+  
+  // Re-run after 3 seconds to catch dynamically loaded content
+  setTimeout(function() {
+    const shiprocketElements = document.querySelectorAll('.shiprocket-headless, .sr-headless-checkout');
+    
+    shiprocketElements.forEach(function(element) {
+      const codElements = element.querySelectorAll('*');
+      codElements.forEach(function(el) {
+        if (el.textContent && el.textContent.toLowerCase().includes('cod') && !el.textContent.includes('Cash on Delivery')) {
+          el.textContent = el.textContent.replace(/\bcod\b/gi, 'Cash on Delivery');
+        }
+        if (el.textContent && el.textContent.toLowerCase().includes('free') && !el.textContent.includes('Free Shipping')) {
+          el.textContent = el.textContent.replace(/\bfree\b/gi, 'Free Shipping');
+        }
+      });
+    });
+  }, 3000);
+}
+
+// Run on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', fixShiprocketText);
+} else {
+  fixShiprocketText();
+}
+
+// Also run when new content is added (for AJAX updates)
+const observer = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    if (mutation.addedNodes.length > 0) {
+      fixShiprocketText();
+    }
+  });
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+</script>

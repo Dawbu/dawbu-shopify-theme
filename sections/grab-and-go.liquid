@@ -1,0 +1,245 @@
+{% comment %}
+  Section: Grab & Go — Quick Add-Ons slider
+  Uses: Swiper.js (CDN), card-product snippet, card-quantity-selector snippet
+  File: sections/grab-and-go.liquid
+{% endcomment %}
+
+{{ 'section-grab-and-go.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
+<section
+  class="grab-and-go"
+  id="grab-and-go-{{ section.id }}"
+  aria-label="{{ section.settings.heading | escape }}"
+  data-track-section="grab_and_go"
+>
+  <div class="grab-and-go__inner">
+    {%- comment -%} ── Header ── {%- endcomment -%}
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="grab-and-go__header">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="grab-and-go__eyebrow">{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="grab-and-go__title">
+            {%- liquid
+              assign heading_parts = section.settings.heading | split: '|'
+              assign heading_main = heading_parts[0]
+              assign heading_highlight = heading_parts[1]
+            -%}
+            {{- heading_main -}}
+            {%- if heading_highlight -%}
+              <span class="grab-and-go__title-highlight">{{ heading_highlight }}</span>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ── Slider ── {%- endcomment -%}
+    <div class="grab-and-go__slider-wrap">
+      <div
+        class="swiper grab-and-go-swiper"
+        id="grab-and-go-swiper-{{ section.id }}"
+      >
+        <div class="swiper-wrapper">
+          {%- liquid
+            assign collection = collections[section.settings.collection]
+            assign products_to_show = section.settings.products_to_show | default: 8
+          -%}
+
+          {%- if collection != blank and collection.products.size > 0 -%}
+            {%- for product in collection.products limit: products_to_show -%}
+              <div class="swiper-slide">
+                {%- render 'card-product',
+                  card_product: product,
+                  media_aspect_ratio: 'square',
+                  show_secondary_image: section.settings.show_secondary_image,
+                  lazy_load: true,
+                  quick_add: 'quantity',
+                  section_id: section.id,
+                  show_tags: false,
+                  skip_styles: true
+                -%}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            {%- comment -%} Placeholder cards when no collection is selected {%- endcomment -%}
+            {%- for i in (1..5) -%}
+              <div class="swiper-slide">
+                {%- render 'card-product',
+                  media_aspect_ratio: 'square',
+                  lazy_load: true,
+                  section_id: section.id,
+                  skip_styles: true
+                -%}
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- comment -%} ── Navigation arrows ── {%- endcomment -%}
+      {%- if section.settings.show_arrows -%}
+        <div class="grab-and-go__nav">
+          <button
+            class="grab-and-go__arrow grab-and-go__arrow--prev"
+            id="grab-and-go-prev-{{ section.id }}"
+            aria-label="{{ 'general.slider.previous_slide' | t }}"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button
+            class="grab-and-go__arrow grab-and-go__arrow--next"
+            id="grab-and-go-next-{{ section.id }}"
+            aria-label="{{ 'general.slider.next_slide' | t }}"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var swiperEl = document.getElementById('grab-and-go-swiper-{{ section.id }}');
+    if (!swiperEl) return;
+
+    function initSwiper() {
+      if (typeof Swiper === 'undefined') {
+        setTimeout(initSwiper, 100);
+        return;
+      }
+
+      var autoplayMs = {{ section.settings.autoplay_seconds | default: 4 | times: 1000 }};
+      new Swiper(swiperEl, {
+        slidesPerView: 2,
+        spaceBetween: 16,
+        loop: true,
+        loopAdditionalSlides: 2,
+        speed: 600,
+        autoplay: autoplayMs > 0 ? {
+          delay: autoplayMs,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true
+        } : false,
+        navigation: {
+          prevEl: '#grab-and-go-prev-{{ section.id }}',
+          nextEl: '#grab-and-go-next-{{ section.id }}',
+        },
+        breakpoints: {
+          0: {
+            slidesPerView: 2,
+            spaceBetween: 10,
+          },
+          750: {
+            slidesPerView: 3,
+          },
+          990: {
+            slidesPerView: {{ section.settings.slides_per_view_desktop | default: 4 | minus: 1 }}
+          },
+          1199: {
+            slidesPerView: {{ section.settings.slides_per_view_desktop | default: 4 }}
+          },
+          1339: {
+            slidesPerView: {{ section.settings.slides_per_view_desktop | default: 4 | plus: 1 }},
+            spaceBetween: 16,
+          },
+        },
+        a11y: {
+          prevSlideMessage: '{{ 'general.slider.previous_slide' | t | escape }}',
+          nextSlideMessage: '{{ 'general.slider.next_slide' | t | escape }}',
+        },
+      });
+    }
+
+    initSwiper();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Grab & Go",
+  "tag": "section",
+  "class": "section-grab-and-go",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Label",
+      "default": "Quick Add-Ons"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (use | to split highlight)",
+      "default": "GRAB & |GO",
+      "info": "Use the pipe character | to mark where the red highlight begins. E.g. 'GRAB & |GO' highlights 'GO'."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "label": "Maximum products to show",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "slides_per_view_desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "Slides visible on desktop",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show secondary image on hover",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Auto-scroll interval (seconds)",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "default": 4,
+      "info": "0 = disable. Slider always loops infinitely."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Grab & Go"
+    }
+  ]
+}
+{% endschema %}

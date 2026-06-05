@@ -1,0 +1,432 @@
+{% comment %}
+  Section: Our Story
+  A responsive founder story section with image, quote, and founder attribution.
+{% endcomment %}
+
+<section class="our-story" id="our-story-{{ section.id }}">
+  <div class="our-story__inner">
+    <!-- Left Content -->
+    <div class="our-story__content">
+      {% if section.settings.badge_text != blank %}
+        <div class="our-story__badge">
+          <span>{{ section.settings.badge_text }}</span>
+        </div>
+      {% endif %}
+
+      <h2 class="our-story__heading">
+        <span class="our-story__heading--black">{{ section.settings.heading_black }}</span>
+        <span class="our-story__heading--red">{{ section.settings.heading_red }}</span>
+      </h2>
+
+      <hr class="our-story__divider">
+
+      {% if section.settings.founder_name != blank %}
+        <p class="our-story__founder-name">{{ section.settings.founder_name }}</p>
+      {% endif %}
+
+      {% if section.settings.founder_meta != blank %}
+        <p class="our-story__founder-meta">{{ section.settings.founder_meta }}</p>
+      {% endif %}
+
+      {% if section.settings.quote != blank %}
+        <div class="our-story__quote">
+          {{ section.settings.quote }}
+        </div>
+      {% endif %}
+
+      <!-- Founder Attribution Card -->
+      <div class="our-story__attribution">
+        {% if section.settings.avatar != blank %}
+          <div class="our-story__avatar">
+            <img
+              src="{{ section.settings.avatar | image_url: width: 100, height: 100, crop: 'center' }}"
+              alt="{{ section.settings.founder_name | escape }}"
+              width="56"
+              height="56"
+              loading="lazy"
+            >
+          </div>
+        {% endif %}
+        <div class="our-story__attribution-text">
+          {% if section.settings.founder_name != blank %}
+            <p class="our-story__attribution-name">{{ section.settings.founder_name }}</p>
+          {% endif %}
+          {% if section.settings.founder_title != blank %}
+            <p class="our-story__attribution-title">{{ section.settings.founder_title }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <!-- Right Image -->
+    {% if section.settings.founder_image != blank %}
+      <div class="our-story__image-wrap">
+        <img
+          src="{{ section.settings.founder_image | image_url }}"
+          srcset="
+            {{ section.settings.founder_image | image_url: width: 400, height: 450 }} 400w,
+            {{ section.settings.founder_image | image_url: width: 800, height: 900 }} 800w,
+            {{ section.settings.founder_image | image_url: width: 1200, height: 1350 }} 1200w
+          "
+          sizes="(max-width: 767px) 100vw, 50vw"
+          alt="{{ section.settings.image_alt | default: section.settings.founder_name | escape }}"
+          width="800"
+          height="900"
+          loading="lazy"
+        >
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .our-story {
+    --os-red: #e31313;
+    --os-black: #111111;
+    --os-gray: #666666;
+    --os-bg: #fef8f0;
+    --os-badge-bg: #f5dc1e;
+    --os-badge-text: #111111;
+    --os-font-heading: inherit;
+    --os-radius: 12px;
+
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .our-story__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1740px;
+    margin-inline: auto;
+    padding-inline: 50px;
+    padding-block: 80px;
+  }
+
+  /* ── Left Content ── */
+  .our-story__content {
+    padding: 0;
+    padding-right: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    background: #ffffff;
+  }
+
+  /* Badge */
+  .our-story__badge {
+    display: inline-flex;
+    margin-bottom: 18px;
+  }
+
+  .our-story__badge span {
+    background: var(--os-badge-bg);
+    color: var(--os-badge-text);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Poppins';
+    letter-spacing: 2px;
+    line-height: 1;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    border-radius: 50px;
+    border: 1.5px solid var(--os-badge-text);
+    box-shadow: 2px 3px 0 0 #040202;
+  }
+
+  /* Heading */
+  .our-story__heading {
+    font-size: 74px;
+    font-weight: 400;
+    font-family: 'Kopiku';
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    margin: 0 0 28px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 12px;
+  }
+
+  .our-story__heading--black {
+    color: var(--os-black);
+  }
+
+  .our-story__heading--red {
+    color: var(--os-red);
+  }
+
+  /* Divider */
+  .our-story__divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 0 0 30px;
+  }
+
+  /* Founder Name & Meta */
+  .our-story__founder-name {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 170%;
+    font-family: 'Poppins';
+    color: var(--os-black);
+    margin: 0;
+    letter-spacing: 0;
+  }
+
+  .our-story__founder-meta {
+    font-size: 14px;
+    color: var(--os-gray);
+    margin: 0 0 20px;
+  }
+
+  /* Quote */
+  .our-story__quote {
+    font-size: 24px;
+    color: #04020299;
+    line-height: 1.4;
+    margin: 0 0 36px;
+    padding: 0;
+    border: none;
+  }
+
+  /* Attribution */
+  .our-story__attribution {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: auto;
+  }
+
+  .our-story__avatar {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--os-bg);
+  }
+
+  .our-story__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .our-story__attribution-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--os-red);
+    margin: 0 0 2px;
+    line-height: 170%;
+  }
+
+  .our-story__attribution-title {
+    font-size: 18px;
+    color: #040202;
+    margin: 0;
+    line-height: 160%;
+  }
+
+  /* ── Right Image ── */
+  .our-story__image-wrap {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .our-story__image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+
+  /* ── Responsive: Tablet ── */
+  @media (max-width: 1199px) {
+    .our-story__content {
+      padding-right: 40px;
+    }
+    .our-story__heading {
+      font-size: 66px;
+    }
+  }
+
+  @media (max-width: 991px) {
+    .our-story__heading {
+      font-size: 56px;
+    }
+    .our-story__quote {
+      font-size: 18px;
+      margin-bottom: 25px;
+    }
+    .our-story__attribution {
+      gap: 15px;
+    }
+    .our-story__avatar {
+      width: 60px;
+      height: 60px;
+    }
+    .our-story__attribution-name {
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .our-story__attribution-title {
+      font-size: 16px;
+      line-height: 1.54;
+    }
+  }
+
+  /* ── Responsive: Mobile ── */
+  @media (max-width: 749px) {
+    .our-story__inner {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      padding-inline: 16px;
+      padding-block: 40px;
+    }
+    .our-story__image-wrap {
+      order: -1;
+      min-height: 300px;
+      max-height: 380px;
+    }
+    .our-story__image-wrap img {
+      object-position: top center;
+    }
+    .our-story__content {
+      padding: 30px 0 0;
+    }
+    .our-story__badge span {
+      font-size: 10px;
+      padding: 7px 10px;
+    }
+    .our-story__heading {
+      font-size: clamp(36px, 10vw, 52px);
+      margin: 0 0 20px;
+    }
+    .our-story__divider {
+      margin: 0 0 20px;
+    }
+    .our-story__quote {
+      font-size: 13px;
+      margin: 0 0 20px;
+    }
+    .our-story__founder-name {
+      font-size: 16px;
+    }
+    .our-story__founder-meta {
+      font-size: 12px;
+      margin: 0 0 12px;
+    }
+    .our-story__attribution {
+      gap: 16px;
+    }
+    .our-story__avatar {
+      width: 60px;
+      height: 60px;
+    }
+    .our-story__attribution-title {
+      font-size: 14px;
+      line-height: 140%;
+    }
+    .our-story__attribution-name {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Our Story",
+  "tag": "section",
+  "class": "section-our-story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "Quick Add-ons"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading_black",
+      "label": "Heading – Black Part",
+      "default": "OUR"
+    },
+    {
+      "type": "text",
+      "id": "heading_red",
+      "label": "Heading – Red Part",
+      "default": "STORY"
+    },
+    {
+      "type": "header",
+      "content": "Founder Details"
+    },
+    {
+      "type": "text",
+      "id": "founder_name",
+      "label": "Founder Name(s)",
+      "default": "Ishika & Shivam Gupta"
+    },
+    {
+      "type": "text",
+      "id": "founder_meta",
+      "label": "Founder Meta (e.g. location, tagline)",
+      "default": "Parents of little Chiku · Hyderabad"
+    },
+    {
+      "type": "text",
+      "id": "founder_title",
+      "label": "Founder Title",
+      "default": "Founders of Dawbu"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar",
+      "label": "Founder Avatar (small circle)"
+    },
+    {
+      "type": "header",
+      "content": "Quote"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Founder Quote",
+      "default": "\"We are parents, just like you. We started Dawbu because we couldn't find toys that were safe, beautiful, affordable, and actually fun, all at once. So we built the store we wished existed.\""
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "founder_image",
+      "label": "Founder Photo (right side)"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image Alt Text",
+      "default": "Founders of Dawbu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Our Story",
+      "category": "Custom Sections"
+    }
+  ]
+}
+{% endschema %}

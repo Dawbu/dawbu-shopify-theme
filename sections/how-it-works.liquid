@@ -1,0 +1,804 @@
+{% comment %}
+  Section: How It Works
+  File: sections/how-it-works.liquid
+{% endcomment %}
+
+<section
+  class="hiw-section"
+  id="how-it-works-{{ section.id }}"
+  data-track-section="how_it_works"
+  style="
+    --hiw-bg: {{ section.settings.background_color }};
+    --hiw-heading-color: {{ section.settings.heading_color }};
+    --hiw-badge-bg: {{ section.settings.badge_bg_color }};
+    --hiw-badge-text: {{ section.settings.badge_text_color }};
+    --hiw-card-bg: {{ section.settings.card_bg_color }};
+    --hiw-btn-primary-bg: {{ section.settings.btn_primary_bg }};
+    --hiw-btn-primary-text: {{ section.settings.btn_primary_text }};
+    --hiw-btn-secondary-border: {{ section.settings.btn_secondary_border }};
+    --hiw-btn-secondary-text: {{ section.settings.btn_secondary_text }};
+  "
+>
+  {%- if section.settings.show_wave_bottom -%}
+    <div class="hiw-dot-bg" aria-hidden="true"></div>
+  {%- endif -%}
+
+  <div class="hiw-container">
+    {%- comment -%} ── Header ── {%- endcomment -%}
+    <div class="hiw-header">
+      {%- if section.settings.badge_text != blank -%}
+        <span class="hiw-badge">{{ section.settings.badge_text }}</span>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="hiw-heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ── Swiper Slider ── {%- endcomment -%}
+    <div class="hiw-slider-wrapper">
+      <div class="swiper hiw-swiper">
+        <div class="swiper-wrapper">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'step_card' -%}
+              <div class="swiper-slide" {{ block.shopify_attributes }}>
+                <div class="hiw-card">
+                  {%- comment -%} Paperclip icon {%- endcomment -%}
+                  <div class="hiw-card__clip" aria-hidden="true">
+                    <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2C7.582 2 4 5.582 4 10v18c0 4.418 3.582 8 8 8s8-3.582 8-8V10c0-2.209-1.791-4-4-4s-4 1.791-4 4v16c0 1.105.895 2 2 2s2-.895 2-2V10" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+
+                  <div class="hiw-card__top">
+                    {%- if block.settings.step_number != blank -%}
+                      <p class="hiw-card__step">
+                        <span class="hiw-card__step-line" aria-hidden="true"></span>
+                        {{ block.settings.step_number }}
+                      </p>
+                    {%- endif -%}
+
+                    {%- if block.settings.title != blank -%}
+                      <h3 class="hiw-card__title">{{ block.settings.title }}</h3>
+                    {%- endif -%}
+
+                    {%- if block.settings.description != blank -%}
+                      <p class="hiw-card__desc">{{ block.settings.description }}</p>
+                    {%- endif -%}
+                  </div>
+
+                  <div class="hiw-card__bottom">
+                    {%- if block.settings.card_image != blank -%}
+                      <div class="hiw-card__image">
+                        {{
+                          block.settings.card_image
+                          | image_url: width: 160
+                          | image_tag: loading: 'lazy', alt: block.settings.title
+                        }}
+                      </div>
+                    {%- endif -%}
+
+                    {%- if block.settings.badge_label != blank -%}
+                      <div class="hiw-card__badge">
+                        <span class="hiw-card__badge-dot" aria-hidden="true"></span>
+                        {{ block.settings.badge_label }}
+                      </div>
+                    {%- endif -%}
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        {%- comment -%} Pagination dots {%- endcomment -%}
+        <div class="swiper-pagination hiw-pagination"></div>
+      </div>
+
+      {%- comment -%} Navigation arrows {%- endcomment -%}
+      {% comment %}
+        <div class="hiw-nav hiw-nav--prev" aria-label="{{ 'accessibility.previous_slide' | t }}">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="hiw-nav hiw-nav--next" aria-label="{{ 'accessibility.next_slide' | t }}">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      {% endcomment %}
+    </div>
+
+    {%- comment -%} ── CTA Buttons ── {%- endcomment -%}
+    {%- if section.settings.btn_primary_label != blank or section.settings.btn_secondary_label != blank -%}
+      <div class="hiw-cta">
+        {%- if section.settings.btn_primary_label != blank -%}
+          <a
+            href="{{ section.settings.btn_primary_url }}"
+            class="hiw-btn hiw-btn--primary"
+            {% if section.settings.btn_primary_url == blank %}
+              aria-disabled="true"
+            {% endif %}
+          >
+            {{ section.settings.btn_primary_label }}
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.btn_secondary_label != blank -%}
+          <a
+            href="{{ section.settings.btn_secondary_url }}"
+            class="hiw-btn hiw-btn--secondary"
+            {% if section.settings.btn_secondary_url == blank %}
+              aria-disabled="true"
+            {% endif %}
+          >
+            {{ section.settings.btn_secondary_label }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} ── Wave SVG ── {%- endcomment -%}
+  <svg
+    class="hiw-bottom-bg"
+    width="1921"
+    height="168"
+    viewBox="0 0 1921 168"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M74.298 86.4799C44 74.7496 12 76.5594 0 76.5594L1 167.479H1921V99.773C1839.56 90.6578 1741 96.1459 1711.29 99.773C1639.27 108.564 1515.89 128.258 1479.18 128.258C1371.27 128.258 1295.11 146.99 1220.6 54.9376C1148 -34.7419 1073 2.25802 1031.24 47.1197C939.69 145.482 841 107.258 764.521 67.8839C679.206 23.9612 600 45.0401 556.843 67.8839C506.5 94.5313 380.385 125.093 328.805 126.359C205.013 135.474 107.554 103.571 74.298 86.4799Z" fill="#fff"/>
+  </svg>
+</section>
+
+<style>
+  /* ============================================================
+     HOW IT WORKS – Section Styles
+  ============================================================ */
+  .hiw-section {
+    position: relative;
+    background-color: var(--hiw-bg, #e82020);
+    padding: 80px 0 0;
+    overflow: hidden;
+  }
+
+  .hiw-bottom-bg {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 50px 0 -1px;
+    position: relative;
+  }
+  /* Dot pattern background */
+  .hiw-dot-bg {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 5.5px, transparent 4.5px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    background-repeat: repeat;
+    z-index: 2;
+    display: block !important;
+    top: 0;
+    bottom: -100px;
+    left: 0;
+    right: 0;
+  }
+
+  .hiw-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── Header ── */
+  .hiw-header {
+    text-align: center;
+    margin-bottom: 34px;
+  }
+
+  .hiw-badge {
+    display: inline-block;
+    background-color: var(--hiw-badge-bg, #f5e642);
+    color: var(--hiw-badge-text, #111111);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+    box-shadow: 3px 4px 0 0 #040202;
+  }
+
+  .hiw-heading {
+    font-family: 'Kopiku';
+    font-size: clamp(40px, 7vw, 74px);
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--hiw-heading-color, #111111);
+    line-height: 1;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .hiw-heading p {
+    margin: 0;
+  }
+  .hiw-heading p strong {
+    color: #fff;
+    font-weight: 400;
+  }
+  /* ── Slider Wrapper ── */
+  .hiw-slider-wrapper {
+    position: relative;
+  }
+
+  .hiw-swiper {
+    padding: 20px 8px 48px !important;
+    overflow: visible !important;
+  }
+
+  /* ── Card ── */
+  .hiw-card {
+    background-color: var(--hiw-card-bg, #ffffff);
+    border-radius: 20px;
+    padding: 28px 24px 24px;
+    height: 100%;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .hiw-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+  }
+
+  /* Paperclip */
+  .hiw-card__clip {
+    position: absolute;
+    top: -20px;
+    right: 28px;
+    z-index: 2;
+  }
+
+  /* Step number */
+  .hiw-card__step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444444;
+    margin: 0 0 14px;
+  }
+
+  .hiw-card__step-line {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background-color: #e82020;
+    flex-shrink: 0;
+  }
+
+  /* Card title */
+  .hiw-card__title {
+    font-family: var(--font-heading-family, 'Impact', sans-serif);
+    font-size: clamp(22px, 2.5vw, 28px);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #111111;
+    margin: 0 0 12px;
+  }
+
+  /* Card description */
+  .hiw-card__desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555555;
+    margin: 0;
+  }
+
+  /* Card bottom */
+  .hiw-card__bottom {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    margin-top: 24px;
+    gap: 12px;
+    align-items: flex-end;
+  }
+
+  .hiw-card__image {
+    order: 1;
+    max-width: 90px;
+  }
+
+  /* Badge inside card */
+  .hiw-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #111111;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .hiw-card__badge-dot {
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #e82020;
+    flex-shrink: 0;
+  }
+
+  /* Card image */
+  .hiw-card__image {
+    flex-shrink: 0;
+    max-width: 123px;
+    margin-bottom: -30px;
+    margin-left: auto;
+  }
+
+  .hiw-card__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  /* ── Swiper Pagination ── */
+  .hiw-pagination {
+    bottom: 8px !important;
+  }
+
+  .hiw-pagination .swiper-pagination-bullet {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+    transition: all 0.2s;
+  }
+
+  .hiw-pagination .swiper-pagination-bullet-active {
+    background: #ffffff;
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  /* ── Navigation Arrows ── */
+  .hiw-nav {
+    display: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-60%);
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: #111111;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: background 0.2s, transform 0.2s;
+    user-select: none;
+  }
+
+  .hiw-nav:hover {
+    background: #ffffff;
+    transform: translateY(-60%) scale(1.05);
+  }
+
+  .hiw-nav--prev {
+    left: -22px;
+  }
+  .hiw-nav--next {
+    right: -22px;
+  }
+
+  .hiw-nav.swiper-button-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* ── CTA Buttons ── */
+  .hiw-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .hiw-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-family: 'Kopiku';
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+    text-decoration: none;
+    padding: 16px 36px;
+    border-radius: 999px;
+    transition: opacity 0.2s, transform 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 4px 4px 0 0 #00000033;
+  }
+
+  .hiw-btn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  .hiw-btn--primary {
+    background-color: var(--hiw-btn-primary-bg, #111111);
+    color: var(--hiw-btn-primary-text, #ffffff);
+    border: 2px solid transparent;
+  }
+
+  .hiw-btn--secondary {
+    background-color: transparent;
+    color: var(--hiw-btn-secondary-text, #111111);
+    border: 2px solid var(--hiw-btn-secondary-border, #111111);
+  }
+
+  /* ============================================================
+     RESPONSIVE
+  ============================================================ */
+
+  /* Large desktop: show all 4 slides, show nav arrows */
+  @media (min-width: 1024px) {
+    .hiw-nav {
+      display: flex;
+    }
+  }
+  @media (max-width: 1199px) {
+    .hiw-card__image {
+      max-width: 100px;
+    }
+  }
+
+  /* Tablet */
+  @media (max-width: 1023px) and (min-width: 640px) {
+    .hiw-section {
+      padding: 64px 0 0;
+    }
+    .hiw-bottom-bg {
+      margin: 40px 0 -1px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 749px) {
+    .hiw-section {
+      padding: 48px 0 0px;
+    }
+
+    .hiw-bottom-bg {
+      min-width: 200%;
+      left: 50%;
+      transform: translate(-35%);
+      margin-top: 20px;
+    }
+    .hiw-heading {
+      font-size: 32px;
+    }
+
+    .hiw-header {
+      margin-bottom: 32px;
+    }
+
+    .hiw-card {
+      min-height: 280px;
+      padding: 25px 20px 20px;
+    }
+    .hiw-badge {
+      padding: 4px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    span.hiw-badge {
+    }
+
+    .hiw-card__bottom .hiw-card__image {
+      max-width: 90px;
+    }
+
+    .hiw-btn {
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .hiw-cta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .hiw-btn {
+      font-size: 14px;
+      padding: 14px 0;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var sectionId = 'how-it-works-{{ section.id }}';
+
+    function initHIWSwiper() {
+      var section = document.getElementById(sectionId);
+      if (!section) return;
+
+      var swiperEl = section.querySelector('.hiw-swiper');
+
+      if (!swiperEl || typeof Swiper === 'undefined') return;
+
+      var swiper = new Swiper(swiperEl, {
+        slidesPerView: 1.1,
+        spaceBetween: 16,
+        centeredSlides: false,
+        loop: false,
+        grabCursor: true,
+        pagination: {
+          el: section.querySelector('.hiw-pagination'),
+          clickable: true,
+        },
+        breakpoints: {
+          480: {
+            slidesPerView: 1.5,
+            spaceBetween: 16,
+          },
+          640: {
+            slidesPerView: 2.1,
+            spaceBetween: 20,
+          },
+          992: {
+            slidesPerView: 3,
+            spaceBetween: 24,
+          },
+          1199: {
+            slidesPerView: 4,
+            spaceBetween: 24,
+          },
+        },
+      });
+    }
+
+    /* Load Swiper JS from CDN if not already present */
+    if (typeof Swiper === 'undefined') {
+      var script = document.createElement('script');
+      script.src = '{{ "swiper-bundle.min.js" | asset_url }}';
+      script.onload = initHIWSwiper;
+      document.head.appendChild(script);
+    } else {
+      document.addEventListener('DOMContentLoaded', initHIWSwiper);
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "How It Works",
+  "tag": "section",
+  "class": "section-how-it-works",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "Simple Process"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>HOW IT <strong>WORKS</strong></p>"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#E82020"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Badge Background",
+      "default": "#F5E642"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "CTA Buttons"
+    },
+    {
+      "type": "text",
+      "id": "btn_primary_label",
+      "label": "Primary Button Label",
+      "default": "Start Building"
+    },
+    {
+      "type": "url",
+      "id": "btn_primary_url",
+      "label": "Primary Button URL"
+    },
+    {
+      "type": "color",
+      "id": "btn_primary_bg",
+      "label": "Primary Button Background",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_primary_text",
+      "label": "Primary Button Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "text",
+      "id": "btn_secondary_label",
+      "label": "Secondary Button Label",
+      "default": "Browse All Sets"
+    },
+    {
+      "type": "url",
+      "id": "btn_secondary_url",
+      "label": "Secondary Button URL"
+    },
+    {
+      "type": "color",
+      "id": "btn_secondary_border",
+      "label": "Secondary Button Border Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_secondary_text",
+      "label": "Secondary Button Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Wave Decoration"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wave_bottom",
+      "label": "Show Bottom Wave",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "wave_color",
+      "label": "Wave Color",
+      "default": "#111111"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step_card",
+      "name": "Step Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "step_number",
+          "label": "Step Number",
+          "default": "01"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card Title",
+          "default": "Pick Your World"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Card Description",
+          "default": "Dinos, glow minis, flowers, space, puzzles, every mood, covered."
+        },
+        {
+          "type": "image_picker",
+          "id": "card_image",
+          "label": "Card Image"
+        },
+        {
+          "type": "text",
+          "id": "badge_label",
+          "label": "Card Badge Label",
+          "default": "10,000+ Sets"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "How It Works",
+      "blocks": [
+        {
+          "type": "step_card",
+          "settings": {
+            "step_number": "01",
+            "title": "Pick Your World",
+            "description": "Dinos, glow minis, flowers, space, puzzles, every mood, covered.",
+            "badge_label": "10,000+ Sets"
+          }
+        },
+        {
+          "type": "step_card",
+          "settings": {
+            "step_number": "02",
+            "title": "Build It Together",
+            "description": "Clear illustrated instructions. Pieces that click. Zero frustration, all satisfaction.",
+            "badge_label": "Easy Checkout"
+          }
+        },
+        {
+          "type": "step_card",
+          "settings": {
+            "step_number": "03",
+            "title": "Display · Gift",
+            "description": "Show it off, wrap it up, or start the next one in the series.",
+            "badge_label": "30-Sec Checkout"
+          }
+        },
+        {
+          "type": "step_card",
+          "settings": {
+            "step_number": "04",
+            "title": "Fast & Secure Pay",
+            "description": "Build your wishlist and enjoy bundle discounts that apply automatically at checkout.",
+            "badge_label": "2-Day Delivery"
+          }
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10
+}
+{% endschema %}

@@ -1,0 +1,560 @@
+/* Modern LEGO-style Explore by Theme Section - Inspired by LEGO.com */
+
+.explore-by-theme-section {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(248, 249, 250, 0.5) 100%);
+}
+
+.explore-by-theme__header {
+  text-align: center;
+  margin-bottom: 5rem;
+  position: relative;
+}
+
+@media screen and (min-width: 750px) {
+  .explore-by-theme__header {
+    margin-bottom: 6rem;
+  }
+}
+
+.explore-by-theme__title {
+  margin-bottom: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.explore-by-theme__description {
+  max-width: 65rem;
+  margin: 0 auto;
+  font-size: 1.8rem;
+  line-height: 1.6;
+  color: #666;
+  font-weight: 400;
+}
+
+@media screen and (min-width: 750px) {
+  .explore-by-theme__description {
+    font-size: 2rem;
+  }
+}
+
+.explore-by-theme__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .explore-by-theme__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+    margin-bottom: 6rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .explore-by-theme__grid {
+    gap: 3rem;
+  }
+}
+
+/* Modern LEGO Card Design */
+.lego-card {
+  position: relative;
+  cursor: pointer;
+  border-radius: 2rem;
+  overflow: visible;
+  background: transparent;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+.lego-card__link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.lego-card__inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 2rem;
+  background: #ffffff;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+}
+
+/* Image Section - Top 70% */
+.lego-card__image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--lego-color, #FF6B6B);
+  flex-shrink: 0;
+  border-radius: 2rem 2rem 0 0;
+}
+
+.lego-card__image-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.lego-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  filter: brightness(1) saturate(1.1);
+}
+
+.lego-card__image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Content Section - Bottom 30% */
+.lego-card__content {
+  position: relative;
+  flex: 1;
+  padding: 2rem 2rem 2.5rem;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+  min-height: auto;
+  border-radius: 0 0 2rem 2rem;
+  text-align: center;
+}
+
+@media screen and (min-width: 750px) {
+  .lego-card__content {
+    padding: 2.5rem 2.5rem 3rem;
+  }
+}
+
+/* Icon Wrapper */
+.lego-card__icon-wrapper {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 3;
+}
+
+.lego-card__icon {
+  width: 5.5rem;
+  height: 5.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lego-color, #FF6B6B);
+  border-radius: 1.4rem;
+  padding: 1.2rem;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.lego-card__icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lego-card__icon svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  position: relative;
+  z-index: 1;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Title */
+.lego-card__title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1.2rem 0;
+  color: #1a1a1a;
+  transition: color 0.3s ease;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+@media screen and (min-width: 750px) {
+  .lego-card__title {
+    font-size: 2.6rem;
+  }
+}
+
+/* Brick Pattern - Modern Design */
+.lego-card__brick-pattern {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.lego-card__brick-pattern .brick {
+  height: 0.6rem;
+  background: var(--lego-color, #FF6B6B);
+  border-radius: 0.3rem;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 0.6;
+}
+
+.lego-card__brick-pattern .brick:nth-child(1) {
+  width: 2.4rem;
+}
+
+.lego-card__brick-pattern .brick:nth-child(2) {
+  width: 1.8rem;
+}
+
+.lego-card__brick-pattern .brick:nth-child(3) {
+  width: 3rem;
+}
+
+/* Shine Effect */
+.lego-card__shine {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 70%
+  );
+  transform: rotate(45deg);
+  transition: opacity 0.6s ease;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Hover Effects */
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) {
+    .lego-card:hover {
+      transform: translateY(-1.2rem) scale(1.02);
+    }
+
+    .lego-card:hover .lego-card__inner {
+      box-shadow: 
+        0 12px 32px rgba(0, 0, 0, 0.12),
+        0 8px 16px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .lego-card:hover .lego-card__image {
+      transform: scale(1.1);
+    }
+
+    .lego-card:hover .lego-card__icon {
+      transform: translateY(-0.4rem) scale(1.1);
+      box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.2),
+        0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .lego-card:hover .lego-card__icon::before {
+      opacity: 1;
+    }
+
+    .lego-card:hover .lego-card__icon svg {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .lego-card:hover .lego-card__title {
+      color: var(--lego-color, #FF6B6B);
+    }
+
+    .lego-card:hover .lego-card__brick-pattern .brick {
+      opacity: 1;
+      transform: translateY(-0.2rem);
+    }
+
+    .lego-card:hover .lego-card__shine {
+      opacity: 1;
+      animation: shine-sweep 1.2s ease-in-out;
+    }
+  }
+}
+
+/* Tap/Click Animation */
+.lego-card:active {
+  transform: translateY(-0.6rem) scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Shine Animation */
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+/* CTA Button - Modern Design */
+.explore-by-theme__cta {
+  text-align: center;
+  margin-top: 5rem;
+}
+
+.explore-by-theme__cta-button {
+  position: relative;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 1.6rem;
+  padding: 1.8rem 4.5rem;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 5rem;
+  box-shadow: 
+    0 4px 16px rgba(255, 107, 107, 0.3),
+    0 2px 8px rgba(255, 107, 107, 0.2);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  display: inline-block;
+}
+
+.explore-by-theme__cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) {
+    .explore-by-theme__cta-button:hover {
+      transform: translateY(-0.3rem) scale(1.05);
+      box-shadow: 
+        0 8px 24px rgba(255, 107, 107, 0.4),
+        0 4px 12px rgba(255, 107, 107, 0.3);
+      background: linear-gradient(135deg, #FF8E8E 0%, #FF6B6B 100%);
+    }
+
+    .explore-by-theme__cta-button:hover::before {
+      left: 100%;
+    }
+  }
+}
+
+.explore-by-theme__cta-button:active {
+  transform: translateY(-0.1rem) scale(1.02);
+}
+
+/* Scroll Animation Enhancements */
+.scroll-trigger.animate--slide-in.lego-card {
+  opacity: 0;
+  transform: translateY(4rem) scale(0.95);
+}
+
+.scroll-trigger:not(.scroll-trigger--offscreen).animate--slide-in.lego-card {
+  animation: lego-card-appear 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  animation-delay: calc(var(--animation-order) * 0.1s);
+}
+
+@keyframes lego-card-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(4rem) scale(0.95);
+  }
+  60% {
+    transform: translateY(-0.5rem) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile Optimizations */
+@media screen and (max-width: 749px) {
+  .lego-card__content {
+    padding: 1.8rem 1.8rem 2.2rem;
+  }
+
+  .lego-card__title {
+    font-size: 1.9rem;
+  }
+
+  .lego-card__icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    padding: 1rem;
+  }
+
+  .explore-by-theme__grid {
+    gap: 1.2rem;
+  }
+
+  .explore-by-theme__cta-button {
+    padding: 1.5rem 3.5rem;
+    font-size: 1.5rem;
+  }
+}
+
+/* Floating Animation for Icons */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-0.8rem);
+    }
+  }
+
+  .lego-card:nth-child(odd) .lego-card__icon {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .lego-card:nth-child(even) .lego-card__icon {
+    animation: float 4s ease-in-out infinite 2s;
+  }
+
+  /* Pulse Animation for CTA */
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 
+        0 4px 16px rgba(255, 107, 107, 0.3),
+        0 2px 8px rgba(255, 107, 107, 0.2);
+    }
+    50% {
+      box-shadow: 
+        0 6px 24px rgba(255, 107, 107, 0.4),
+        0 4px 12px rgba(255, 107, 107, 0.3);
+    }
+  }
+
+  .explore-by-theme__cta-button {
+    animation: pulse 3s ease-in-out infinite;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .lego-card__inner,
+  .lego-card__image,
+  .lego-card__icon,
+  .lego-card__title,
+  .lego-card__brick-pattern .brick,
+  .explore-by-theme__cta-button {
+    transition: none;
+    animation: none !important;
+  }
+
+  .lego-card:hover {
+    transform: none;
+  }
+
+  .lego-card--loaded {
+    animation: none !important;
+  }
+}
+
+/* Ripple Animation */
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.lego-card--touching .lego-card__inner {
+  transform: scale(0.97);
+}
+
+.lego-card--loaded {
+  animation: lego-card-bounce 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes lego-card-bounce {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Additional Polish - Subtle border on cards */
+.lego-card__inner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Color accent on hover */
+.lego-card:hover .lego-card__inner::after {
+  border-color: var(--lego-color, #FF6B6B);
+  border-width: 2px;
+  opacity: 0.3;
+}

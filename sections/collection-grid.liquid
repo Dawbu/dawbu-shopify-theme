@@ -1,0 +1,228 @@
+{{ 'collection-grid.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+<div
+  class="collection-grid-section"
+  id="collection-grid-{{ section.id }}"
+  data-track-section="collection_grid_slider"
+  style="background-color: {{ section.settings.bg_color }};"
+>
+  <svg
+    class="collection-grid-bg top"
+    width="1921"
+    height="122"
+    viewBox="0 0 1921 122"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M143.524 92.1165C57.1951 48.0596 12.5376 39.5774 1 40.8434L0 0H1921V92.1173H1764.22C1723 92.1173 1614 111.862 1562.65 118.703C1528.45 123.261 1480.53 120.602 1460.85 118.703C1387.55 120.223 1335.5 75.4853 1314.26 63.4641C1229 7.98485 1171 6.48486 1137.12 4.70557C1072 4.70557 978.975 53.9849 962.018 80.5549C921.297 144.362 826.96 94.0157 784.881 65.5303C692.037 10.8389 586.026 42.7422 544.627 65.5303C510.421 83.7608 461.148 98.4464 440.788 103.51C281.161 133.895 176.101 108.575 143.524 92.1165Z" fill="{{ section.settings.bg_wave_color | default: '#fff'  }}"/>
+  </svg>
+
+  <div class="container">
+    <div class="collection-grid__inner">
+      <div class="collection-grid__header-grid">
+        <div class="collection-grid__header">
+          {% if section.settings.label != blank %}
+            <h2 class="collection-grid__label">{{ section.settings.label }}</h2>
+          {% endif %}
+          {% if section.settings.title != blank %}
+            <h2 class="collection-grid__title">{{ section.settings.title }}</h2>
+          {% endif %}
+          {% if section.settings.description != blank %}
+            <p class="collection-grid__description">{{ section.settings.description }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {%- assign collection = collections[section.settings.collection] -%}
+
+      <div
+        class="collection-grid__grid"
+        id="cg-grid-{{ section.id }}"
+      >
+        {%- if collection != blank -%}
+          {%- for product in collection.products -%}
+            <div class="collection-grid__item">
+              {%- render 'card-product',
+                card_product: product,
+                media_aspect_ratio: 'square',
+                show_secondary_image: section.settings.show_secondary_image,
+                lazy_load: true,
+                quick_add: 'quantity',
+                section_id: section.id,
+                show_tags: false,
+                skip_styles: true
+              -%}
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+      {%- assign total = collection.products.size -%}
+      {%- liquid
+        assign btn_href = section.settings.button_link
+        if btn_href == blank or btn_href == '#'
+          if collection != blank
+            assign btn_href = collection.url
+          else
+            assign btn_href = '/collections/all'
+          endif
+        endif
+      -%}
+      {% if section.settings.button_label != blank %}
+        <button
+          type="button"
+          class="collection-grid__btn js-load-more"
+          data-grid="cg-grid-{{ section.id }}"
+          data-total="{{ total }}"
+          data-initial-show="{{ section.settings.products_to_show }}"
+          id="cg-btn-{{ section.id }}"
+        >
+          {{ section.settings.button_label }}
+        </button>
+      {% endif %}
+    </div>
+  </div>
+
+  <svg
+    class="collection-grid-bg bottom"
+    width="1921"
+    height="136"
+    viewBox="0 0 1921 136"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M74.298 86.4799C44 74.7496 12 76.5594 0 76.5594L1 135.616H1921V99.773C1839.56 90.6578 1741 96.1459 1711.29 99.773C1639.27 108.564 1515.89 128.258 1479.18 128.258C1371.27 128.258 1295.11 146.99 1220.6 54.9376C1148 -34.7419 1073 2.25802 1031.24 47.1197C939.69 145.482 841 107.258 764.521 67.8839C679.206 23.9612 600 45.0401 556.843 67.8839C506.5 94.5313 380.385 125.093 328.805 126.359C205.013 135.474 107.554 103.571 74.298 86.4799Z" fill="{{ section.settings.bg_wave_color | default: '#fff'  }}"/>
+  </svg>
+</div>
+
+<script>
+  (function () {
+    function getColumns() {
+      var w = window.innerWidth;
+      if (w >= 1440) return 6;
+      if (w >= 1200) return 5;
+      if (w >= 992) return 4;
+      if (w >= 749) return 3;
+      return 4;
+    }
+
+    function initLoadMore(btn) {
+      if (!btn || btn.dataset.cgInit) return;
+      btn.dataset.cgInit = '1';
+
+      var grid = document.getElementById(btn.dataset.grid);
+      if (!grid) return;
+      var items = Array.from(grid.querySelectorAll('.collection-grid__item'));
+      var initialShow = parseInt(btn.dataset.initialShow || '24', 10);
+
+      // Hide everything past the initial visible count
+      items.forEach(function (item, i) {
+        if (i >= initialShow) item.classList.add('cg-hidden');
+      });
+
+      // If there's nothing to reveal, hide the button
+      if (grid.querySelectorAll('.cg-hidden').length === 0) {
+        btn.style.display = 'none';
+        return;
+      }
+
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        grid.querySelectorAll('.cg-hidden').forEach(function (item) {
+          item.classList.remove('cg-hidden');
+          item.classList.add('cg-reveal');
+        });
+        btn.style.opacity = '0';
+        btn.style.pointerEvents = 'none';
+        setTimeout(function () { btn.style.display = 'none'; }, 300);
+      });
+    }
+
+    function boot() {
+      document.querySelectorAll('.js-load-more').forEach(initLoadMore);
+    }
+
+    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener('shopify:section:load', boot);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection Grid",
+  "tag": "section",
+  "class": "section-collection-grid",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 4,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Badge/Label",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured Collection"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Shop All"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "bg_wave_color",
+      "label": "Wave SVG Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show secondary image on hover",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Grid"
+    }
+  ]
+}
+{% endschema %}

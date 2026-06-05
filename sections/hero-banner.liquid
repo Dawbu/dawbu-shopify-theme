@@ -1,0 +1,200 @@
+{{ 'section-hero-banner.css' | asset_url | stylesheet_tag }}
+
+<section class="hero-banner-section" id="hero-banner-{{ section.id }}" data-track-section="hero_banner">
+  <a href="{{ section.settings.url }}">
+    <div class="hero-banner-section__wrapper">
+      <div class="hero-banner-section__content">
+        <h6 class="sub-text">{{ section.settings.sub_text }}</h6>
+        <h1 class="heading">{{ section.settings.heading }}</h1>
+        <p class="description">{{ section.settings.description }}</p>
+      </div>
+      {% assign left_count = 0 %}
+      {% assign right_count = 0 %}
+      {% for block in section.blocks %}
+        {% if block.type == 'animate_img' %}
+          {% if block.settings.img_position == 'left' %}
+            {% assign left_count = left_count | plus: 1 %}
+            {% assign current_index = left_count %}
+          {% else %}
+            {% assign right_count = right_count | plus: 1 %}
+            {% assign current_index = right_count %}
+          {% endif %}
+          <span
+            class="animate-img {{ block.settings.img_position }} {{ block.settings.img_position }}-{{ current_index }}{% if block.settings.hide_on_mobile %} hide-mobile{% endif %}{% if block.settings.hide_on_desktop %} hide-desktop{% endif %}"
+            {%- if block.settings.width_desktop > 0 %} style="--img-width-d: {{ block.settings.width_desktop }}%;{% if block.settings.width_mobile > 0 %} --img-width-m: {{ block.settings.width_mobile }}%;{% endif %}"{% endif -%}
+          >
+            <img
+              src="{{ block.settings.img |  image_url: width: block.settings.img.width }}"
+              alt="{{ block.settings.img.alt }}"
+              width=""
+              height=""
+            >
+          </span>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="hero-banner-animate-text">
+      <svg class="bg-svg" width="1921" height="145" viewBox="0 0 1921 145" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M74.298 103.222C44 91.4915 12 93.3012 0 93.3012L1 0H1921V116.515C1839.56 107.4 1741 112.888 1711.29 116.515C1639.27 125.306 1515.89 145 1479.18 145C1371.27 145 1308.15 133.438 1220.6 53.6795C1159.52 -7.08876 1122.87 -7.08873 1031.24 87.8616C937.935 184.56 807.5 133.89 764.521 95.6258C692.852 31.8192 600 72.7821 556.843 95.6258C498.49 126.513 380.385 141.835 328.805 143.101C205.013 152.216 107.5 116.076 74.298 103.222Z" fill="{{ section.settings.background_color }}"/>
+      </svg>
+
+      <svg
+        viewBox="0 0 1921 240"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        xml:space="preserve"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <defs>
+          <path id="heroWavePath-{{ section.id }}" d="M1.46924 143.06C13.4692 143.06 46.4692 150.385 76.7672 162.115C109.969 174.969 207.482 211.109 331.274 201.994C382.854 200.728 500.959 185.406 559.312 154.519C602.469 131.675 698.469 96.0603 763.469 143.06C820.43 184.248 935.469 238.56 1012.97 143.06C1096.11 40.6047 1177.89 49.2917 1238.97 110.06C1326.52 189.818 1373.73 203.893 1481.65 203.893C1518.36 203.893 1641.74 187.199 1713.76 178.408C1743.47 174.781 1841.03 166.293 1922.47 175.408" stroke="white" stroke-width="130"/>
+        </defs>
+          <path d="M143.524 108.632C57.1951 64.5746 12.5376 56.0923 1 57.3583L0 188.301C12 188.301 44 186.492 74.298 198.222C107.5 211.077 205.013 247.216 328.805 238.101C380.385 236.835 498.49 221.513 556.843 190.626C600 167.782 692.852 126.819 764.521 190.626C807.5 228.89 937.935 279.56 1031.24 182.862C1122.87 87.9113 1159.52 87.9113 1220.6 148.68C1308.15 228.438 1371.27 240 1479.18 240C1515.89 240 1639.27 220.306 1711.29 211.515C1741 207.888 1839.56 202.4 1921 211.515V108.632H1764.22C1723 108.632 1614 128.377 1562.65 135.218C1528.45 139.776 1480.53 137.117 1460.85 135.218C1387.55 136.738 1332.58 102.134 1314.26 79.979C1247.47 13.1339 1168.34 -1.04544 1137.12 0.220506C1065.45 -4.33711 990.523 62.8877 962.018 97.0699C921.297 160.877 826.96 110.531 784.881 82.0452C692.037 27.3538 586.026 59.2572 544.627 82.0452C510.421 100.276 461.148 114.961 440.788 120.025C281.161 150.41 176.101 125.09 143.524 108.632Z" fill="#E52227"/>
+          {% capture marquee_text %}
+            {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ section.settings.animate_text }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          {% endcapture %}
+          <text class="curved-text-svg" fill="#fff">
+            <textPath xlink:href="#heroWavePath-{{ section.id }}" startOffset="0%" textLength="100%" lengthAdjust="spacing">
+              {{ marquee_text }}
+              <animate attributeName="startOffset" from="0%" to="-100%" dur="20s" repeatCount="indefinite" />
+            </textPath>
+          </text>
+          <text class="curved-text-svg" fill="#fff">
+            <textPath xlink:href="#heroWavePath-{{ section.id }}" startOffset="100%" textLength="100%" lengthAdjust="spacing">
+              {{ marquee_text }}
+              <animate attributeName="startOffset" from="100%" to="0%" dur="20s" repeatCount="indefinite" />
+            </textPath>
+          </text>
+      </svg>
+    </div>
+  </a>
+</section>
+
+<style>
+  .hero-banner-section {
+    --bg-color: {{ section.settings.background_color }};
+    --text-color: {{ section.settings.text_color }};
+    overflow: hidden;
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+  }
+  .hero-banner-section a{
+    text-decoration: none;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "sub_text",
+      "label": "Sub Text",
+      "default": "PREMIUM QUALITY"
+    },
+    {
+      "type": "url",
+      "id": "url",
+      "label": "url"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Hero Banner Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Describe your brand in a few words here."
+    },
+    {
+      "type": "text",
+      "id": "animate_text",
+      "label": "Animated Scrolling Text",
+      "default": "10,000+ HAPPY KIDS"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#FFD700"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "animate_img",
+      "name": "Animated Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "img",
+          "label": "Image"
+        },
+        {
+          "type": "select",
+          "id": "img_position",
+          "label": "Position",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "left",
+          "info": "Images on the same side are auto-stacked top→bottom in the order you add them."
+        },
+        {
+          "type": "header",
+          "content": "Visibility"
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_on_mobile",
+          "label": "Hide on mobile",
+          "default": false,
+          "info": "Use for decorative images that crowd the small screen."
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_on_desktop",
+          "label": "Hide on desktop",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Override size (optional)"
+        },
+        {
+          "type": "range",
+          "id": "width_desktop",
+          "label": "Width — desktop (%)",
+          "min": 0, "max": 30, "step": 1, "default": 0,
+          "info": "Width as % of section. 0 = use auto layout."
+        },
+        {
+          "type": "range",
+          "id": "width_mobile",
+          "label": "Width — mobile (%)",
+          "min": 0, "max": 40, "step": 1, "default": 0,
+          "info": "0 = use auto layout."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner",
+      "blocks": [
+        { "type": "animate_img", "settings": { "img_position": "left" } },
+        { "type": "animate_img", "settings": { "img_position": "right" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

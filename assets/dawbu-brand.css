@@ -1,0 +1,84 @@
+/*  ============================================================
+    DAWBU brand overrides — Poppins + brand red on common
+    cross-section UI (related products, collection bundle, etc).
+    Loaded once via layout/theme.liquid.
+    ============================================================ */
+
+:root {
+  --dawbu-red: #e52227;
+  --dawbu-red-dark: #c41a1f;
+  --dawbu-yellow: #faed17;
+  --dawbu-black: #040202;
+  --dawbu-white: #ffffff;
+  --dawbu-font: 'Poppins', system-ui, -apple-system, sans-serif;
+}
+
+/* --- Related products + product recommendations --- */
+.related-products .title,
+.related-products .title-wrapper > h2,
+product-recommendations .title,
+product-recommendations h2 {
+  font-family: var(--dawbu-font);
+  font-weight: 800;
+  letter-spacing: -.012em;
+  color: var(--dawbu-black);
+}
+
+.related-products .card__heading,
+.related-products .card-information,
+.related-products .price,
+product-recommendations .card__heading,
+product-recommendations .card-information,
+product-recommendations .price {
+  font-family: var(--dawbu-font);
+}
+.related-products .card__heading,
+product-recommendations .card__heading {
+  font-weight: 700;
+  letter-spacing: -.005em;
+}
+
+/* --- Collection bundle (Buy the Complete Collection) --- */
+[class^="collection-bundle-"] .title,
+[class*=" collection-bundle-"] .title,
+[class^="collection-bundle-"] h2,
+[class*=" collection-bundle-"] h2 {
+  font-family: var(--dawbu-font);
+  font-weight: 800;
+  letter-spacing: -.012em;
+  color: var(--dawbu-black);
+}
+[class^="collection-bundle-"] .rte,
+[class*=" collection-bundle-"] .rte,
+[class^="collection-bundle-"] p,
+[class*=" collection-bundle-"] p,
+[class^="collection-bundle-"] button,
+[class*=" collection-bundle-"] button {
+  font-family: var(--dawbu-font);
+}
+[class^="collection-bundle-"] .collection-bundle__grid h3,
+[class*=" collection-bundle-"] .collection-bundle__grid h3,
+[class^="collection-bundle-"] .collection-bundle__grid .card__heading,
+[class*=" collection-bundle-"] .collection-bundle__grid .card__heading {
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* --- Main "Add Selected Items to Cart" button on collection-bundle: DAWBU red pill --- */
+[class^="collection-bundle-"] .button,
+[class*=" collection-bundle-"] .button,
+[class^="collection-bundle-"] button[type="button"]:not(.card__quick-add-button),
+[class*=" collection-bundle-"] button[type="button"]:not(.card__quick-add-button) {
+  font-family: var(--dawbu-font);
+  font-weight: 800;
+  letter-spacing: .03em;
+}
+
+/* --- Product card titles across the site (general) --- */
+.card__heading,
+.card__information .card__heading a,
+.product-card__title,
+.product-item__name {
+  font-family: var(--dawbu-font);
+}

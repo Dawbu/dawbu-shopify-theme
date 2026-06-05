@@ -1,0 +1,263 @@
+{%- comment -%}
+  Snippet: dawbu-byob-bridge
+  -------------------------------
+  Detects whether the current product belongs to any BYOB pack's collection
+  and, if so, renders a tasteful "Bundle & save" banner on the PDP linking
+  to that pack's page. Picks the cheapest matching pack first (entry tier).
+
+  Required:
+    product   - the current product (passed in by main-product.liquid)
+
+  Reads pack data from `snippets/dawbu-byob-packs.liquid` (no metaobjects).
+{%- endcomment -%}
+
+{%- if product == blank or product.id == blank -%}
+  {%- comment -%} nothing to do {%- endcomment -%}
+{%- else -%}
+
+  {%- comment -%}
+    =========================================================================
+    INLINE PACK DATA — keep in sync with snippets/dawbu-byob-packs.liquid
+    -------------------------------------------------------------------------
+    Shopify blocks `{% include %}` inside snippets rendered via `{% render %}`,
+    so we duplicate the 4 arrays we need here. The sections (hub/builder) still
+    use the include. When you add/edit/disable a pack, update BOTH files.
+    =========================================================================
+  {%- endcomment -%}
+  {%- assign pack_handles     = "build-craft-crate,mega-box,block-sets,master-builder-set,collectors-vault,glow-grab-bag,glow-mini-pack,glow-squad-bag,mini-starter-pack,mini-mates-pack,mini-figures,mini-heroes-pack,big-mini-figures,premium-minis" | split: "," -%}
+  {%- assign pack_titles      = "Build & Craft Crate|10-in-1 Mega Box|Block Sets|Master Builder Set|Collector's Vault|Glow Grab Bag|Glow Mini Pack|Glow Squad Bag|Mini Starter Pack|Mini Mates Pack|Mini Figures|Mini Heroes Pack|Big Mini Figures|Premium Minis" | split: "|" -%}
+  {%- assign pack_quantities  = "6,6,6,6,6,25,14,11,9,7,6,6,6,6" | split: "," -%}
+  {%- assign pack_prices      = "390,450,735,849,1419,199,199,209,210,199,199,220,279,310" | split: "," -%}
+  {%- assign pack_collections = "byob-block-69,byob-block-79,byob-block-129,byob-block-149,byob-block-249,byob-mini-bulk,byob-mini-15,byob-mini-20,byob-mini-25,byob-mini-30,byob-mini-35,byob-mini-39,byob-mini-49,byob-mini-55" | split: "," -%}
+  {%- assign pack_badges      = "|MOST POPULAR||||VALUE||TRENDING|||||PREMIUM|" | split: "|" -%}
+
+  {%- comment -%} Build a comma-bounded string of the product's collection handles for fast lookup {%- endcomment -%}
+  {%- assign pc_handles = ',' -%}
+  {%- for c in product.collections -%}
+    {%- assign pc_handles = pc_handles | append: c.handle | append: ',' -%}
+  {%- endfor -%}
+
+  {%- assign matching_pi = -1 -%}
+  {%- assign matching_price_low = 9999999 -%}
+
+  {%- for phandle in pack_handles -%}
+    {%- assign pi = forloop.index0 -%}
+    {%- assign first_char = phandle | slice: 0, 1 -%}
+    {%- if first_char == '_' -%}{%- continue -%}{%- endif -%}
+
+    {%- assign coll_handle = pack_collections[pi] -%}
+    {%- assign search = ',' | append: coll_handle | append: ',' -%}
+
+    {%- if pc_handles contains search -%}
+      {%- assign price = pack_prices[pi] | times: 1 -%}
+      {%- if price < matching_price_low -%}
+        {%- assign matching_price_low = price -%}
+        {%- assign matching_pi = pi -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if matching_pi >= 0 -%}
+    {%- assign mp_handle = pack_handles[matching_pi] -%}
+    {%- assign mp_title  = pack_titles[matching_pi] -%}
+    {%- assign mp_qty    = pack_quantities[matching_pi] -%}
+    {%- assign mp_price  = pack_prices[matching_pi] -%}
+    {%- assign mp_badge  = pack_badges[matching_pi] -%}
+
+    <a class="dawbu-byob-bridge" href="/pages/{{ mp_handle }}"
+       aria-label="Save more with the {{ mp_title }} bundle"
+       data-byob-bridge
+       data-from-product-id="{{ product.id }}"
+       data-from-product-title="{{ product.title | escape }}"
+       data-from-product-handle="{{ product.handle }}"
+       data-pack-handle="{{ mp_handle }}">
+      <span class="dbb__glyph" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 7H4l1.5-4h13L20 7z"/>
+          <path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7"/>
+          <path d="M12 3v18"/>
+        </svg>
+      </span>
+      <span class="dbb__copy">
+        <span class="dbb__eyebrow">Bundle &amp; save</span>
+        <span class="dbb__line">
+          Buy any <strong>{{ mp_qty }}</strong> for <strong>Rs. {{ mp_price }}</strong>
+          {%- if mp_badge != blank %} <span class="dbb__chip">{{ mp_badge }}</span>{%- endif %}
+        </span>
+      </span>
+      <span class="dbb__arrow" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"/><path d="m13 5 7 7-7 7"/>
+        </svg>
+      </span>
+    </a>
+
+    <style>
+      .dawbu-byob-bridge {
+        --dawbu-red: #e52227;
+        --dawbu-yellow: #faed17;
+        --dawbu-black: #040202;
+        display: grid;
+        grid-template-columns: 44px 1fr 24px;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        margin: 12px 0 18px;
+        padding: 14px 18px;
+        background: var(--dawbu-red);
+        border: 2px solid var(--dawbu-red);
+        border-radius: 14px;
+        text-decoration: none;
+        color: #fff;
+        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        position: relative;
+        overflow: hidden;
+        transition: background .2s ease, color .2s ease, transform .15s ease, box-shadow .25s ease;
+        isolation: isolate;
+      }
+      .dawbu-byob-bridge:hover {
+        background: var(--dawbu-yellow);
+        color: var(--dawbu-red);
+        box-shadow: 0 10px 26px rgba(229, 34, 39, .28);
+        transform: translateY(-1px);
+      }
+      .dawbu-byob-bridge:active { transform: translateY(0); }
+      .dbb__glyph {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        background: rgba(255,255,255,.18);
+        color: #fff;
+        display: grid; place-items: center;
+        flex-shrink: 0;
+        transition: background .2s ease, color .2s ease;
+      }
+      .dawbu-byob-bridge:hover .dbb__glyph {
+        background: var(--dawbu-red);
+        color: var(--dawbu-yellow);
+      }
+      .dbb__copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+      .dbb__eyebrow {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+        color: var(--dawbu-yellow);
+        transition: color .2s ease;
+      }
+      .dawbu-byob-bridge:hover .dbb__eyebrow { color: var(--dawbu-red); }
+      .dbb__line {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .dbb__line strong { font-weight: 800; }
+      .dbb__chip {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: var(--dawbu-yellow);
+        color: var(--dawbu-red);
+      }
+      .dbb__arrow {
+        color: inherit;
+        display: grid; place-items: center;
+        transition: transform .25s cubic-bezier(.22, 1, .36, 1);
+      }
+      .dawbu-byob-bridge:hover .dbb__arrow { transform: translateX(4px); }
+      @media (max-width: 749px) {
+        .dawbu-byob-bridge {
+          grid-template-columns: 38px 1fr 20px;
+          gap: 10px;
+          padding: 12px 14px;
+          border-radius: 12px;
+        }
+        .dbb__glyph { width: 38px; height: 38px; border-radius: 10px; }
+        .dbb__glyph svg { width: 18px; height: 18px; }
+        .dbb__eyebrow { font-size: 10px; letter-spacing: .2em; }
+        .dbb__line { font-size: 13px; }
+        .dbb__chip { font-size: 9px; padding: 2px 6px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dawbu-byob-bridge, .dbb__arrow { transition: none; }
+        .dawbu-byob-bridge:hover { transform: none; }
+        .dawbu-byob-bridge:hover .dbb__arrow { transform: none; }
+      }
+    </style>
+
+    <script>
+      (function () {
+        if (window.__dawbuBridgeBound) return;
+        window.__dawbuBridgeBound = true;
+
+        // Impression — one per banner the first time it enters the viewport
+        function fireBridgeView(a) {
+          if (a.__bridgeViewed) return;
+          a.__bridgeViewed = true;
+          var payload = {
+            surface: 'pdp_bridge',
+            product_id: a.dataset.fromProductId || '',
+            product_handle: a.dataset.fromProductHandle || '',
+            pack_handle: a.dataset.packHandle || ''
+          };
+          try { document.dispatchEvent(new CustomEvent('byob:bridge_view', { detail: payload })); } catch (_) {}
+          if (window.dataLayer && window.dataLayer.push) {
+            window.dataLayer.push(Object.assign({ event: 'byob_bridge_view' }, payload));
+          }
+        }
+        function observeBridges() {
+          var els = document.querySelectorAll('[data-byob-bridge]');
+          if (!els.length) return;
+          if (!('IntersectionObserver' in window)) {
+            els.forEach(fireBridgeView);
+            return;
+          }
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+              if (en.isIntersecting) { fireBridgeView(en.target); io.unobserve(en.target); }
+            });
+          }, { threshold: 0.4 });
+          els.forEach(function (el) { io.observe(el); });
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', observeBridges);
+        } else {
+          observeBridges();
+        }
+
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('[data-byob-bridge]');
+          if (!a) return;
+          try {
+            sessionStorage.setItem('byob_source', JSON.stringify({
+              source: 'pdp_bridge',
+              product_id: a.dataset.fromProductId || '',
+              product_title: a.dataset.fromProductTitle || '',
+              product_handle: a.dataset.fromProductHandle || '',
+              pack: a.dataset.packHandle || '',
+              at: Date.now()
+            }));
+          } catch (_) {}
+          var payload = {
+            surface: 'pdp_bridge',
+            product_id: a.dataset.fromProductId,
+            product_handle: a.dataset.fromProductHandle,
+            pack_handle: a.dataset.packHandle
+          };
+          try { document.dispatchEvent(new CustomEvent('byob:bridge_click', { detail: payload })); } catch (_) {}
+          if (window.dataLayer && window.dataLayer.push) {
+            window.dataLayer.push(Object.assign({ event: 'byob_bridge_click' }, payload));
+          }
+        }, true);
+      })();
+    </script>
+  {%- endif -%}
+{%- endif -%}

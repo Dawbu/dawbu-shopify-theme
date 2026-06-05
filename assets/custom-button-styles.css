@@ -1,0 +1,72 @@
+/* Custom Button Styles for Add to Cart and Sold Out buttons */
+
+/* Add to Cart button styling */
+button[name="add"],
+.product-form__submit {
+  background-color: #e02424; /* Red background */
+  color: white; /* White text */
+  font-weight: bold;
+  border-radius: 9999px; /* Pill shape */
+  padding: 12px 28px; /* Specified padding */
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Add to Cart button hover effect */
+button[name="add"]:hover:not([disabled]),
+.product-form__submit:hover:not([disabled]) {
+  background-color: #b91c1c; /* Darker red on hover */
+}
+
+/* Sold Out button styling */
+button[name="add"]:disabled,
+.product-form__submit:disabled,
+button[name="add"][aria-disabled="true"],
+.product-form__submit[aria-disabled="true"] {
+  background-color: #f87171; /* Light red background */
+  color: white; /* White text */
+  font-weight: bold;
+  border-radius: 9999px; /* Pill shape */
+  opacity: 0.8; /* Slight transparency */
+  cursor: not-allowed;
+}
+
+/* Quick add buttons on collection pages */
+.quick-add__submit {
+  background-color: #e02424; /* Red background */
+  color: white; /* White text */
+  font-weight: bold;
+  border-radius: 9999px; /* Pill shape */
+  padding: 12px 28px; /* Specified padding */
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Quick add buttons hover effect */
+.quick-add__submit:hover:not([disabled]) {
+  background-color: #b91c1c; /* Darker red on hover */
+}
+
+/* Quick add buttons sold out state */
+.quick-add__submit:disabled,
+.quick-add__submit[aria-disabled="true"] {
+  background-color: #f87171; /* Light red background */
+  color: white; /* White text */
+  font-weight: bold;
+  border-radius: 9999px; /* Pill shape */
+  opacity: 0.8; /* Slight transparency */
+  cursor: not-allowed;
+}
+
+/* Override any button after pseudo-elements that might interfere with styling */
+button[name="add"]:after,
+.product-form__submit:after,
+.quick-add__submit:after {
+  box-shadow: none;
+}
+
+button[name="add"]:before,
+.product-form__submit:before,
+.quick-add__submit:before {
+  box-shadow: none;
+}

@@ -1,0 +1,307 @@
+{% comment %}
+  Bundle Pills Section
+  Active class is applied when current page URL matches the button's link URL
+{% endcomment %}
+
+<div class="bundle-pills-section" id="bundle-pills-{{ section.id }}">
+  <div class="bundle-pills-wrapper">
+    {% for block in section.blocks %}
+      {% if block.type == 'pill' %}
+        {% assign pill_url = block.settings.link %}
+        {% assign current_url = request.path %}
+
+        {% comment %} Compare current path with pill link path {% endcomment %}
+        {% assign pill_path = pill_url | split: '?' | first %}
+        {% assign is_active = false %}
+
+        {% if current_url == pill_path or request.path contains pill_path and pill_path != '/' %}
+          {% assign is_active = true %}
+        {% elsif pill_url contains '?' %}
+          {% assign pill_full = pill_url | split: '?' %}
+          {% assign pill_query = pill_full[1] %}
+          {% if request.path == pill_full[0] and request.query_string == pill_query %}
+            {% assign is_active = true %}
+          {% endif %}
+        {% endif %}
+
+        <a
+          href="{{ pill_url }}"
+          class="bundle-pill {% if is_active %}active{% endif %}"
+          {{ block.shopify_attributes }}
+        >
+          {{ block.settings.label }}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .bundle-pills-section {
+    background-color: {{ section.settings.background_color }};
+    padding: {{ section.settings.section_padding }}px 16px;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+
+  .bundle-pills-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: {{ section.settings.alignment }};
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .bundle-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 11px 22px;
+    border-radius: 999px;
+    border: 2px solid {{ section.settings.border_color }};
+    background-color: #ffffff;
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.font_size }}px;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: -.005em;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.12s ease, box-shadow 0.2s ease;
+  }
+
+  .bundle-pill:hover {
+    background-color: {{ section.settings.hover_bg_color }};
+    color: {{ section.settings.hover_text_color }};
+    border-color: {{ section.settings.hover_bg_color }};
+    transform: translateY(-1px);
+  }
+
+  .bundle-pill.active {
+    background-color: {{ section.settings.active_bg_color }};
+    color: {{ section.settings.active_text_color }};
+    border-color: {{ section.settings.active_bg_color }};
+    font-weight: 800;
+    box-shadow: 0 8px 22px rgba(229, 34, 39, .25);
+  }
+
+  @media (max-width: 768px) {
+    .bundle-pills-wrapper {
+      gap: 8px;
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .bundle-pills-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .bundle-pill {
+      font-size: 13px;
+      padding: 8px 16px;
+      flex-shrink: 0;
+    }
+    .bundle-pills-section{
+      padding: 20px 16px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    // Only run JS fallback if server-side Liquid didn't already set an active pill.
+    // This prevents a brief flicker where active class is removed and re-applied on hydrate.
+    var container = document.getElementById('bundle-pills-{{ section.id }}');
+    if (!container) return;
+    if (container.querySelector('.bundle-pill.active')) return;
+
+    var pills = container.querySelectorAll('.bundle-pill');
+    var currentFull = window.location.pathname + window.location.search;
+
+    for (var i = 0; i < pills.length; i++) {
+      var pill = pills[i];
+      var href = pill.getAttribute('href');
+      if (!href) continue;
+      var normalized = href.replace(/^https?:\/\/[^\/]+/, '');
+      if (
+        normalized === currentFull ||
+        normalized === window.location.pathname ||
+        (normalized.length > 1 && currentFull.startsWith(normalized))
+      ) {
+        pill.classList.add('active');
+        break;
+      }
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Bundle Pills",
+  "tag": "section",
+  "class": "bundle-pills",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width (px)",
+      "min": 600,
+      "max": 1600,
+      "step": 20,
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section padding (px)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size (px)",
+      "min": 11,
+      "max": 20,
+      "step": 1,
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "default": "#f5f4ee"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Pill text color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Pill border color",
+      "default": "#c8c8c0"
+    },
+    {
+      "type": "color",
+      "id": "active_bg_color",
+      "label": "Active background color",
+      "default": "#2d6a4f"
+    },
+    {
+      "type": "color",
+      "id": "active_text_color",
+      "label": "Active text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hover_bg_color",
+      "label": "Hover background color",
+      "default": "#e8e8e0"
+    },
+    {
+      "type": "color",
+      "id": "hover_text_color",
+      "label": "Hover text color",
+      "default": "#1a1a1a"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Bundle Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "At ₹399 get bundle of 5"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle Pills",
+      "blocks": [
+        {
+          "type": "pill",
+          "settings": {
+            "label": "At ₹399 get bundle of 5",
+            "link": "/collections/bundle-399"
+          }
+        },
+        {
+          "type": "pill",
+          "settings": {
+            "label": "At ₹299 get bundle of 5",
+            "link": "/collections/bundle-299"
+          }
+        },
+        {
+          "type": "pill",
+          "settings": {
+            "label": "At ₹599 get bundle of 5",
+            "link": "/collections/bundle-599"
+          }
+        },
+        {
+          "type": "pill",
+          "settings": {
+            "label": "At ₹999 get bundle of 10 manure",
+            "link": "/collections/bundle-999"
+          }
+        },
+        {
+          "type": "pill",
+          "settings": {
+            "label": "At ₹1599 get bundle of 15",
+            "link": "/collections/bundle-1599"
+          }
+        },
+        {
+          "type": "pill",
+          "settings": {
+            "label": "At ₹2999 get bundle of 25",
+            "link": "/collections/bundle-2999"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

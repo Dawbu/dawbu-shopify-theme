@@ -1,0 +1,555 @@
+{% comment %}
+  Section: Glow Mini World — Quick Add-ons with Swiper Slider & Tab Filtering
+  File: sections/glow-mini-world.liquid
+{% endcomment %}
+
+{%- style -%}
+  #gmw-section-{{ section.id }} {
+    background: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+  }
+
+  #gmw-section-{{ section.id }} .gmw-inner {
+    max-width: 1660px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ── Badge ── */
+  #gmw-section-{{ section.id }} .gmw-badge {
+    display: inline-flex;
+    align-items: center;
+    background: {{ section.settings.badge_bg }};
+    color: {{ section.settings.badge_text_color }};
+    font-size: 14px;
+    font-weight: 600;
+    font-family: Poppins;
+    letter-spacing: 2px;
+    line-height: 1;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    border-radius: 50px;
+    border: 1.5px solid #040202;
+    box-shadow: 2px 3px #040202;
+    margin: 0 0 20px;
+  }
+
+  /* ── Heading ── */
+  #gmw-section-{{ section.id }} .gmw-heading {
+    font-size: clamp(32px,5vw,74px);
+    font-weight: 400;
+    font-family: 'Kopiku';
+    line-height: 1.05;
+    text-transform: uppercase;
+    margin: 0 0 24px;
+    letter-spacing: -.02em;
+    color: {{ section.settings.heading_color }};
+  }
+
+  #gmw-section-{{ section.id }} .gmw-heading span.accent {
+    color: {{ section.settings.heading_accent_color }};
+  }
+
+  /* ── Tabs ── */
+  #gmw-section-{{ section.id }} .gmw-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    margin-bottom: 32px;
+    white-space: nowrap;
+    overflow: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+  }
+
+  #gmw-section-{{ section.id }} .gmw-tabs::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
+
+  #gmw-section-{{ section.id }} .gmw-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 22px;
+    border-radius: 14px;
+    font-size: 18px;
+    box-shadow: 3px 3px 0 0 #B8181C;
+    font-weight: 500;
+    font-family: 'Poppins';
+    cursor: pointer;
+    border: 2px solid {{ section.settings.tab_border_color }};
+    background: {{ section.settings.tab_inactive_bg }};
+    color: {{ section.settings.tab_inactive_text }};
+    transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  #gmw-section-{{ section.id }} .gmw-tab-btn:hover {
+    background: {{ section.settings.tab_active_bg }};
+    color: {{ section.settings.tab_active_text }};
+    border-color: {{ section.settings.tab_active_bg }};
+    transform: translateY(-1px);
+  }
+
+  #gmw-section-{{ section.id }} .gmw-tab-btn.is-active {
+    background: {{ section.settings.tab_active_bg }};
+    color: {{ section.settings.tab_active_text }};
+    border-color: {{ section.settings.tab_active_bg }};
+  }
+
+  /* ── Slider Panels ── */
+  #gmw-section-{{ section.id }} .gmw-panel {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  #gmw-section-{{ section.id }} .gmw-panel.is-active {
+    display: block;
+    opacity: 1;
+  }
+
+  #gmw-section-{{ section.id }} .swiper-slide {
+    height: auto;
+  }
+
+  /* Product card wrapper — ensure consistent height */
+  #gmw-section-{{ section.id }} .gmw-card-wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+
+  @media (max-width: 749px) {
+     #gmw-section-{{ section.id }} {
+    padding: 60px 0;
+  }
+    #gmw-section-{{ section.id }} .gmw-tabs {
+      gap: 8px;
+      margin: 0 -20px 24px;
+      padding-left: 20px;
+    }
+    #gmw-section-{{ section.id }} .gmw-tab-btn {
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+
+    #gmw-section-{{ section.id }} .gmw-badge {
+      font-size: 12px;
+      line-height: 1.5;
+    padding: 6px 14px;
+    }
+  }
+{%- endstyle -%}
+
+<section id="gmw-section-{{ section.id }}" class="gmw-section">
+  <div class="gmw-inner">
+    {%- if section.settings.badge_text != blank -%}
+      <div class="gmw-badge">{{ section.settings.badge_text }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h2 class="gmw-heading">
+        {%- assign heading_parts = section.settings.heading | split: '|' -%}
+        {%- for part in heading_parts -%}
+          {%- if forloop.last and heading_parts.size > 1 -%}
+            <span class="accent">{{ part | strip }}</span>
+          {%- else -%}
+            {{ part | strip }}
+          {%- endif -%}
+          {%- unless forloop.last %} {% endunless -%}
+        {%- endfor -%}
+      </h2>
+    {%- endif -%}
+
+    {%- comment -%} Collect tab blocks {%- endcomment -%}
+    {%- assign tab_blocks = section.blocks | where: 'type', 'tab' -%}
+
+    {%- if tab_blocks.size > 0 -%}
+      <!-- TAB BUTTONS -->
+      <div class="gmw-tabs" role="tablist" aria-label="Product themes">
+        {%- for block in tab_blocks -%}
+          <button
+            class="gmw-tab-btn{% if forloop.first %} is-active{% endif %}"
+            data-tab="gmw-panel-{{ section.id }}-{{ forloop.index0 }}"
+            role="tab"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            aria-controls="gmw-panel-{{ section.id }}-{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            {{ block.settings.tab_label }}
+          </button>
+        {%- endfor -%}
+      </div>
+
+      <!-- TAB PANELS -->
+      {%- for block in tab_blocks -%}
+        {%- assign panel_id = 'gmw-panel-' | append: section.id | append: '-' | append: forloop.index0 -%}
+        {%- assign swiper_id = 'gmw-swiper-' | append: section.id | append: '-' | append: forloop.index0 -%}
+
+        <div
+          id="{{ panel_id }}"
+          class="gmw-panel{% if forloop.first %} is-active{% endif %}"
+          role="tabpanel"
+          aria-labelledby="{{ panel_id }}-tab"
+        >
+          {%- assign collection_handle = block.settings.collection -%}
+          {%- assign tab_collection = collections[collection_handle] -%}
+          {%- assign products_limit = section.settings.products_per_tab -%}
+
+          <div class="swiper" id="{{ swiper_id }}" data-swiper-id="{{ swiper_id }}">
+            <div class="swiper-wrapper">
+              {%- if tab_collection != blank and tab_collection.products_count > 0 -%}
+                {%- for product in tab_collection.products limit: products_limit -%}
+                  <div class="swiper-slide">
+                    <div class="gmw-card-wrap">
+                      {%- render 'card-product',
+                        card_product: product,
+                        media_aspect_ratio: 'square',
+                        show_secondary_image: section.settings.show_secondary_image,
+                        lazy_load: true,
+                        quick_add: 'quantity',
+                        section_id: section.id,
+                        show_tags: false,
+                        skip_styles: true
+                      -%}
+                    </div>
+                  </div>
+                {%- endfor -%}
+              {%- else -%}
+                {%- for i in (1..6) -%}
+                  <div class="swiper-slide">
+                    <div class="gmw-card-wrap">
+                      {%- assign placeholder_product = 'product-' | append: i -%}
+                      {{ placeholder_product | placeholder_svg_tag: 'placeholder-svg' }}
+                    </div>
+                  </div>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+            <!-- /.swiper-wrapper -->
+
+            <!-- Pagination dots -->
+          </div>
+          <!-- /.swiper -->
+        </div>
+        <!-- /.gmw-panel -->
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+  <!-- /.gmw-inner -->
+</section>
+
+<script>
+  (function () {
+    function initGMWSection(sectionId) {
+      var section = document.getElementById('gmw-section-' + sectionId);
+      if (!section) return;
+
+      /* ── Tabs ── */
+      var tabs = section.querySelectorAll('.gmw-tab-btn');
+      var panels = section.querySelectorAll('.gmw-panel');
+
+      function activateTab(btn) {
+        tabs.forEach(function (t) {
+          t.classList.remove('is-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        panels.forEach(function (p) {
+          p.classList.remove('is-active');
+          p.style.opacity = '0';
+        });
+
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-selected', 'true');
+
+        var targetId = btn.getAttribute('data-tab');
+        var targetPanel = document.getElementById(targetId);
+        if (targetPanel) {
+          targetPanel.classList.add('is-active');
+          // Trigger reflow for transition
+          requestAnimationFrame(function () {
+            targetPanel.style.opacity = '1';
+          });
+          // Re-update Swiper inside this panel
+          var swiper = targetPanel.querySelector('.swiper');
+          if (swiper && swiper._swiperInstance) {
+            swiper._swiperInstance.update();
+          }
+        }
+      }
+
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activateTab(btn);
+        });
+      });
+
+      /* ── Swipers — init after DOM ready ── */
+      function initSwipers() {
+        if (typeof Swiper === 'undefined') {
+          setTimeout(initSwipers, 80);
+          return;
+        }
+
+        var swiperEls = section.querySelectorAll('.swiper[data-swiper-id]');
+
+        swiperEls.forEach(function (el) {
+          var swiperId = el.getAttribute('data-swiper-id');
+          var paginationEl = document.getElementById(swiperId + '-pagination');
+
+          var instance = new Swiper(el, {
+            slidesPerView: 1.3,
+            spaceBetween: 16,
+            grabCursor: true,
+            breakpoints: {
+              0: {
+                slidesPerView: 2,
+                spaceBetween: 16,
+              },
+              640: {
+                slidesPerView: 3,
+                spaceBetween: 18,
+              },
+              1024: {
+                slidesPerView: 4,
+                spaceBetween: 20,
+              },
+              1280: {
+                slidesPerView: 5,
+                spaceBetween: 20,
+              },
+              1400: {
+                slidesPerView: 6,
+                spaceBetween: 20,
+              },
+            },
+          });
+
+          // Attach to DOM element for later .update() calls
+          el._swiperInstance = instance;
+        });
+      }
+
+      initSwipers();
+    }
+
+    // Init on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function () {
+      initGMWSection('{{ section.id }}');
+    });
+
+    // Shopify Theme Editor live reload
+    document.addEventListener('shopify:section:load', function (e) {
+      if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+        initGMWSection('{{ section.id }}');
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Glow Mini World",
+  "tag": "section",
+  "class": "section-glow-mini-world",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Label",
+      "default": "QUICK ADD-ONS"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Badge Background",
+      "default": "#f5e642"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (use | to split accent word)",
+      "default": "GLOW MiNi | WORLD",
+      "info": "Text before | is default color, text after | is accent color. Example: 'GLOW MiNi | WORLD'"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent_color",
+      "label": "Heading Accent Color",
+      "default": "#e8132a"
+    },
+    {
+      "type": "header",
+      "content": "Tab Buttons"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_bg",
+      "label": "Active Tab Background",
+      "default": "#e8132a"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_text",
+      "label": "Active Tab Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tab_inactive_bg",
+      "label": "Inactive Tab Background",
+      "default": "#e8132a"
+    },
+    {
+      "type": "color",
+      "id": "tab_inactive_text",
+      "label": "Inactive Tab Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tab_border_color",
+      "label": "Tab Border Color",
+      "default": "#e8132a"
+    },
+    {
+      "type": "header",
+      "content": "Product Cards"
+    },
+    {
+      "type": "range",
+      "id": "products_per_tab",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "label": "Max Products Per Tab",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show Secondary Image on Hover",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "Tab Label",
+          "default": "All Themes"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Glow Mini World",
+      "blocks": [
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "All Themes"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Animals"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Plants"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Ocean"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Space"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Fantasy"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

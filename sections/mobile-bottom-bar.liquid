@@ -1,0 +1,134 @@
+{{ 'mobile-bottom-bar.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%} Only render when enabled in Theme Settings → Mobile Bottom Bar {%- endcomment -%}
+{%- if settings.mbb_enabled -%}
+
+{%- comment -%} Resolve category URL: use the picker value, fall back to /collections/all {%- endcomment -%}
+{%- assign mbb_cat_url = settings.mbb_category_url | default: '/collections/all' -%}
+
+<style>
+  :root {
+    --mbb-bg:          {{ settings.mbb_color_bg }};
+    --mbb-border:      {{ settings.mbb_color_border }};
+    --mbb-icon-color:  {{ settings.mbb_color_icon }};
+    --mbb-active-color:{{ settings.mbb_color_active }};
+  }
+</style>
+
+<nav class="mbb-nav" id="mobile-bottom-bar" aria-label="Mobile navigation">
+
+  {%- if settings.mbb_show_home -%}
+  <!-- Home -->
+  <a href="{{ routes.root_url }}" class="mbb-item {% if request.page_type == 'index' %}mbb-item--active{% endif %}">
+    <span class="mbb-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V9.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="mbb-label">{{ settings.mbb_label_home }}</span>
+  </a>
+  {%- endif -%}
+
+  {%- if settings.mbb_show_category -%}
+  <!-- Category -->
+  <a href="{{ mbb_cat_url }}" class="mbb-item {% if request.path contains '/collections' %}mbb-item--active{% endif %}">
+    <span class="mbb-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3"  y="3"  width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="13" y="3"  width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="3"  y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        <rect x="13" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+      </svg>
+    </span>
+    <span class="mbb-label">{{ settings.mbb_label_category }}</span>
+  </a>
+  {%- endif -%}
+
+  {%- if settings.mbb_show_search -%}
+  <!-- Search -->
+  <button class="mbb-item" id="mbb-search-btn" aria-label="Open search" type="button">
+    <span class="mbb-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="mbb-label">{{ settings.mbb_label_search }}</span>
+  </button>
+  {%- endif -%}
+
+  {%- if settings.mbb_show_cart -%}
+  <!-- Cart -->
+  <button class="mbb-item" id="mbb-cart-btn" aria-label="Open cart" type="button">
+    <span class="mbb-icon mbb-icon--cart">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 2L3 6V20C3 21.1 3.9 22 5 22H19C20.1 22 21 21.1 21 20V6L18 2H6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M3 6H21" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M16 10C16 12.21 14.21 14 12 14C9.79 14 8 12.21 8 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      {%- if cart.item_count > 0 -%}
+        <span class="mbb-cart-count" id="mbb-cart-count">{{ cart.item_count }}</span>
+      {%- else -%}
+        <span class="mbb-cart-count mbb-cart-count--hidden" id="mbb-cart-count"></span>
+      {%- endif -%}
+    </span>
+    <span class="mbb-label">{{ settings.mbb_label_cart }}</span>
+  </button>
+  {%- endif -%}
+
+</nav>
+
+<script>
+(function () {
+  {%- if settings.mbb_show_search -%}
+  // ---- Search ----
+  document.getElementById('mbb-search-btn').addEventListener('click', function () {
+    var detailsModal = document.querySelector('details-modal.header__search');
+    if (detailsModal) {
+      var details = detailsModal.querySelector('details');
+      var summary = detailsModal.querySelector('summary');
+      if (details && !details.hasAttribute('open')) {
+        details.setAttribute('open', '');
+        if (summary) summary.setAttribute('aria-expanded', 'true');
+      }
+      setTimeout(function () {
+        var input = document.querySelector('#Search-In-Modal, #Search-In-Modal-1, .search__input');
+        if (input) input.focus();
+      }, 100);
+    }
+  });
+  {%- endif -%}
+
+  {%- if settings.mbb_show_cart -%}
+  // ---- Cart ----
+  document.getElementById('mbb-cart-btn').addEventListener('click', function () {
+    var cartDrawer = document.querySelector('cart-drawer');
+    if (cartDrawer && typeof cartDrawer.open === 'function') {
+      cartDrawer.open();
+    } else {
+      var cartBubble = document.querySelector('#cart-icon-bubble');
+      if (cartBubble) cartBubble.click();
+    }
+  });
+
+  // ---- Keep cart count in sync ----
+  document.addEventListener('cart:refresh', function () {
+    fetch('/cart.js')
+      .then(function (r) { return r.json(); })
+      .then(function (cart) {
+        var badge = document.getElementById('mbb-cart-count');
+        if (!badge) return;
+        if (cart.item_count > 0) {
+          badge.textContent = cart.item_count > 99 ? '99+' : cart.item_count;
+          badge.classList.remove('mbb-cart-count--hidden');
+        } else {
+          badge.textContent = '';
+          badge.classList.add('mbb-cart-count--hidden');
+        }
+      });
+  });
+  {%- endif -%}
+})();
+</script>
+
+{%- endif -%}

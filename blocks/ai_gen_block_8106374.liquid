@@ -1,0 +1,935 @@
+{% doc %}
+  @prompt
+    Write a professional and parent-friendly Frequently Asked Questions (FAQs) section for a toy and educational kits store named Dawbu. The store is based in Hyderabad and focuses on safe, affordable, and creative play products that reduce children’s screen time.
+    The FAQs must include:
+    
+    What all do you have at Dawbu?
+    
+    Is Dawbu genuine or fake?
+    
+    Does Dawbu have a Cash on Delivery (COD) option?
+    
+    Will all the toys or kits work as shown?
+    
+    When will I receive my order? How can I track it?
+    
+    Can I cancel my order?
+    
+    Can you provide free toys or kits?
+    
+    How can I collaborate with Dawbu?
+    
+    How can I supply toys/products to you?
+    
+    We are an NGO and we want to collaborate with Dawbu. How can we do that?
+    
+    Do you sponsor events?
+    
+    Each answer should be written in a clear, trustworthy, and engaging tone to build customer confidence and make parents feel comfortable shopping with Dawbu." no bold text and for cod extra charges there in one small paragraph every question answer should be there , remove ngo and kits things because this website sales toys building blocks , remove this sponsor ,rest all good nice, make the ux more attractive , hey i cant scroll in each qyestion 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-faq-section-{{ ai_gen_id }} {
+    padding: {{ block.settings.section_padding_top }}px 0 {{ block.settings.section_padding_bottom }}px;
+    background: {{ block.settings.background_color }};
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-faq-section-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, {{ block.settings.background_color }} 0%, {{ block.settings.background_gradient_color }} 100%);
+    opacity: {{ block.settings.gradient_opacity | divided_by: 100.0 }};
+    pointer-events: none;
+  }
+
+  .ai-faq-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.container_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ai-faq-header-{{ ai_gen_id }} {
+    text-align: {{ block.settings.text_alignment }};
+    margin-bottom: {{ block.settings.header_spacing }}px;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .ai-faq-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.title_color }};
+    margin: 0 0 {{ block.settings.title_margin }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    position: relative;
+    display: inline-block;
+  }
+
+  .ai-faq-title-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, {{ block.settings.accent_color }}, {{ block.settings.accent_secondary_color }});
+    border-radius: 2px;
+  }
+
+  .ai-faq-subtitle-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  .ai-faq-list-{{ ai_gen_id }} {
+    display: grid;
+    gap: {{ block.settings.item_spacing }}px;
+    margin-top: {{ block.settings.content_spacing }}px;
+  }
+
+  .ai-faq-item-{{ ai_gen_id }} {
+    background: {{ block.settings.item_background_color }};
+    border: {{ block.settings.item_border_width }}px solid {{ block.settings.item_border_color }};
+    border-radius: {{ block.settings.item_border_radius }}px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: calc(var(--item-index) * 0.1s);
+    opacity: 0;
+    transform: translateY(20px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(1) { --item-index: 1; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(2) { --item-index: 2; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(3) { --item-index: 3; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(4) { --item-index: 4; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(5) { --item-index: 5; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(6) { --item-index: 6; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(7) { --item-index: 7; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(8) { --item-index: 8; }
+  .ai-faq-item-{{ ai_gen_id }}:nth-child(9) { --item-index: 9; }
+
+  .ai-faq-item-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, {{ block.settings.accent_color }}, {{ block.settings.accent_secondary_color }});
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+    transform-origin: top;
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: {{ block.settings.accent_color }};
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}:hover::before {
+    transform: scaleY(1);
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}.active {
+    border-color: {{ block.settings.accent_color }};
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}.active::before {
+    transform: scaleY(1);
+  }
+
+  .ai-faq-question-{{ ai_gen_id }} {
+    width: 100%;
+    padding: {{ block.settings.question_padding }}px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: {{ block.settings.question_size }}px;
+    color: {{ block.settings.question_color }};
+    font-weight: 600;
+    line-height: 1.3;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .ai-faq-question-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.question_hover_color }};
+  }
+
+  .ai-faq-question-{{ ai_gen_id }}:focus {
+    outline: 2px solid {{ block.settings.accent_color }};
+    outline-offset: 2px;
+  }
+
+  .ai-faq-question-text-{{ ai_gen_id }} {
+    flex: 1;
+    padding-right: 20px;
+  }
+
+  .ai-faq-icon-wrapper-{{ ai_gen_id }} {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, {{ block.settings.accent_color }}, {{ block.settings.accent_secondary_color }});
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+  }
+
+  .ai-faq-icon-{{ ai_gen_id }} {
+    width: 18px;
+    height: 18px;
+    color: #ffffff;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}.active .ai-faq-icon-{{ ai_gen_id }} {
+    transform: rotate(180deg);
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}.active .ai-faq-icon-wrapper-{{ ai_gen_id }} {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .ai-faq-answer-{{ ai_gen_id }} {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: {{ block.settings.answer_background_color }};
+    position: relative;
+  }
+
+  .ai-faq-answer-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: {{ block.settings.question_padding }}px;
+    right: {{ block.settings.question_padding }}px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, {{ block.settings.item_border_color }}, transparent);
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}.active .ai-faq-answer-{{ ai_gen_id }} {
+    max-height: none;
+    overflow: visible;
+    padding: {{ block.settings.question_padding }}px;
+    padding-top: calc({{ block.settings.question_padding }}px + 10px);
+  }
+
+  .ai-faq-answer-content-{{ ai_gen_id }} {
+    font-size: {{ block.settings.answer_size }}px;
+    color: {{ block.settings.answer_color }};
+    line-height: 1.6;
+    margin: 0;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease 0.1s;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: {{ block.settings.accent_color }} transparent;
+  }
+
+  .ai-faq-answer-content-{{ ai_gen_id }}::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .ai-faq-answer-content-{{ ai_gen_id }}::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .ai-faq-answer-content-{{ ai_gen_id }}::-webkit-scrollbar-thumb {
+    background-color: {{ block.settings.accent_color }};
+    border-radius: 3px;
+    opacity: 0.7;
+  }
+
+  .ai-faq-answer-content-{{ ai_gen_id }}::-webkit-scrollbar-thumb:hover {
+    opacity: 1;
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}.active .ai-faq-answer-content-{{ ai_gen_id }} {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .ai-faq-answer-content-{{ ai_gen_id }} p {
+    margin: 0 0 16px;
+  }
+
+  .ai-faq-answer-content-{{ ai_gen_id }} p:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-faq-stats-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: {{ block.settings.content_spacing }}px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: {{ block.settings.item_border_radius }}px;
+    backdrop-filter: blur(10px);
+  }
+
+  .ai-faq-stat-{{ ai_gen_id }} {
+    text-align: center;
+  }
+
+  .ai-faq-stat-number-{{ ai_gen_id }} {
+    font-size: 28px;
+    font-weight: 700;
+    color: {{ block.settings.accent_color }};
+    display: block;
+    line-height: 1;
+  }
+
+  .ai-faq-stat-label-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: {{ block.settings.subtitle_color }};
+    margin-top: 5px;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .ai-faq-item-{{ ai_gen_id }}:hover .ai-faq-icon-wrapper-{{ ai_gen_id }} {
+    animation: pulse 2s infinite;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-faq-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;
+    }
+
+    .ai-faq-subtitle-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subtitle_size | times: 0.9 }}px;
+    }
+
+    .ai-faq-question-{{ ai_gen_id }} {
+      font-size: {{ block.settings.question_size | times: 0.9 }}px;
+      padding: {{ block.settings.question_padding | times: 0.8 }}px;
+    }
+
+    .ai-faq-answer-content-{{ ai_gen_id }} {
+      font-size: {{ block.settings.answer_size | times: 0.9 }}px;
+      max-height: 300px;
+    }
+
+    .ai-faq-item-{{ ai_gen_id }}.active .ai-faq-answer-{{ ai_gen_id }} {
+      padding: {{ block.settings.question_padding | times: 0.8 }}px;
+      padding-top: calc({{ block.settings.question_padding | times: 0.8 }}px + 10px);
+    }
+
+    .ai-faq-stats-{{ ai_gen_id }} {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .ai-faq-icon-wrapper-{{ ai_gen_id }} {
+      width: 35px;
+      height: 35px;
+    }
+
+    .ai-faq-icon-{{ ai_gen_id }} {
+      width: 16px;
+      height: 16px;
+    }
+  }
+{% endstyle %}
+
+<faq-section-{{ ai_gen_id }} class="ai-faq-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-faq-container-{{ ai_gen_id }}">
+    {% if block.settings.title != blank or block.settings.subtitle != blank %}
+      <div class="ai-faq-header-{{ ai_gen_id }}">
+        {% if block.settings.title != blank %}
+          <h2 class="ai-faq-title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+        {% endif %}
+        {% if block.settings.subtitle != blank %}
+          <div class="ai-faq-subtitle-{{ ai_gen_id }}">{{ block.settings.subtitle }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="ai-faq-list-{{ ai_gen_id }}">
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">What all do you have at Dawbu?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>At Dawbu, we specialize in high-quality toys and building blocks designed to spark creativity and reduce screen time for children. Our collection includes educational building sets, creative construction toys, STEM learning blocks, puzzle games, and interactive play sets. All our products are carefully selected to be safe, affordable, and engaging for children of different age groups. We focus on toys that promote hands-on learning, problem-solving skills, and imaginative play while keeping kids away from screens.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">Is Dawbu genuine or fake?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>Dawbu is absolutely genuine and legitimate. We are a registered toy store based in Hyderabad, committed to providing authentic, safe, and high-quality products. All our toys meet safety standards and come with proper certifications. We have transparent business practices, genuine customer reviews, and a dedicated customer service team. You can verify our authenticity through our official website, social media presence, and customer testimonials. We stand behind every product we sell and offer reliable customer support.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">Does Dawbu have a Cash on Delivery (COD) option?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>Yes, we offer Cash on Delivery (COD) for your convenience and peace of mind. You can place your order online and pay when your toys are delivered to your doorstep. This option is available across most locations we serve.</p>
+            <p>Please note that COD orders may include a small additional handling charge to cover the extra processing costs. The exact amount will be displayed during checkout before you confirm your order. We also accept online payments through secure payment gateways for a seamless shopping experience.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">Will all the toys work as shown?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>Absolutely! We guarantee that all toys will function exactly as described and shown on our website. Every product undergoes quality checks before shipping to ensure it meets our high standards. Our product descriptions and images accurately represent what you will receive. If any toy doesn't work as expected or arrives damaged, we offer hassle-free returns and replacements. We believe in complete transparency and customer satisfaction, so you can shop with confidence knowing that your purchase will deliver the fun and learning experience promised.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">When will I receive my order? How can I track it?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>Most orders are processed within 1-2 business days and delivered within 3-7 business days, depending on your location. Orders within Hyderabad typically arrive faster, while other cities may take a few additional days.</p>
+            <p>Once your order is shipped, you'll receive a tracking number via email and SMS. You can use this number to track your package in real-time on our website or the courier partner's tracking page. We'll also send you updates at key delivery milestones. If you have any questions about your order status, our customer service team is always ready to help.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">Can I cancel my order?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>Yes, you can cancel your order, but the timing matters. If your order hasn't been processed or shipped yet, you can cancel it easily by contacting our customer service team or through your account dashboard. We'll provide a full refund for cancelled orders.</p>
+            <p>However, if your order has already been shipped, you won't be able to cancel it, but you can return the items once delivered according to our return policy. We recommend contacting us as soon as possible if you need to make any changes to your order. Our team will do their best to accommodate your request.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">Can you provide free toys?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>While we don't typically provide free toys, we do run special promotions, contests, and giveaways from time to time. We also offer attractive discounts, bundle deals, and seasonal sales that make our toys very affordable. Additionally, we sometimes partner with schools and educational institutions for special programs.</p>
+            <p>The best way to stay updated about our offers and promotions is to follow us on social media and subscribe to our newsletter. We believe in making quality toys accessible to all families while maintaining the sustainability of our business to continue serving the community.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">How can I collaborate with Dawbu?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>We welcome various collaboration opportunities! Whether you're an educator, content creator, parent blogger, or organization focused on child development, we'd love to explore partnership possibilities. We collaborate with schools for educational programs, work with influencers for product reviews, and partner with community organizations for awareness campaigns.</p>
+            <p>If you're interested in collaborating, please reach out to us through our contact page or email us directly. Include details about your proposal, your audience or organization, and how you envision the collaboration. We review each proposal carefully and respond to all serious collaboration inquiries.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-item-{{ ai_gen_id }}" data-faq-item>
+        <button class="ai-faq-question-{{ ai_gen_id }}" aria-expanded="false" data-faq-button>
+          <span class="ai-faq-question-text-{{ ai_gen_id }}">How can I supply toys/products to you?</span>
+          <div class="ai-faq-icon-wrapper-{{ ai_gen_id }}">
+            <svg class="ai-faq-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+          </div>
+        </button>
+        <div class="ai-faq-answer-{{ ai_gen_id }}" data-faq-answer>
+          <div class="ai-faq-answer-content-{{ ai_gen_id }}">
+            <p>We're always looking for high-quality, safe, and innovative toys to add to our collection. If you're a manufacturer, distributor, or have unique toy products that align with our mission of promoting creative, screen-free play, we'd be interested in hearing from you.</p>
+            <p>Please contact us with details about your products, including safety certifications, pricing, minimum order quantities, and product catalogs. We prioritize toys that are educational, safe for children, and promote hands-on learning. All potential suppliers must meet our quality standards and safety requirements before we consider adding their products to our store.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if block.settings.show_stats %}
+      <div class="ai-faq-stats-{{ ai_gen_id }}">
+        <div class="ai-faq-stat-{{ ai_gen_id }}">
+          <span class="ai-faq-stat-number-{{ ai_gen_id }}">500+</span>
+          <div class="ai-faq-stat-label-{{ ai_gen_id }}">Happy Families</div>
+        </div>
+        <div class="ai-faq-stat-{{ ai_gen_id }}">
+          <span class="ai-faq-stat-number-{{ ai_gen_id }}">100+</span>
+          <div class="ai-faq-stat-label-{{ ai_gen_id }}">Quality Toys</div>
+        </div>
+        <div class="ai-faq-stat-{{ ai_gen_id }}">
+          <span class="ai-faq-stat-number-{{ ai_gen_id }}">24/7</span>
+          <div class="ai-faq-stat-label-{{ ai_gen_id }}">Support</div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</faq-section-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class FaqSection{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.faqItems = this.querySelectorAll('[data-faq-item]');
+        this.setupEventListeners();
+        this.setupIntersectionObserver();
+      }
+
+      setupEventListeners() {
+        this.faqItems.forEach((item) => {
+          const button = item.querySelector('[data-faq-button]');
+          const answer = item.querySelector('[data-faq-answer]');
+
+          button.addEventListener('click', () => {
+            const isActive = item.classList.contains('active');
+            
+            if (isActive) {
+              this.closeFaq(item, button, answer);
+            } else {
+              this.openFaq(item, button, answer);
+            }
+          });
+
+          button.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              button.click();
+            }
+          });
+        });
+      }
+
+      setupIntersectionObserver() {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.animationPlayState = 'running';
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        });
+
+        this.faqItems.forEach((item) => {
+          observer.observe(item);
+        });
+      }
+
+      openFaq(item, button, answer) {
+        item.classList.add('active');
+        button.setAttribute('aria-expanded', 'true');
+        
+        setTimeout(() => {
+          item.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+          });
+        }, 100);
+      }
+
+      closeFaq(item, button, answer) {
+        item.classList.remove('active');
+        button.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    customElements.define('faq-section-{{ ai_gen_id }}', FaqSection{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FAQ section",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "<p>Find answers to common questions about our toys and services</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show statistics",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "background_gradient_color",
+      "label": "Background gradient color",
+      "default": "#f8f9fa"
+    },
+    {
+      "type": "range",
+      "id": "gradient_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Gradient opacity",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#334fb4"
+    },
+    {
+      "type": "color",
+      "id": "accent_secondary_color",
+      "label": "Accent secondary color",
+      "default": "#5a67d8"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "item_background_color",
+      "label": "FAQ item background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "item_border_color",
+      "label": "FAQ item border",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Question color",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "question_hover_color",
+      "label": "Question hover color",
+      "default": "#334fb4"
+    },
+    {
+      "type": "color",
+      "id": "answer_background_color",
+      "label": "Answer background",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Answer text color",
+      "default": "#555555"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "question_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Question size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "answer_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Answer size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "min": 600,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Container width",
+      "default": 900
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "header_spacing",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Header spacing",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "content_spacing",
+      "min": 20,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Content spacing",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "title_margin",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Title margin",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "FAQ item spacing",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "question_padding",
+      "min": 16,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Question padding",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "item_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "item_border_radius",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ section"
+    }
+  ]
+}
+{% endschema %}

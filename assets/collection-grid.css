@@ -1,0 +1,248 @@
+.collection-grid-bg.top {
+    margin-top: -1px;
+}
+
+.collection-grid-bg.bottom {
+    margin-bottom: -1px;
+}
+
+.collection-grid-bg {
+    width: 100%;
+    height: auto;
+    display: block;
+    position: relative;
+}
+
+.collection-grid-section {
+    overflow: hidden;
+    position: relative;
+    background-image: url(https://cdn.shopify.com/s/files/1/0624/0311/7119/files/dot.png?v=1778861851);
+    background-repeat: repeat;
+    background-size: contain;
+}
+
+.collection-grid-section .container {
+    max-width: 1688px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.collection-grid__inner {
+    padding: 70px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.collection-grid__header-grid {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.collection-grid__btn {
+    color: #e02424;
+    font-family: Kopiku, sans-serif;
+    border-bottom: 2px solid;
+    text-decoration: none;
+    width: max-content;
+    background: #fff;
+    padding: 9px 22px 11px;
+    font-size: 16px;
+    min-height: auto;
+    height: auto;
+    min-width: auto;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    transition: all .4s ease;
+    margin: 0 auto;
+    box-shadow: 3px 3px #0003 !important;
+    border: 0;
+    border-radius: 50px;
+}
+
+.collection-grid__btn:hover {
+    transform: translateY(-2px);
+}
+
+.collection-grid__header {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.collection-grid__header * {
+    margin: 0;
+}
+
+.collection-grid__label {
+    display: flex;
+    align-items: center;
+    background: #faed17;
+    border-radius: 100px;
+    padding: 4px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #111;
+    width: max-content;
+    font-family: poppins;
+    box-shadow: 3px 4px #040202;
+    border: 1px solid #040202;
+    margin-top: 0;
+}
+
+.collection-grid__title {
+    font-size: 74px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #111;
+    letter-spacing: -.02em;
+    padding-bottom: 4px;
+}
+
+.collection-grid__title * {
+    color: #fff;
+}
+
+.collection-grid__description {
+    font-size: 24px;
+    color: #fff;
+    line-height: 1;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ── Grid layout ─────────────────────────────────────────── */
+/* ≥ 1440px → 6 columns (base, no media query needed) */
+.collection-grid__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+}
+
+/* Hidden items (before load-more reveals them) */
+.collection-grid__item.cg-hidden {
+    display: none;
+}
+
+/* Reveal animation */
+@keyframes cg-fadein {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.collection-grid__item.cg-reveal {
+    animation: cg-fadein 0.35s ease both;
+}
+
+@keyframes cg-fadeout {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+.collection-grid__item.cg-collapsing {
+    animation: cg-fadeout 0.3s ease forwards;
+    pointer-events: none;
+}
+
+@media (max-width: 1439px) {
+    .collection-grid__title {
+        font-size: 66px;
+    }
+
+    .collection-grid__description {
+        font-size: 22px;
+    }
+
+    .collection-grid__grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 1199px) {
+    .collection-grid__title {
+        font-size: 56px;
+    }
+
+    .collection-grid__description {
+        font-size: 20px;
+    }
+
+    .collection-grid__grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 991px) {
+    .collection-grid__title {
+        font-size: 46px;
+    }
+
+    .collection-grid__inner {
+        padding: 50px 0;
+    }
+
+    .collection-grid__grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+}
+
+@media (max-width: 749px) {
+    .collection-grid__title {
+        font-size: 32px;
+    }
+
+    .collection-grid__label {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .collection-grid__description {
+        font-size: 16px;
+    }
+
+    .collection-grid__header {
+        gap: 15px;
+    }
+
+    .collection-grid__btn {
+        font-size: 14px;
+    }
+
+    .collection-grid__inner {
+        padding: 25px 0;
+        gap: 20px;
+    }
+
+    .collection-grid__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .collection-grid-bg {
+        min-width: 200%;
+        left: 50%;
+        transform: translate(-35%);
+    }
+}

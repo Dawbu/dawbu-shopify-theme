@@ -1,0 +1,111 @@
+{% comment %}
+  Renders product tags/badges for PDP
+  
+  Accepts:
+  - product: {Object} Product Liquid object
+  - show_rating: {Boolean} Show rating badge
+  - class: {String} Additional CSS classes
+  
+  Usage:
+  {% render 'product-tags', product: product, show_rating: true %}
+{% endcomment %}
+
+{%- liquid
+  assign tag_badges = ''
+  assign has_tags = false
+  
+  # Common tag patterns to look for
+  assign beginner_tags = 'beginner,beginner-friendly,easy,starter'
+  assign indoor_tags = 'indoor,houseplant,indoor-plant'
+  assign outdoor_tags = 'outdoor,garden,outdoor-plant'
+  assign organic_tags = 'organic,certified-organic'
+  assign new_tags = 'new,new-arrival'
+  assign bestseller_tags = 'bestseller,best-seller,popular'
+  
+  # Check product tags
+  for tag in product.tags
+    assign tag_lower = tag | downcase
+    if tag_lower contains 'beginner' or tag_lower contains 'easy' or tag_lower contains 'starter'
+      assign has_tags = true
+      assign tag_badges = tag_badges | append: 'beginner,'
+    elsif tag_lower contains 'indoor' or tag_lower contains 'houseplant'
+      assign has_tags = true
+      assign tag_badges = tag_badges | append: 'indoor,'
+    elsif tag_lower contains 'outdoor' or tag_lower contains 'garden'
+      assign has_tags = true
+      assign tag_badges = tag_badges | append: 'outdoor,'
+    elsif tag_lower contains 'organic' or tag_lower contains 'certified'
+      assign has_tags = true
+      assign tag_badges = tag_badges | append: 'organic,'
+    elsif tag_lower contains 'new'
+      assign has_tags = true
+      assign tag_badges = tag_badges | append: 'new,'
+    elsif tag_lower contains 'bestseller' or tag_lower contains 'popular'
+      assign has_tags = true
+      assign tag_badges = tag_badges | append: 'bestseller,'
+    endif
+  endfor
+  
+  # Check metafields for tags
+  if product.metafields.custom.product_tags != blank
+    assign has_tags = true
+    assign tag_badges = tag_badges | append: product.metafields.custom.product_tags | append: ','
+  endif
+-%}
+
+{%- if has_tags or show_rating -%}
+  <div class="product-tags {{ class }}" {{ block.shopify_attributes }}>
+    <div class="product-tags__container">
+      {%- if show_rating and product.metafields.reviews.rating.value != blank -%}
+        <div class="product-tags__badge product-tags__badge--rating">
+          <span class="product-tags__icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 0L10.163 5.528L16 6.12L11.82 9.944L12.98 16L8 12.728L3.02 16L4.18 9.944L0 6.12L5.837 5.528L8 0Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="product-tags__text">
+            {{ product.metafields.reviews.rating.value.rating | round: 1 }}
+            <span class="product-tags__count">({{ product.metafields.reviews.rating_count }})</span>
+          </span>
+        </div>
+      {%- endif -%}
+      
+      {%- assign tag_array = tag_badges | split: ',' -%}
+      {%- for tag_item in tag_array -%}
+        {%- if tag_item != blank -%}
+          {%- case tag_item -%}
+            {%- when 'beginner' -%}
+              <div class="product-tags__badge product-tags__badge--beginner">
+                <span class="product-tags__icon">🌱</span>
+                <span class="product-tags__text">Beginner Friendly</span>
+              </div>
+            {%- when 'indoor' -%}
+              <div class="product-tags__badge product-tags__badge--indoor">
+                <span class="product-tags__icon">🏠</span>
+                <span class="product-tags__text">Indoor</span>
+              </div>
+            {%- when 'outdoor' -%}
+              <div class="product-tags__badge product-tags__badge--outdoor">
+                <span class="product-tags__icon">🌳</span>
+                <span class="product-tags__text">Outdoor</span>
+              </div>
+            {%- when 'organic' -%}
+              <div class="product-tags__badge product-tags__badge--organic">
+                <span class="product-tags__icon">🌿</span>
+                <span class="product-tags__text">Organic</span>
+              </div>
+            {%- when 'new' -%}
+              <div class="product-tags__badge product-tags__badge--new">
+                <span class="product-tags__text">New</span>
+              </div>
+            {%- when 'bestseller' -%}
+              <div class="product-tags__badge product-tags__badge--bestseller">
+                <span class="product-tags__text">Best Seller</span>
+              </div>
+          {%- endcase -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+

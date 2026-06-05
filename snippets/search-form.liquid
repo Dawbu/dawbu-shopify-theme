@@ -1,0 +1,77 @@
+{% comment %}
+  Renders a standalone search form (used by 404 page and search results page).
+
+  Accepts:
+  - input_id: {String} Id for the search input (optional, default Search-In-Modal)
+  - predictive_search_enabled: {Boolean} Enable predictive search wrapper (optional)
+  - placeholder: {String} Input placeholder (optional)
+
+  Usage:
+  {% render 'search-form' %}
+  {% render 'search-form', predictive_search_enabled: true %}
+{% endcomment %}
+
+{%- liquid
+  assign input_id = input_id | default: 'Search-In-Modal'
+  assign placeholder = placeholder | default: 'general.search.search' | t
+-%}
+
+{%- if predictive_search_enabled -%}
+  <predictive-search class="search-form" data-loading-text="{{ 'accessibility.loading' | t }}">
+{%- else -%}
+  <search-form class="search-form">
+{%- endif -%}
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search search-form__form">
+    <div class="field">
+      <input
+        class="search__input field__input"
+        id="{{ input_id }}"
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ placeholder }}"
+        {%- if predictive_search_enabled -%}
+          role="combobox"
+          aria-expanded="false"
+          aria-owns="predictive-search-results"
+          aria-controls="predictive-search-results"
+          aria-haspopup="listbox"
+          aria-autocomplete="list"
+          autocorrect="off"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        {%- endif -%}
+      >
+      <label class="field__label" for="{{ input_id }}">{{ 'general.search.search' | t }}</label>
+      <input type="hidden" name="options[prefix]" value="last">
+
+      <button
+        type="reset"
+        class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"
+        aria-label="{{ 'general.search.reset' | t }}"
+      >
+        <span class="svg-wrapper">{{- 'icon-reset.svg' | inline_asset_content -}}</span>
+      </button>
+      <button type="submit" class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+        <span class="svg-wrapper">{{- 'icon-search.svg' | inline_asset_content -}}</span>
+      </button>
+    </div>
+
+    {%- if predictive_search_enabled -%}
+      <div class="predictive-search predictive-search--search-template" tabindex="-1" data-predictive-search hidden>
+        <div class="predictive-search__loading-state hidden">
+          <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+    {%- endif -%}
+  </form>
+{%- if predictive_search_enabled -%}
+  </predictive-search>
+{%- else -%}
+  </search-form>
+{%- endif -%}

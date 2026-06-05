@@ -1,0 +1,146 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "heading_block": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<div class=\"dawbu-byob-heading\"><h1>Build Your Own Bundle</h1><p>Pick. Mix. Save. Always free shipping above ₹150.</p></div><style>.dawbu-byob-heading{font-family:'Poppins',system-ui,sans-serif;text-align:center;padding:40px 16px 8px;background:#ffffff}.dawbu-byob-heading h1{margin:0;font-weight:900;letter-spacing:-.022em;color:#e52227;font-size:clamp(34px,5.4vw,56px);line-height:1.05}.dawbu-byob-heading p{margin:10px auto 0;max-width:540px;font-size:15px;color:#5a5a5a;font-weight:500}</style>",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "bundle_pills": {
+      "type": "bundle-pills",
+      "blocks": {
+        "p01": {
+          "type": "pill",
+          "settings": {
+            "label": "Glow Grab Bag · 25 · ₹199",
+            "link": "/pages/glow-grab-bag"
+          }
+        },
+        "p02": {
+          "type": "pill",
+          "settings": {
+            "label": "Glow Mini Pack · 14 · ₹199",
+            "link": "/pages/glow-mini-pack"
+          }
+        },
+        "p03": {
+          "type": "pill",
+          "settings": {
+            "label": "Glow Squad Bag · 11 · ₹209",
+            "link": "/pages/glow-squad-bag"
+          }
+        },
+        "p04": {
+          "type": "pill",
+          "settings": {
+            "label": "Mini Starter · 9 · ₹210",
+            "link": "/pages/mini-starter-pack"
+          }
+        },
+        "p05": {
+          "type": "pill",
+          "settings": {
+            "label": "Mini Mates · 7 · ₹199",
+            "link": "/pages/mini-mates-pack"
+          }
+        },
+        "p06": {
+          "type": "pill",
+          "settings": {
+            "label": "Mini Figures · 6 · ₹199",
+            "link": "/pages/mini-figures"
+          }
+        },
+        "p07": {
+          "type": "pill",
+          "settings": {
+            "label": "Mini Heroes · 6 · ₹220",
+            "link": "/pages/mini-heroes-pack"
+          }
+        },
+        "p08": {
+          "type": "pill",
+          "settings": {
+            "label": "Big Mini Figures · 6 · ₹279",
+            "link": "/pages/big-mini-figures"
+          }
+        },
+        "p09": {
+          "type": "pill",
+          "settings": {
+            "label": "Premium Minis · 6 · ₹310",
+            "link": "/pages/premium-minis"
+          }
+        }
+      },
+      "block_order": [
+        "p01",
+        "p02",
+        "p03",
+        "p04",
+        "p05",
+        "p06",
+        "p07",
+        "p08",
+        "p09"
+      ],
+      "settings": {
+        "alignment": "center",
+        "max_width": 1180,
+        "section_padding": 24,
+        "font_size": 14,
+        "background_color": "#ffffff",
+        "text_color": "#040202",
+        "border_color": "#040202",
+        "active_bg_color": "#e52227",
+        "active_text_color": "#faed17",
+        "hover_bg_color": "#faed17",
+        "hover_text_color": "#e52227"
+      }
+    },
+    "bundle_builder": {
+      "type": "bundle-5-products",
+      "settings": {
+        "title": "Add Any 6 for Big Mini Figures",
+        "bundle_size": 6,
+        "collection": "byob-mini-49",
+        "bundle_price_label": "Bundle Price:",
+        "bundle_price": 27900,
+        "add_to_cart_text": "Add to Cart",
+        "card_button_text": "ADD TO BUNDLE",
+        "redirect_to_cart": false
+      }
+    },
+    "bundle_banner": {
+      "type": "bundle-banner",
+      "disabled": true,
+      "settings": {
+        "eyebrow": "Hurry — limited stock",
+        "heading": "Build your own bundle, your way",
+        "subheading": "Mix any items across packs. The more you build, the more you save.",
+        "cta_label": "Start building",
+        "cta_link": "/pages/big-mini-figures",
+        "background_color": "#e52227",
+        "text_color": "#ffffff",
+        "accent_color": "#faed17"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "bundle_banner",
+    "heading_block",
+    "bundle_pills",
+    "bundle_builder"
+  ]
+}

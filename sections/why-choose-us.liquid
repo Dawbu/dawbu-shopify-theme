@@ -1,0 +1,606 @@
+{% comment %}
+  Section: Why Choose Us / Confidence
+  File: sections/why-choose-us.liquid
+{% endcomment %}
+
+<section class="why-choose-us" data-track-section="why_choose_us" style="background-color: {{ section.settings.background_color }};">
+  <div class="wcu-inner">
+    {% if section.settings.badge_text != blank %}
+      <div class="wcu-badge">{{ section.settings.badge_text }}</div>
+    {% endif %}
+
+    {% if section.settings.heading != blank %}
+      <h2 class="wcu-heading" style="color: {{ section.settings.heading_color }};">
+        {{ section.settings.heading }}
+      </h2>
+    {% endif %}
+
+    {%- assign main_cards = section.blocks | where: 'type', 'main_card' -%}
+    {% if main_cards.size > 0 %}
+      <div class="wcu-cards">
+        {% for block in main_cards %}
+          <div
+            class="wcu-card{% if block.settings.highlighted %} wcu-card--highlighted{% endif %}"
+            style="
+              background-color: {{ block.settings.card_bg }};
+              border-color: {{ block.settings.card_border }};
+            "
+            {{ block.shopify_attributes }}
+          >
+            {% if block.settings.icon != blank %}
+              <div class="wcu-card__icon">
+                <img
+                  src="{{ block.settings.icon | img_url: '120x120' }}"
+                  alt="{{ block.settings.title | escape }}"
+                  width="80"
+                  height="80"
+                  loading="lazy"
+                >
+              </div>
+            {% elsif block.settings.icon_emoji != blank %}
+              <div class="wcu-card__icon wcu-card__icon--emoji">
+                <span
+                  class="wcu-icon-bg"
+                  style="background-color:{{ block.settings.icon_bg }};border-radius:{{ block.settings.icon_radius }}px;"
+                >
+                  {{ block.settings.icon_emoji }}
+                </span>
+              </div>
+            {% endif %}
+
+            <h3 class="wcu-card__title" style="color: {{ block.settings.title_color }};">
+              {{ block.settings.title }}
+            </h3>
+
+            {% if block.settings.description != blank %}
+              <p class="wcu-card__desc" style="color: {{ block.settings.desc_color }};">
+                {{ block.settings.description }}
+              </p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {%- assign badge_items = section.blocks | where: 'type', 'badge_item' -%}
+    {% if badge_items.size > 0 %}
+      <div class="wcu-badges">
+        {% for block in badge_items %}
+          <div class="wcu-badge-item" {{ block.shopify_attributes }}>
+            {% if block.settings.badge_icon != blank %}
+              <img
+                src="{{ block.settings.badge_icon | img_url: '80x80' }}"
+                alt="{{ block.settings.badge_label | escape }}"
+                width="40"
+                height="40"
+                loading="lazy"
+              >
+            {% elsif block.settings.badge_emoji != blank %}
+              <span class="wcu-badge-item__emoji">{{ block.settings.badge_emoji }}</span>
+            {% endif %}
+            <span class="wcu-badge-item__label">{{ block.settings.badge_label }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+          /* ── Section wrapper ── */
+          .why-choose-us {
+            padding: {{ section.settings.padding_top }}px 20px {{ section.settings.padding_bottom }}px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+          }
+
+          .wcu-inner {
+            max-width: 1340px;
+            margin: 0 auto;
+          }
+
+          /* ── Badge pill ── */
+          .wcu-badge {
+            background: {{ section.settings.badge_bg }};
+            color: {{ section.settings.badge_text_color }};
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            border: 1px solid #040202;
+            box-shadow: 4px 4px 0 0 #040202;
+          }
+
+          /* ── Heading ── */
+          .wcu-heading {
+            font-size: clamp(40px, 7vw, 74px);
+            font-weight: 400;
+            font-family: 'Kopiku';
+            line-height: 1;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            margin: 0 0 26px;
+          }
+
+          /* ── Main cards grid ── */
+          .wcu-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 30px;
+          }
+
+          .wcu-card {
+            border-radius: 20px;
+            border: 3px solid transparent;
+            padding: 36px 32px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: transform 0.2s ease;
+          }
+
+          .wcu-card:hover {
+            transform: translateY(-4px);
+          }
+
+          .wcu-card--highlighted {
+            border-width: 3px;
+          }
+
+          /* ── Card icon ── */
+          .wcu-card__icon {
+            width: 70px;
+            height: 70px;
+          }
+
+          .wcu-card__icon img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+          }
+
+          .wcu-card__icon--emoji {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .wcu-icon-bg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            font-size: 36px;
+            line-height: 1;
+          }
+
+          /* ── Card text ── */
+          .wcu-card__title {
+            font-size: clamp(18px, 2vw, 20px);
+            font-weight: 600;
+            font-family: 'Poppins';
+            line-height: 1.2;
+            margin: 0;
+          }
+
+          .wcu-card__desc {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+            opacity: 0.85;
+            font-family: 'Poppins';
+          }
+
+          /* ── Bottom badge strip ── */
+          .wcu-badges {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+          }
+
+          .wcu-badge-item {
+            background: {{ section.settings.badge_item_bg }};
+            border: 1px solid {{ section.settings.badge_item_border }};
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+          }
+
+          .wcu-badge-item img,
+          .wcu-badge-item__emoji {
+            font-size: 30px;
+            line-height: 1;
+          }
+
+          .wcu-badge-item__label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            text-align: center;
+            font-family: 'Poppins';
+            color: {{ section.settings.badge_item_label_color }};
+          }
+
+          /* ── Responsive ── */
+          @media (max-width: 1199px) {
+            .wcu-cards {
+              gap: 20px;
+            }
+      .wcu-heading{font-size: 56px;}
+            .wcu-badges {
+              grid-template-columns: repeat(3, 1fr);
+            }
+          }
+
+          @media (max-width: 991px) {
+      .wcu-heading{font-size: 42px;}
+  .wcu-cards, .wcu-badges {
+      gap: 15px;
+  }
+    .wcu-card {
+        padding: 25px 20px;
+    }
+
+    .wcu-card--highlighted {border-width: 2px;}
+
+    .wcu-icon-bg {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px !important;
+        font-size: 28px;
+    }
+
+    .wcu-card__icon {
+        width: max-content;
+        height: auto;
+    }
+
+    .wcu-card__title {font-size: 16px;}
+
+    .wcu-card__desc {
+        font-size: 14px;
+    }
+          }
+          @media (max-width: 749px) {
+            .why-choose-us {
+            padding: {{ section.settings.padding_top | times: 0.6 }}px 20px {{ section.settings.padding_bottom | times: 0.6 }}px;
+          }
+            .wcu-cards {
+              grid-template-columns: 1fr;
+            }
+        .wcu-badge {
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+            .wcu-badges {
+              grid-template-columns: repeat(2, 1fr);
+            }
+
+            .wcu-card {
+              padding: 24px 20px 28px;
+            }
+          }
+
+          @media (max-width: 400px) {
+            .wcu-badges {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+</style>
+
+{% schema %}
+{
+  "name": "Why Choose Us",
+  "tag": "section",
+  "class": "section-why-choose-us",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Layout"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Badge Pill"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Label",
+      "default": "WHY CHOOSE US"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Badge Background",
+      "default": "#f5e642"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading Text",
+      "default": "SHOP WITH CONFiDENCE"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#e8132a"
+    },
+    {
+      "type": "header",
+      "content": "Bottom Badge Strip"
+    },
+    {
+      "type": "color",
+      "id": "badge_item_bg",
+      "label": "Badge Item Background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "badge_item_border",
+      "label": "Badge Item Border",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "badge_item_label_color",
+      "label": "Badge Item Label Color",
+      "default": "#111111"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "main_card",
+      "name": "Feature Card",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Icon"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon Image (overrides emoji)"
+        },
+        {
+          "type": "text",
+          "id": "icon_emoji",
+          "label": "Icon Emoji (if no image)",
+          "default": "🏆"
+        },
+        {
+          "type": "color",
+          "id": "icon_bg",
+          "label": "Icon Background Color",
+          "default": "#e8132a"
+        },
+        {
+          "type": "range",
+          "id": "icon_radius",
+          "min": 0,
+          "max": 50,
+          "step": 2,
+          "unit": "px",
+          "label": "Icon Border Radius",
+          "default": 18
+        },
+        {
+          "type": "header",
+          "content": "Card"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlighted",
+          "label": "Highlighted Card (thicker border)",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "card_bg",
+          "label": "Card Background",
+          "default": "#fff0f2"
+        },
+        {
+          "type": "color",
+          "id": "card_border",
+          "label": "Card Border Color",
+          "default": "#ffd6da"
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Missing a piece? We replace it."
+        },
+        {
+          "type": "color",
+          "id": "title_color",
+          "label": "Title Color",
+          "default": "#111111"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Just message us your order number on WhatsApp. Replacement shipped, free, no questions asked."
+        },
+        {
+          "type": "color",
+          "id": "desc_color",
+          "label": "Description Color",
+          "default": "#444444"
+        }
+      ]
+    },
+    {
+      "type": "badge_item",
+      "name": "Badge Strip Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "badge_icon",
+          "label": "Badge Icon Image (overrides emoji)"
+        },
+        {
+          "type": "text",
+          "id": "badge_emoji",
+          "label": "Badge Emoji (if no image)",
+          "default": "🚚"
+        },
+        {
+          "type": "text",
+          "id": "badge_label",
+          "label": "Badge Label",
+          "default": "FREE SHIPPING"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Why Choose Us",
+      "blocks": [
+        {
+          "type": "main_card",
+          "settings": {
+            "icon_emoji": "🏆",
+            "icon_bg": "#e8132a",
+            "icon_radius": 18,
+            "highlighted": false,
+            "card_bg": "#fff0f2",
+            "card_border": "#ffd6da",
+            "title": "Missing a piece? We replace it.",
+            "title_color": "#111111",
+            "description": "Just message us your order number on WhatsApp. Replacement shipped, free, no questions asked.",
+            "desc_color": "#444444"
+          }
+        },
+        {
+          "type": "main_card",
+          "settings": {
+            "icon_emoji": "✅",
+            "icon_bg": "#f5e642",
+            "icon_radius": 18,
+            "highlighted": true,
+            "card_bg": "#fffce0",
+            "card_border": "#f5e642",
+            "title": "Cash on Delivery – pay on arrival",
+            "title_color": "#111111",
+            "description": "₹49 extra for COD. Or pay online for instant confirmation and a smoother experience.",
+            "desc_color": "#444444"
+          }
+        },
+        {
+          "type": "main_card",
+          "settings": {
+            "icon_emoji": "💎",
+            "icon_bg": "#e8132a",
+            "icon_radius": 18,
+            "highlighted": false,
+            "card_bg": "#1a1a1a",
+            "card_border": "#333333",
+            "title": "5–7 day pan-India delivery",
+            "title_color": "#ffffff",
+            "description": "Tracked from our Hyderabad warehouse to your door. You get SMS updates all the way.",
+            "desc_color": "#aaaaaa"
+          }
+        },
+        {
+          "type": "badge_item",
+          "settings": {
+            "badge_emoji": "🚚",
+            "badge_label": "FREE SHIPPING"
+          }
+        },
+        {
+          "type": "badge_item",
+          "settings": {
+            "badge_emoji": "🔄",
+            "badge_label": "EASY RETURNS"
+          }
+        },
+        {
+          "type": "badge_item",
+          "settings": {
+            "badge_emoji": "🔒",
+            "badge_label": "SECURE PAY"
+          }
+        },
+        {
+          "type": "badge_item",
+          "settings": {
+            "badge_emoji": "🎁",
+            "badge_label": "GIFT WRAP"
+          }
+        },
+        {
+          "type": "badge_item",
+          "settings": {
+            "badge_emoji": "📞",
+            "badge_label": "24/7 SUPPORT"
+          }
+        },
+        {
+          "type": "badge_item",
+          "settings": {
+            "badge_emoji": "⚡",
+            "badge_label": "2-DAY DELIVERY"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

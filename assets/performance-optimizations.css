@@ -1,0 +1,262 @@
+/* Performance Optimizations CSS */
+
+/* Critical CSS optimizations */
+:root {
+  /* Reduce paint complexity */
+  --will-change-auto: auto;
+  --will-change-transform: transform;
+  --will-change-opacity: opacity;
+}
+
+/* Optimize animations for better performance */
+.animate--hover-vertical-lift .card-wrapper .card--card,
+.animate--hover-vertical-lift .card-wrapper .card--standard .card__inner {
+  will-change: var(--will-change-transform);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.animate--hover-vertical-lift .card-wrapper:not(:hover) .card--card,
+.animate--hover-vertical-lift .card-wrapper:not(:hover) .card--standard .card__inner {
+  will-change: var(--will-change-auto);
+}
+
+/* Optimize button animations */
+.animate--hover-vertical-lift .button:not(.button--tertiary) {
+  will-change: var(--will-change-transform);
+  backface-visibility: hidden;
+}
+
+.animate--hover-vertical-lift .button:not(.button--tertiary):not(:hover) {
+  will-change: var(--will-change-auto);
+}
+
+/* Optimize loading spinner */
+.loading__spinner {
+  contain: layout style paint;
+  will-change: var(--will-change-transform);
+}
+
+.loading__spinner.hidden {
+  will-change: var(--will-change-auto);
+}
+
+/* Optimize cart drawer animations */
+cart-drawer.animate {
+  will-change: var(--will-change-transform);
+  contain: layout;
+}
+
+cart-drawer:not(.animate) {
+  will-change: var(--will-change-auto);
+}
+
+/* Optimize image loading */
+.card__media img,
+.media img {
+  content-visibility: auto;
+  contain-intrinsic-size: 300px 300px;
+}
+
+/* Optimize product cards */
+.card-wrapper {
+  contain: layout style;
+}
+
+/* Optimize quantity selectors */
+.quantity-input {
+  contain: layout style;
+}
+
+/* Reduce layout thrashing */
+.page-width {
+  contain: layout;
+}
+
+/* Optimize slideshow performance */
+.slideshow {
+  contain: layout style;
+}
+
+.slideshow__slide {
+  will-change: var(--will-change-transform);
+  backface-visibility: hidden;
+}
+
+.slideshow__slide:not(.slideshow__slide--active) {
+  will-change: var(--will-change-auto);
+}
+
+/* Optimize modal dialogs */
+modal-dialog {
+  contain: layout style;
+}
+
+modal-dialog[open] {
+  will-change: var(--will-change-opacity);
+}
+
+modal-dialog:not([open]) {
+  will-change: var(--will-change-auto);
+}
+
+/* Optimize search functionality */
+.predictive-search {
+  contain: layout style;
+}
+
+/* Critical path optimization */
+.above-the-fold {
+  contain: layout style paint;
+}
+
+/* Optimize cart notification */
+.cart-notification {
+  contain: layout style;
+  will-change: var(--will-change-transform);
+}
+
+.cart-notification:not(.animate) {
+  will-change: var(--will-change-auto);
+}
+
+/* Optimize menu drawer */
+.menu-drawer {
+  contain: layout;
+}
+
+.menu-drawer.animate {
+  will-change: var(--will-change-transform);
+}
+
+.menu-drawer:not(.animate) {
+  will-change: var(--will-change-auto);
+}
+
+/* Performance hints for browsers */
+.critical-resource {
+  font-display: swap;
+}
+
+/* Optimize form elements */
+.product-form {
+  contain: layout style;
+}
+
+/* Optimize price elements */
+.price {
+  contain: layout style;
+}
+
+/* Optimize variant selectors */
+.variant-selects {
+  contain: layout style;
+}
+
+/* GPU acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize scroll performance */
+.scroll-optimized {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Reduce repaints */
+.no-repaint {
+  contain: paint;
+}
+
+/* Optimize text rendering */
+.optimized-text {
+  text-rendering: optimizeSpeed;
+  font-smooth: auto;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* Critical above-the-fold styles */
+.hero-section,
+.announcement-bar {
+  contain: layout style paint;
+}
+
+/* Lazy load optimization */
+.lazy-load {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
+}
+
+/* Optimize footer */
+.footer {
+  contain: layout style;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 300px;
+}
+
+/* Performance monitoring */
+@supports (content-visibility: auto) {
+  .performance-optimized {
+    content-visibility: auto;
+  }
+}
+
+/* Reduce composite layers */
+.composite-optimized {
+  isolation: isolate;
+}
+
+/* Optimize for mobile */
+@media (max-width: 749px) {
+  .mobile-optimized {
+    contain: layout style;
+  }
+  
+  .mobile-optimized img {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 200px;
+  }
+}
+
+/* Optimize for desktop */
+@media (min-width: 750px) {
+  .desktop-optimized {
+    contain: layout style paint;
+  }
+}
+
+/* Critical resource hints */
+.preload-hint {
+  font-display: swap;
+}
+
+/* Optimize animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate--hover-vertical-lift .card-wrapper .card--card,
+  .animate--hover-vertical-lift .card-wrapper .card--standard .card__inner,
+  .animate--hover-vertical-lift .button:not(.button--tertiary) {
+    transition: none;
+    will-change: auto;
+  }
+}
+
+/* Optimize focus management */
+.focus-optimized:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Optimize for print */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-optimized {
+    color-adjust: exact;
+  }
+}

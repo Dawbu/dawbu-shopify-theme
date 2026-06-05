@@ -1,0 +1,76 @@
+{{ 'section-img-dot.css' | asset_url | stylesheet_tag }}
+
+<section class="img-dot-section" id="img-dot-{{ section.id }}" data-track-section="img_dot_banner">
+  <div class="img-dot-wrapper">
+    {% for i in (1..6) %}
+      <span class="dot dot-{{ i }}"></span>
+    {% endfor %}
+    <div class="img-dot-media">
+      <img
+        src="{{ section.settings.img |  image_url: width: section.settings.img.width }}"
+        alt="{{ section.settings.img.alt }}"
+        width=""
+        height=""
+      >
+    </div>
+  </div>
+</section>
+
+<style>
+  #img-dot-{{ section.id }} {
+    background-color: {{ section.settings.background_color }};
+    padding: {{ section.settings.padding }}px 0;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+  }
+  @media (max-width:749px){
+    #img-dot-{{ section.id }}{
+      padding: {{ section.settings.padding_mobile }}px 0;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Image Dot",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "img",
+      "label": "Image"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "min": 0,
+      "max": 150,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top/Bottom",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding Top/Bottom (Mobile)",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image Dot"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,33 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "track_order_iframe": {
+      "type": "track-order-iframe",
+      "settings": {
+        "heading": "Track Your Order",
+        "heading_size": "h1",
+        "heading_alignment": "center",
+        "description": "<p>Enter your order number and email address to track your shipment in real-time.</p>",
+        "tracking_url": "https://dawbu.openleaf.tech/",
+        "max_width": 1200,
+        "iframe_height": 800,
+        "iframe_height_mobile": 600,
+        "border_radius": 8,
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    }
+  },
+  "order": [
+    "track_order_iframe"
+  ]
+}

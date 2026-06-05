@@ -1,0 +1,1305 @@
+{% comment %}
+  Section: Bundle 5 Products
+  Products are pulled from a single collection chosen in the theme editor.
+  Customers pick any 5 and add them all to cart at once.
+{% endcomment %}
+
+{% assign bundle_collection = collections[section.settings.collection] %}
+{% assign bundle_size = section.settings.bundle_size | default: 5 %}
+
+{%- render 'tao-pdp-quickview' -%}
+
+<div class="bundle-section" id="bundle-section-{{ section.id }}" data-bundle-size="{{ bundle_size }}" data-bundle-price-cents="{{ section.settings.bundle_price | default: 0 }}">
+
+  {%- comment -%} ── TOP BUNDLE BOX ── {%- endcomment -%}
+  <div class="bundle-box-wrapper">
+    <div class="bundle-head">
+      <h2 class="bundle-title">{{ section.settings.title }}</h2>
+      <span class="bundle-count" id="bundle-count-{{ section.id }}">0 of {{ bundle_size }} picked</span>
+    </div>
+
+    <div class="bundle-surprise-wrap" style="text-align:center;">
+      <button type="button" class="bundle-surprise" id="bundle-surprise-{{ section.id }}" data-section="{{ section.id }}" aria-label="Fill bundle with random products">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="16" cy="8" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="8" cy="16" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/></svg>
+        <span class="bundle-surprise__label">Surprise Me</span>
+      </button>
+    </div>
+
+    <div class="bundle-slots" id="bundle-slots-{{ section.id }}">
+      {% assign bundle_size = section.settings.bundle_size | default: 5 %}
+      {% for i in (1..bundle_size) %}
+        <div class="bundle-slot empty" data-slot="{{ forloop.index }}">
+          <span class="slot-plus">+</span>
+          <button class="slot-remove" aria-label="Remove item">✕</button>
+          <img class="slot-image" src="" alt="" />
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="bundle-footer">
+      <div class="bundle-price-wrap">
+      <span class="bundle-price">
+        <span class="bundle-price-label">{{ section.settings.bundle_price_label }}</span>
+        <span class="bundle-price-value" id="bundle-price-{{ section.id }}">
+          {{ section.settings.bundle_price | money }}
+        </span>
+      </span>
+        <span class="bundle-mrp-wrap" id="bundle-mrp-wrap-{{ section.id }}" style="display:none;">
+          <span class="bundle-mrp-slash">/</span>
+          <span class="bundle-mrp-label">MRP</span>
+          <span class="bundle-mrp-value" id="bundle-mrp-{{ section.id }}"></span>
+          <span class="bundle-mrp-save" id="bundle-save-{{ section.id }}"></span>
+        </span>
+        </div>
+      <button
+        class="bundle-add-to-cart btn btn-primary"
+        id="bundle-atc-{{ section.id }}"
+        disabled
+        data-section="{{ section.id }}"
+      >
+        {{ section.settings.add_to_cart_text }}
+      </button>
+    </div>
+  </div>
+
+  {%- comment -%} ── PRODUCT GRID ── {%- endcomment -%}
+  <div class="bundle-product-grid">
+
+    {% if bundle_collection != blank %}
+      {% for product in bundle_collection.products %}
+        {% unless product.available %}{% continue %}{% endunless %}
+        {% assign first_variant = product.first_available_variant %}
+
+        {%- comment -%}
+          Wrapper div carries all the data attributes the bundle JS needs.
+          The snippet renders inside it; we append the "ADD TO CART" button after.
+        {%- endcomment -%}
+        <div
+          class="bundle-product-card"
+          data-product-id="{{ product.id }}"
+          data-variant-id="{{ first_variant.id }}"
+          data-product-title="{{ product.title | escape }}"
+          data-product-image="{{ product.featured_image | img_url: '400x400' }}"
+          data-product-price="{{ product.price | money }}"
+          data-price-cents="{{ product.price }}"
+          data-compare-cents="{{ product.compare_at_price | default: product.price }}"
+        >
+          {%- if product.compare_at_price > product.price -%}
+            {%- assign pct_off = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+          {%- else -%}
+            {%- assign pct_off = 0 -%}
+          {%- endif -%}
+          <a href="{{ product.url }}" class="bundle-product-card__inner" tabindex="-1">
+            <div class="bundle-product-card__media">
+              {%- if product.featured_image -%}
+                {{ product.featured_image | image_url: width: 400 | image_tag:
+                    loading: 'lazy',
+                    sizes: '(min-width:990px) 25vw, 45vw',
+                    widths: '200,300,400',
+                    class: 'bundle-product-card__img',
+                    alt: product.title }}
+              {%- endif -%}
+            </div>
+            <div class="bundle-product-card__body">
+              <h3 class="bundle-product-card__title">{{ product.title }}</h3>
+              <div class="bundle-product-card__price">
+                <span class="bundle-product-card__price-now">{{ product.price | money }}</span>
+                {%- if pct_off > 0 -%}
+                  <span class="bundle-product-card__price-was">{{ product.compare_at_price | money }}</span>
+                  <span class="bundle-product-card__pct">{{ pct_off }}% OFF</span>
+                {%- endif -%}
+              </div>
+            </div>
+          </a>
+
+          <button
+            class="card-add-btn btn w-full product__add-cart product-item__select-options inline-flex content-center"
+            data-section="{{ section.id }}"
+            aria-label="Add {{ product.title | escape }} to bundle"
+          >
+            {{ section.settings.card_button_text }}
+          </button>
+        </div>
+
+      {% endfor %}
+
+    {% else %}
+      <p class="bundle-no-collection">Please select a collection in the section settings.</p>
+    {% endif %}
+
+  </div>
+
+</div>
+
+{%- comment -%} ──────────────── STYLES ──────────────── {%- endcomment -%}
+<style>
+  .bundle-section {
+    --dawbu-red: #e52227;
+    --dawbu-red-dark: #c41a1f;
+    --dawbu-yellow: #faed17;
+    --dawbu-yellow-soft: #fffaee;     /* much softer cream, was saturated */
+    --dawbu-black: #040202;
+    --dawbu-cream: #fdf8ee;
+    --clr-purple-bg: #fdf8ee;         /* ivory panel */
+    --clr-green: #e52227;
+    --clr-green-dark: #c41a1f;
+    --clr-slot-border: #e9d9bf;       /* warm sand, not pink */
+    --clr-text: #040202;
+    --clr-muted: #6b6258;
+    --radius-card: 14px;
+    --radius-btn: 999px;
+    max-width: 1560px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  }
+  .bundle-section *,
+  .bundle-section *::before,
+  .bundle-section *::after { font-family: inherit; }
+
+  /* ── Bundle Box ── */
+  .bundle-box-wrapper {
+    background: var(--clr-purple-bg);
+    border-radius: 20px;
+    padding: 70px 24px 50px;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .bundle-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--clr-text);
+    margin: 0 0 24px;
+  }
+
+  .bundle-slots {
+    display: flex;
+    gap: 26px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    max-width: 80%;
+    margin-inline: auto;
+  }
+
+  .bundle-slot {
+    width: 90px;
+    height: 90px;
+    border: 2px dashed var(--clr-slot-border);
+    border-radius: var(--radius-card);
+    background: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+    overflow: hidden;
+  }
+
+  .bundle-slot.filled {
+    border-style: solid;
+    border-color: var(--clr-green);
+    background: #fff;
+  }
+
+  .bundle-slot.filled:hover { transform: scale(1.04); }
+
+  .slot-plus {
+    font-size: 28px;
+    color: var(--clr-slot-border);
+    font-weight: 300;
+  }
+
+  .bundle-slot.filled .slot-plus { display: none; }
+
+  .slot-image {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(var(--radius-card) - 2px);
+  }
+
+  .bundle-slot.filled .slot-image { display: block; }
+
+  .slot-remove {
+    display: none;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.15s;
+    z-index: 2;
+  }
+
+  .bundle-slot.filled .slot-remove { display: flex; }
+  .slot-remove:hover { background: rgba(0,0,0,0.8); }
+
+  /* ── Bundle Footer ── */
+  .bundle-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .bundle-price-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  @media (max-width: 600px) {
+    .bundle-footer {
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .bundle-price-wrap {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      row-gap: 8px;
+    }
+    .bundle-price {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .bundle-mrp-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .bundle-mrp-slash { display: none; }
+    .bundle-mrp-label { font-size: 13px; }
+    .bundle-mrp-value { font-size: 15px; }
+    .bundle-mrp-save {
+      display: inline-block;
+      font-size: 12px;
+      padding: 5px 11px;
+    }
+    .bundle-add-to-cart.btn {
+      width: 100%;
+      margin: 0;
+    }
+  }
+  @media (max-width: 380px) {
+    .bundle-mrp-save { display: block; margin-top: 4px; }
+  }
+
+  .bundle-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--clr-text);
+  }
+
+  .bundle-price-label {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--clr-muted);
+    margin-right: 4px;
+  }
+    .bundle-mrp-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    flex-wrap: wrap;
+    white-space: nowrap;
+  }
+  .bundle-mrp-wrap > * { white-space: nowrap; }
+
+  .bundle-mrp-slash {
+    color: var(--clr-muted);
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  .bundle-mrp-label {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--clr-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .bundle-mrp-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--clr-text);
+    text-decoration: line-through;
+    opacity: 0.55;
+  }
+
+  .bundle-mrp-save {
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(135deg, #14a06b, #0e855b);
+    padding: 5px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    box-shadow: 0 3px 10px rgba(14, 133, 91, .35);
+    letter-spacing: .02em;
+  }
+  .bundle-mrp-value {
+    color: #e63946 !important;
+    text-decoration: line-through;
+    text-decoration-color: #e63946;
+    text-decoration-thickness: 2px;
+    font-weight: 700;
+  }
+  .bundle-mrp-label {
+    color: #e63946;
+    font-weight: 700;
+  }
+
+  .bundle-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .bundle-head .bundle-title { margin: 0; }
+  .bundle-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0e855b;
+    background: #e8f4ee;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .bundle-count.full {
+    background: #0e855b;
+    color: #fff;
+  }
+  .bundle-count.full::before {
+    content: "\2713 ";
+    font-weight: 900;
+  }
+
+  .bundle-add-to-cart:hover:not(:disabled) { background: var(--clr-green-dark); }
+
+  .bundle-add-to-cart:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* ── Product Grid ── */
+  .bundle-product-grid {
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: 20px;
+  }
+
+  /* Wrapper around each product-item snippet + add button */
+  .bundle-product-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: box-shadow 0.2s;
+    gap: 16px;
+  }
+  .bundle-product-card__inner {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #ececec;
+    transition: box-shadow .2s, transform .2s, border-color .2s;
+  }
+  .bundle-product-card__inner:hover {
+    border-color: #cfcfcf;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    transform: translateY(-2px);
+  }
+  .bundle-product-card__media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #faf8f3;
+    overflow: hidden;
+  }
+  .bundle-product-card__img { width: 100%; height: 100%; object-fit: cover; display:block; }
+  .bundle-product-card__pct {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    color: var(--dawbu-red);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+    border-radius: 0;
+    letter-spacing: .02em;
+    margin-left: 2px;
+    white-space: nowrap;
+  }
+  .bundle-product-card__body {
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .bundle-product-card__title {
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .bundle-product-card__price {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .bundle-product-card__price-now {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .bundle-product-card__price-was {
+    font-size: 12.5px;
+    color: #888;
+    text-decoration: line-through;
+    text-decoration-color: rgba(0,0,0,.35);
+    text-decoration-thickness: 1px;
+    font-weight: 500;
+  }
+  @media (max-width: 768px) {
+    .bundle-product-card__body { padding: 10px 12px 12px; }
+    .bundle-product-card__title { font-size: 13px; }
+    .bundle-product-card__price-now { font-size: 15px; }
+    .bundle-product-card__price-was { font-size: 12px; }
+  }
+
+  .bundle-no-collection {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--clr-muted);
+    padding: 40px 0;
+  }
+
+  @keyframes slot-pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+
+  .bundle-slot.pop { animation: slot-pop 0.25s ease; }
+  @media (max-width: 1440px){
+    .bundle-slots { 
+      max-width: 90%;
+   }
+  }
+  @media (max-width: 768px) {
+
+    .bundle-slot { width: 55px; height: 55px; border-radius: 8px;}
+    .bundle-slots { 
+      gap: 8px;
+      margin-bottom: 16px;
+      max-width: 100%;
+   }
+    .bundle-box-wrapper{
+      border-radius: 16px;
+      padding: 40px 16px 30px;
+      margin-bottom: 24px;
+    }
+    .bundle-title{
+      font-size: 20px;
+      margin: 0 0 16px;
+    }
+    .bundle-footer{
+      gap: 12px;
+    }
+    .bundle-price-label{
+      font-size: 16px;
+    }
+    .bundle-price{
+      font-size: 18px;
+    }
+    .bundle-footer .bundle-add-to-cart.btn{
+      line-height: 1;
+    }
+    .bundle-product-grid{
+      grid-template-columns: repeat(2,1fr);
+      gap: 16px;
+    }
+    .bundle-product-card .card-add-btn{
+      padding: 8px;
+    }
+    .bundle-mrp-label{
+      font-size: 16px;
+    }
+    .bundle-mrp-value{
+      font-size: 18px;
+    }
+    .bundle-slot.filled .slot-image{
+      border-radius: 4px;
+    }
+  }
+
+  /* ───── Surprise Me button ───── */
+  .bundle-section .bundle-surprise {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 auto 20px;
+    background: var(--dawbu-yellow);
+    color: var(--dawbu-black);
+    border: 2px solid var(--dawbu-black);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .18s ease, color .18s ease, transform .12s ease, box-shadow .25s ease;
+  }
+  .bundle-section .bundle-surprise:hover:not(:disabled) {
+    background: var(--dawbu-red);
+    color: var(--dawbu-yellow);
+    border-color: var(--dawbu-red);
+    box-shadow: 4px 4px 0 var(--dawbu-yellow);
+    transform: translateY(-2px);
+  }
+  .bundle-section .bundle-surprise:active:not(:disabled) { transform: translateY(0); }
+  .bundle-section .bundle-surprise:disabled { opacity: .6; cursor: not-allowed; }
+  .bundle-section .bundle-surprise.is-rolling svg { animation: bundle-spin .6s linear infinite; }
+  @keyframes bundle-spin { to { transform: rotate(360deg); } }
+  .bundle-section .bundle-slot.is-spinning .slot-image { filter: blur(2px); }
+  .bundle-section .bundle-head + .bundle-surprise { display: inline-flex; }
+
+  /* ───── DAWBU brand overrides ───── */
+  .bundle-section .bundle-title {
+    font-weight: 800;
+    letter-spacing: -.012em;
+  }
+  .bundle-section .bundle-count {
+    color: var(--dawbu-black);
+    background: #fff;
+    border: 1.5px solid #ebe3d5;
+    font-weight: 700;
+  }
+  .bundle-section .bundle-count.full {
+    background: var(--dawbu-red);
+    color: #fff;
+    border-color: var(--dawbu-red);
+  }
+  .bundle-section .bundle-mrp-save {
+    background: var(--dawbu-red);
+    color: var(--dawbu-yellow);
+    box-shadow: 0 3px 10px rgba(229, 34, 39, .35);
+  }
+  .bundle-section .bundle-mrp-value {
+    color: var(--dawbu-red) !important;
+    text-decoration-color: var(--dawbu-red) !important;
+  }
+  .bundle-section .bundle-mrp-label { color: var(--dawbu-red); }
+  .bundle-section .bundle-slot.filled {
+    border-color: var(--dawbu-red);
+    box-shadow: 0 6px 18px rgba(229, 34, 39, .14);
+  }
+
+  /* Main Add-to-Cart pill button */
+  .bundle-section .bundle-add-to-cart,
+  .bundle-section .bundle-add-to-cart.btn {
+    background: var(--dawbu-red);
+    color: #fff;
+    border: 2px solid var(--dawbu-red);
+    border-radius: 999px;
+    padding: 14px 32px;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .18s ease, color .18s ease, transform .12s ease, box-shadow .25s ease;
+  }
+  .bundle-section .bundle-add-to-cart:hover:not(:disabled),
+  .bundle-section .bundle-add-to-cart.btn:hover:not(:disabled) {
+    background: var(--dawbu-yellow);
+    color: var(--dawbu-red);
+    box-shadow: 0 10px 26px rgba(229, 34, 39, .25);
+  }
+  .bundle-section .bundle-add-to-cart:active:not(:disabled) { transform: scale(.97); }
+  .bundle-section .bundle-add-to-cart:disabled {
+    background: #f0d7d8;
+    border-color: #f0d7d8;
+    color: #fff;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  /* Per-card ADD TO BUNDLE button — solid DAWBU red */
+  .bundle-section .card-add-btn {
+    background: var(--dawbu-red);
+    color: #fff;
+    border: 2px solid var(--dawbu-red);
+    border-radius: 999px;
+    padding: 11px 16px;
+    font-weight: 800;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease, box-shadow .25s ease;
+  }
+  .bundle-section .card-add-btn:hover:not(:disabled) {
+    background: var(--dawbu-red-dark);
+    border-color: var(--dawbu-red-dark);
+    box-shadow: 0 8px 20px rgba(229, 34, 39, .22);
+  }
+  .bundle-section .card-add-btn:active:not(:disabled) { transform: scale(.97); }
+  .bundle-section .card-add-btn.is-added {
+    background: #f3f7f1;
+    color: #2f7a3a;
+    border-color: #cfe6d2;
+    box-shadow: none;
+  }
+  .bundle-section .card-add-btn:disabled {
+    background: #efb3b6;
+    border-color: #efb3b6;
+    color: #fff;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* When the theme's tingle quickview popup is open on this page, hide third-party
+     floating widgets (Bloy loyalty Reward button, upsell, chat etc) so they don't
+     cover the popup's Add to Cart / Add to bundle button. */
+  html.open-popup .bloy-popup,
+  html.open-popup [class*="bloy-launcher"],
+  html.open-popup .bloy-button,
+  html.open-popup #shopify-block-bloy,
+  html.open-popup [class*="reward-launcher"],
+  html.open-popup [data-bloy-launcher],
+  html.open-popup .essential-upsell,
+  html.open-popup .whatmore-floating,
+  html.open-popup [class*="whatmore"],
+  html.open-popup [data-glozin-element],
+  html.open-popup #pinchk-btn,
+  html.open-popup .Polaris-Frame__Skip{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+  /* Add safe-area padding to the tingle modal box on iOS so the action area
+     stays above the home indicator / nav bar */
+  html.open-popup .tingle-modal-box{
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html.open-popup .tingle-modal--visible .tingle-modal-box__content{
+    padding-bottom:calc(20px + env(safe-area-inset-bottom,0px)) !important;
+  }
+</style>
+
+{%- comment -%} ──────────────── JS ──────────────── {%- endcomment -%}
+<script>
+(function () {
+  'use strict';
+
+  var SECTION_ID = '{{ section.id }}';
+  var sectionEl  = document.getElementById('bundle-section-' + SECTION_ID);
+  var MAX_SLOTS  = parseInt(sectionEl.getAttribute('data-bundle-size'), 10) || 5;
+
+  var bundleItems = [];
+
+  var slotsEl  = document.getElementById('bundle-slots-' + SECTION_ID);
+  var atcBtn   = document.getElementById('bundle-atc-' + SECTION_ID);
+  var slotEls  = Array.from(slotsEl.querySelectorAll('.bundle-slot'));
+
+  // ── Render slots ──────────────────────────────────────────────
+  function renderSlots() {
+    slotEls.forEach(function (slot, i) {
+      var item = bundleItems[i];
+      if (item) {
+        slot.classList.add('filled');
+        slot.querySelector('.slot-image').src = item.image;
+        slot.querySelector('.slot-image').alt = item.title;
+        slot.dataset.variantId = item.variantId;
+        slot.dataset.productId = item.productId;
+      } else {
+        slot.classList.remove('filled');
+        slot.querySelector('.slot-image').src = '';
+        slot.querySelector('.slot-image').alt = '';
+        delete slot.dataset.variantId;
+        delete slot.dataset.productId;
+      }
+    });
+
+    atcBtn.disabled = bundleItems.length < MAX_SLOTS;
+    var countEl = document.getElementById('bundle-count-' + SECTION_ID);
+    if (countEl) {
+      countEl.textContent = bundleItems.length + ' of ' + MAX_SLOTS + ' picked';
+      countEl.classList.toggle('full', bundleItems.length >= MAX_SLOTS);
+    }
+    updateMrpDisplay();
+    updateCardStates();
+  }
+    // ── Update running MRP total ─────────────────────────────────
+  function updateMrpDisplay() {
+    var mrpWrap  = document.getElementById('bundle-mrp-wrap-' + SECTION_ID);
+    var mrpValue = document.getElementById('bundle-mrp-' + SECTION_ID);
+    var saveEl   = document.getElementById('bundle-save-' + SECTION_ID);
+    if (!mrpWrap || !mrpValue) return;
+
+    // MRP = sum of compare_at_price (original prices). Falls back to price if compare_at is 0.
+    var totalCents   = bundleItems.reduce(function (sum, b) {
+      var c = (b.compareCents && b.compareCents > b.priceCents) ? b.compareCents : b.priceCents;
+      return sum + c;
+    }, 0);
+    var bundlePrice  = parseInt(sectionEl.getAttribute('data-bundle-price-cents'), 10) || 0;
+
+    if (totalCents === 0) {
+      mrpWrap.style.display = 'none';
+      return;
+    }
+
+    mrpWrap.style.display = 'flex';
+
+    // Format using Shopify money format if available, otherwise simple fallback
+    function formatMoney(cents) {
+      if (window.Shopify && typeof Shopify.formatMoney === 'function' && window.themeGlobalVariables) {
+        return Shopify.formatMoney(cents, themeGlobalVariables.settings.money_format);
+      }
+      // Simple fallback — works for INR (no decimal paise display)
+      return '₹' + (cents / 100).toFixed(0);
+    }
+
+    mrpValue.textContent = formatMoney(totalCents);
+
+    // Show savings progressively. When bundle is full, compare to bundle price.
+    // When partial, compare current items' MRP total to a prorated bundle price.
+    var compareCents;
+    if (bundleItems.length === MAX_SLOTS) {
+      compareCents = bundlePrice;
+    } else if (MAX_SLOTS > 0) {
+      compareCents = Math.round((bundlePrice / MAX_SLOTS) * bundleItems.length);
+    } else {
+      compareCents = 0;
+    }
+    if (compareCents > 0 && totalCents > compareCents) {
+      var saveCents = totalCents - compareCents;
+      var savePct = Math.round((saveCents / totalCents) * 100);
+      saveEl.textContent = 'Save ' + formatMoney(saveCents) + ' (' + savePct + '% off)';
+      saveEl.style.display = '';
+    } else {
+      saveEl.textContent = '';
+      saveEl.style.display = 'none';
+    }
+  }
+
+  // ── Sync card button states ───────────────────────────────────
+  function updateCardStates() {
+    var cards  = sectionEl.querySelectorAll('.bundle-product-card');
+    var remaining = MAX_SLOTS - bundleItems.length;
+
+    cards.forEach(function (card) {
+      var pid         = card.dataset.productId;
+      var btn         = card.querySelector('.card-add-btn');
+      var qtyInBundle = bundleItems.filter(function (b) { return b.productId === pid; }).length;
+      var inBundle    = qtyInBundle > 0;
+
+      card.classList.toggle('in-bundle', inBundle);
+      btn.classList.toggle('is-added', inBundle);
+      btn.disabled    = remaining <= 0;
+      btn.textContent = inBundle
+        ? '\u2713 Added (' + qtyInBundle + ')'
+        : '{{ section.settings.card_button_text }}';
+    });
+  }
+
+  // ── Add product N times to next empty slots ──────────────────
+  function addToBundle(card, qty) {
+    qty = Math.max(1, parseInt(qty, 10) || 1);
+    var remaining = MAX_SLOTS - bundleItems.length;
+    if (remaining <= 0) return;
+    qty = Math.min(qty, remaining);
+
+    var newIdxStart = bundleItems.length;
+    for (var i = 0; i < qty; i++) {
+      bundleItems.push({
+        variantId    : card.dataset.variantId,
+        productId    : card.dataset.productId,
+        title        : card.dataset.productTitle,
+        image        : card.dataset.productImage,
+        priceCents   : parseInt(card.dataset.priceCents, 10) || 0,
+        compareCents : parseInt(card.dataset.compareCents, 10) || parseInt(card.dataset.priceCents, 10) || 0
+      });
+      (function (slotEl) {
+        if (!slotEl) return;
+        slotEl.classList.add('pop');
+        slotEl.addEventListener('animationend', function () {
+          slotEl.classList.remove('pop');
+        }, { once: true });
+      })(slotEls[newIdxStart + i]);
+    }
+
+    renderSlots();
+  }
+
+  // ── Remove item from slot ─────────────────────────────────────
+  function removeFromSlot(slotIndex) {
+    bundleItems.splice(slotIndex, 1);
+    renderSlots();
+  }
+
+  // ── Unified click handler ─────────────────────────────────────
+  sectionEl.addEventListener('click', function (e) {
+
+    var cardBtn = e.target.closest('.card-add-btn[data-section="' + SECTION_ID + '"]');
+    if (cardBtn) {
+      var card = cardBtn.closest('.bundle-product-card');
+      if (card) addToBundle(card, 1);
+      return;
+    }
+
+    var removeBtn = e.target.closest('.slot-remove');
+    if (removeBtn) {
+      var slot      = removeBtn.closest('.bundle-slot');
+      var slotIndex = parseInt(slot.dataset.slot, 10) - 1;
+      removeFromSlot(slotIndex);
+      return;
+    }
+
+    var atc = e.target.closest('#bundle-atc-' + SECTION_ID);
+    if (atc && !atc.disabled) {
+      addBundleToCart();
+      return;
+    }
+
+    var sur = e.target.closest('#bundle-surprise-' + SECTION_ID);
+    if (sur && !sur.disabled) {
+      surpriseMeFill();
+    }
+  });
+
+  // ── Surprise Me: slot-machine fill from available products ─────
+  function surpriseMeFill() {
+    var sur = document.getElementById('bundle-surprise-' + SECTION_ID);
+    if (!sur) return;
+    bundleItems.length = 0;
+    renderSlots();
+
+    var cards = Array.prototype.slice.call(
+      sectionEl.querySelectorAll('.bundle-product-card')
+    );
+    if (!cards.length) return;
+
+    sur.disabled = true;
+    sur.classList.add('is-rolling');
+
+    var remaining = MAX_SLOTS;
+    var pool = cards.slice();
+    // Build the final set first so the reveal lands deterministically.
+    var finalPicks = [];
+    for (var i = 0; i < remaining; i++) {
+      if (!pool.length) pool = cards.slice();
+      var idx = Math.floor(Math.random() * pool.length);
+      finalPicks.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
+
+    var revealIdx = 0;
+    var spinTicks = 0;
+    var maxSpinTicks = 14; // ~700ms of spinning
+    var spinInterval = 60;
+
+    function tick() {
+      // Until the spin budget is exhausted, push random "spinning" frames
+      // into every still-empty slot to give the slot-machine vibe.
+      if (spinTicks < maxSpinTicks) {
+        for (var s = revealIdx; s < MAX_SLOTS; s++) {
+          var randCard = cards[Math.floor(Math.random() * cards.length)];
+          var slotEl = slotEls[s];
+          if (!slotEl) continue;
+          var img = slotEl.querySelector('.slot-image');
+          if (img) {
+            img.src = randCard.dataset.productImage || '';
+          }
+          slotEl.classList.add('filled', 'is-spinning');
+        }
+        spinTicks++;
+        setTimeout(tick, spinInterval);
+        return;
+      }
+
+      // Spin done — reveal the actual final pick one slot at a time.
+      if (revealIdx >= MAX_SLOTS) {
+        // remove spinning state from any leftover slots
+        slotEls.forEach(function (s) { s.classList.remove('is-spinning'); });
+        // commit the picks
+        finalPicks.forEach(function (card) {
+          bundleItems.push({
+            variantId   : card.dataset.variantId,
+            productId   : card.dataset.productId,
+            title       : card.dataset.productTitle,
+            image       : card.dataset.productImage,
+            priceCents  : parseInt(card.dataset.priceCents, 10) || 0,
+            compareCents: parseInt(card.dataset.compareCents, 10) || parseInt(card.dataset.priceCents, 10) || 0
+          });
+        });
+        renderSlots();
+        sur.disabled = false;
+        sur.classList.remove('is-rolling');
+        return;
+      }
+
+      var pickCard = finalPicks[revealIdx];
+      var slot = slotEls[revealIdx];
+      if (slot) {
+        slot.classList.remove('is-spinning');
+        slot.classList.add('pop');
+        var imgEl = slot.querySelector('.slot-image');
+        if (imgEl) imgEl.src = pickCard.dataset.productImage || '';
+      }
+      revealIdx++;
+      setTimeout(tick, 110);
+    }
+
+    setTimeout(tick, spinInterval);
+  }
+
+  // ── Add all items to cart ─────────────────────────────────────
+  //
+  // ROOT CAUSE FIX:
+  // Shopify's /cart/add.js does NOT support multiple items via FormData
+  // (items[][id] format is silently ignored for multi-item adds).
+  // The ONLY reliable way to add multiple items at once is JSON body.
+  // We do this in two steps:
+  //   1. POST JSON to /cart/add.js  → adds products reliably
+  //   2. GET  /cart/sections.js     → re-renders the cart drawer HTML
+  //
+  function addBundleToCart() {
+    if (bundleItems.length < MAX_SLOTS) return;
+
+    var cart =
+      document.querySelector('cart-notification') ||
+      document.querySelector('cart-drawer');
+
+    atcBtn.disabled = true;
+    atcBtn.classList.add('loading');
+    atcBtn.textContent = 'Adding\u2026';
+
+    // ── Line item properties: kept to the minimum.
+    //   _bundleTitle  — human-readable name (also picked up by Fastrr instead of "Shopify Bundle")
+    //   _bundle       — same value, kept for any tool reading the legacy key
+    //   _tao_source   — single analytics tag; the rest of attribution lives in the dataLayer event
+    // No slot/session/timestamp/anchor/size in here — Shopify already has order time + line order,
+    // and rich payload travels via the analytics event below (which GA4/Clarity capture). ─────
+    var bundleTitle = '{{ section.settings.title | strip_html | escape }}';
+    if (!bundleTitle){
+      bundleTitle = 'Pick ' + MAX_SLOTS + ' for Rs.' + Math.round(bundlePrice / 100);
+    }
+    var taoSource = 'bundle_picker_direct';
+    var anchorPid = null;
+    try {
+      var src = sessionStorage.getItem('tao_bb_source');
+      anchorPid = sessionStorage.getItem('tao_bb_anchor_product_id');
+      var qsParam = new URL(window.location.href).searchParams.get('tao_src');
+      var qsAnchor = new URL(window.location.href).searchParams.get('anchor');
+      if (qsAnchor && !anchorPid) anchorPid = qsAnchor;
+      taoSource = src || qsParam || 'bundle_picker_direct';
+      // Clear after attaching so next session starts fresh
+      sessionStorage.removeItem('tao_bb_source');
+      sessionStorage.removeItem('tao_bb_anchor_product_id');
+    } catch(_){}
+
+    // Restore richer attribution on the line item: title + source + anchor product.
+    // Hidden from customer email/cart UI (underscore prefix) but visible in Shopify Admin.
+    var lineProps = {
+      _bundleTitle: bundleTitle,
+      _bundle:      bundleTitle,
+      _tao_source:  taoSource,
+      _tao_at:      new Date().toISOString().slice(0,16)
+    };
+    if (anchorPid) lineProps._tao_anchor_product = String(anchorPid);
+
+    var items = bundleItems.map(function (b, idx) {
+      // Slot info per item so warehouse / admin can see bundle order at a glance.
+      var perItemProps = Object.assign({}, lineProps, {
+        _bundle_slot: (idx + 1) + ' of ' + bundleItems.length
+      });
+      return {
+        id: parseInt(b.variantId, 10),
+        quantity: 1,
+        properties: perItemProps
+      };
+    });
+
+    // Fire analytics event (rich payload travels in GA4 / GTM, NOT on the order)
+    try {
+      var anchorProductId = null;
+      try { anchorProductId = sessionStorage.getItem('tao_bb_anchor_product_id'); } catch(_){}
+      var analyticsDetail = {
+        source: taoSource,
+        bundle_title: bundleTitle,
+        collection: '{{ section.settings.collection }}',
+        size: MAX_SLOTS,
+        price: bundlePrice,
+        anchor_product_id: anchorProductId,
+        variant_ids: bundleItems.map(function(b){ return b.variantId; })
+      };
+      document.dispatchEvent(new CustomEvent('tao:bundle_picker_add', { detail: analyticsDetail }));
+      if (window.dataLayer) window.dataLayer.push(Object.assign({ event: 'tao_bundle_picker_add' }, analyticsDetail));
+    } catch(_){}
+
+    // Collect section IDs exactly the way the theme does
+    var sectionIds = (cart && typeof cart.getSectionsToRender === 'function')
+      ? cart.getSectionsToRender().map(function (s) { return s.id; })
+      : [];
+
+    // ── STEP 1: Add items + request section re-renders in ONE request ──
+    // Shopify returns parsedState.sections with fresh HTML in the same response.
+    // This is identical to how the theme's addGiftwrapClick works.
+    fetch('/cart/add.js', {
+      method  : 'POST',
+      headers : {
+        'Content-Type'     : 'application/json',
+        'Accept'           : 'application/json',
+        'X-Requested-With' : 'XMLHttpRequest'
+      },
+      body: JSON.stringify({
+        items        : items,
+        sections     : sectionIds,          // ← key: sections come back in this same response
+        sections_url : window.location.pathname
+      })
+    })
+    .then(function (res) {
+      if (!res.ok) return res.json().then(function (err) { throw err; });
+      return res.json();
+    })
+    .then(function (parsedState) {
+
+      // ── Tag the cart with bundle metadata for reporting (fire-and-forget) ──
+      // One extra /cart/update.js call total, only on bundle add. No polling.
+      try {
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            attributes: {
+              tao_bundle:         bundleTitle,
+              tao_bundle_type:    'byob',
+              tao_bundle_source:  taoSource,
+              tao_bundle_size:    String(MAX_SLOTS),
+              tao_bundle_revenue: String(bundlePrice)
+            }
+          })
+        }).catch(function(){});
+      } catch(_){}
+
+      // ── STEP 2: Update cart count bubble ─────────────────────
+      fetch('/cart.json')
+        .then(function (r) { return r.json(); })
+        .then(function (cartJson) {
+          if (cartJson.item_count !== undefined) {
+            document.querySelectorAll('.cart-count').forEach(function (el) {
+              el.innerHTML = el.classList.contains('cart-count-drawer')
+                ? '(' + cartJson.item_count + ')'
+                : (cartJson.item_count > 100 ? '~' : cartJson.item_count);
+            });
+            var headerPrice = document.querySelector('header-total-price');
+            if (headerPrice && typeof headerPrice.updateTotal === 'function') {
+              headerPrice.updateTotal(cartJson);
+            }
+            var freeShip = document.querySelector('free-ship-progress-bar');
+            if (freeShip && typeof freeShip.init === 'function') {
+              freeShip.init(cartJson.items_subtotal_price);
+            }
+          }
+        })
+        .catch(function () {});
+
+      // ── STEP 3: Inject section HTML from the add.js response ─
+      // parsedState.sections already has the rendered HTML — no second fetch needed.
+      if (parsedState.sections && cart && typeof cart.getSectionsToRender === 'function') {
+        cart.getSectionsToRender().forEach(function (section) {
+          var el = document.getElementById(section.id);
+          if (!el || !parsedState.sections[section.id]) return;
+          var html = new DOMParser().parseFromString(
+            parsedState.sections[section.id], 'text/html'
+          );
+          var minicartForm = html.querySelector('#minicart-form');
+          if (minicartForm) el.innerHTML = minicartForm.innerHTML;
+        });
+        // Re-bind theme's cart event listeners on the new DOM
+        if (typeof cart.cartAction === 'function') cart.cartAction();
+      }
+
+      // ── STEP 4: Success UI (DOM is already updated, safe to open) ──
+      {% if section.settings.redirect_to_cart %}
+        window.location.href = '/cart';
+      {% else %}
+        atcBtn.textContent      = '\u2713 Added to Cart!';
+        atcBtn.style.background = '#276749';
+
+        // Open drawer — no setTimeout needed, DOM is already correct
+        if (cart && typeof cart.open === 'function') {
+          cart.open();
+        }
+
+        // Cart upsell / recommend panel
+        var cartRecommend = document.querySelector('.cart-recommend');
+        if (cartRecommend && !cartRecommend.classList.contains('hidden-recommend')) {
+          if (cartRecommend.classList.contains('cart-recommend-custom')) {
+            var upsellItems  = document.querySelectorAll('.cart-upsell-item');
+            var upsellSlides = document.querySelectorAll('.swiper-cart-upsell .swiper-slide');
+            if (upsellItems.length > 0) {
+              setTimeout(function () { cartRecommend.classList.add('open'); }, 800);
+            } else if (upsellSlides.length === 0) {
+              cartRecommend.classList.remove('block');
+              cartRecommend.classList.add('hidden');
+            }
+          } else {
+            setTimeout(function () { cartRecommend.classList.add('open'); }, 800);
+          }
+        }
+
+        // Reset bundle slots after success
+        setTimeout(function () {
+          bundleItems             = [];
+          atcBtn.style.background = '';
+          atcBtn.textContent      = '{{ section.settings.add_to_cart_text }}';
+          renderSlots();   // also resets MRP display via updateMrpDisplay()
+        }, 2200);
+      {% endif %}
+    })
+    .catch(function (err) {
+      console.error('Bundle ATC error:', err);
+      var msg = (err && err.description) ? err.description : 'Error \u2013 Try again';
+      if (typeof handleErrorMessagePopup === 'function') {
+        handleErrorMessagePopup(msg);
+      } else {
+        atcBtn.textContent = msg;
+      }
+      atcBtn.disabled = false;
+    })
+    .finally(function () {
+      atcBtn.classList.remove('loading');
+      {% unless section.settings.redirect_to_cart %}
+        setTimeout(function () {
+          atcBtn.disabled = bundleItems.length < MAX_SLOTS;
+        }, 2300);
+      {% endunless %}
+    });
+  }
+
+  // ── Init ─────────────────────────────────────────────────────
+  renderSlots();
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Bundle 5 Products",
+  "tag": "section",
+  "class": "section-bundle-5",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Add Any 5 Products In The Box"
+    },
+    {
+      "type": "number",
+      "id": "bundle_size",
+      "label": "Bundle Size (how many products to pick)",
+      "default": 5,
+      "info": "E.g. 5, 10, 25 — sets how many slots appear and how many must be filled before Add to Cart activates."
+    },
+    {
+      "type": "header",
+      "content": "Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "All products from this collection will appear in the grid below."
+    },
+    {
+      "type": "header",
+      "content": "Bundle Box"
+    },
+    {
+      "type": "text",
+      "id": "bundle_price_label",
+      "label": "Price Label",
+      "default": "RS."
+    },
+    {
+      "type": "number",
+      "id": "bundle_price",
+      "label": "Bundle Price (in smallest currency unit, e.g. paise/cents)",
+      "default": 59900,
+      "info": "Enter price in smallest unit. E.g. ₹599 → 59900"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Add to Cart Button Text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "card_button_text",
+      "label": "Product Card Button Text",
+      "default": "ADD TO CART"
+    },
+    {
+      "type": "checkbox",
+      "id": "redirect_to_cart",
+      "label": "Redirect to /cart after adding bundle",
+      "default": false
+    }
+  ],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "Bundle 5 Products"
+    }
+  ]
+}
+{% endschema %}

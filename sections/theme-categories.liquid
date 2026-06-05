@@ -1,0 +1,387 @@
+{{ 'section-theme-categories.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="theme-categories-wrapper page-width section-{{ section.id }}-padding">
+    {%- if section.settings.heading != blank -%}
+      <div class="theme-categories-header">
+        <h2 class="theme-categories-title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+          {{ section.settings.heading }}
+        </h2>
+        {%- if section.settings.subheading != blank -%}
+          <p class="theme-categories-subheading{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+            {{ section.settings.subheading }}
+          </p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="theme-categories-grid grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign collection = block.settings.collection
+            assign category_title = block.settings.title | default: collection.title
+            assign category_url = collection.url | default: block.settings.url
+            assign category_image = block.settings.image | default: collection.featured_image
+            assign category_color = block.settings.background_color | default: '#00A8CC'
+            assign hover_color = block.settings.hover_color | default: category_color
+          -%}
+          
+          <div
+            class="theme-category-card grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+            {{ block.shopify_attributes }}
+            {% if settings.animations_reveal_on_scroll %}
+              data-cascade
+              style="--animation-order: {{ forloop.index }};"
+            {% endif %}
+          >
+            <a
+              href="{{ category_url }}"
+              class="theme-category-link"
+              aria-label="{{ category_title | escape }}"
+              style="--category-bg-color: {{ category_color }}; --category-hover-color: {{ hover_color }};"
+            >
+              <div class="theme-category-card__inner">
+                {%- if category_image -%}
+                  <div class="theme-category-card__media">
+                    <div class="theme-category-card__image-wrapper">
+                      <img
+                        srcset="
+                          {%- if category_image.width >= 165 -%}{{ category_image | image_url: width: 165 }} 165w,{%- endif -%}
+                          {%- if category_image.width >= 330 -%}{{ category_image | image_url: width: 330 }} 330w,{%- endif -%}
+                          {%- if category_image.width >= 535 -%}{{ category_image | image_url: width: 535 }} 535w,{%- endif -%}
+                          {%- if category_image.width >= 750 -%}{{ category_image | image_url: width: 750 }} 750w,{%- endif -%}
+                          {%- if category_image.width >= 1000 -%}{{ category_image | image_url: width: 1000 }} 1000w,{%- endif -%}
+                          {%- if category_image.width >= 1500 -%}{{ category_image | image_url: width: 1500 }} 1500w,{%- endif -%}
+                          {{ category_image | image_url }} {{ category_image.width }}w
+                        "
+                        src="{{ category_image | image_url: width: 750 }}"
+                        sizes="
+                          (min-width: 990px) calc((100vw - 10rem) / {{ section.settings.columns_desktop }}),
+                          (min-width: 750px) calc((100vw - 10rem) / 3),
+                          calc(100vw - 3rem)
+                        "
+                        alt="{{ category_image.alt | default: category_title | escape }}"
+                        height="{{ category_image.height }}"
+                        width="{{ category_image.width }}"
+                        loading="lazy"
+                        class="theme-category-card__image"
+                      >
+                    </div>
+                    {%- if block.settings.show_sparkle -%}
+                      <div class="theme-category-card__sparkle" aria-hidden="true">
+                        <span class="sparkle sparkle--1">✨</span>
+                        <span class="sparkle sparkle--2">⭐</span>
+                        <span class="sparkle sparkle--3">✨</span>
+                      </div>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+                
+                <div class="theme-category-card__content">
+                  <h3 class="theme-category-card__title">
+                    {{ category_title }}
+                  </h3>
+                  {%- if block.settings.description != blank -%}
+                    <p class="theme-category-card__description">
+                      {{ block.settings.description }}
+                    </p>
+                  {%- endif -%}
+                </div>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="theme-categories-grid grid grid--6-col-desktop grid--2-col-tablet-down">
+        {%- for i in (1..6) -%}
+          <div class="theme-category-card grid__item">
+            <div class="theme-category-link" style="--category-bg-color: #00A8CC;">
+              <div class="theme-category-card__inner">
+                <div class="theme-category-card__content">
+                  <h3 class="theme-category-card__title">
+                    {{ 'sections.theme_categories.onboarding.category_title' | t: number: forloop.index }}
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.show_cta_button and section.settings.cta_text != blank -%}
+      <div class="theme-categories-cta{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <a
+          href="{{ section.settings.cta_url | default: routes.collections_url }}"
+          class="button button--primary theme-categories-cta__button"
+        >
+          {{ section.settings.cta_text }}
+          <span class="icon-wrap">
+            {{- 'icon-arrow.svg' | inline_asset_content -}}
+          </span>
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Theme Categories",
+  "tag": "section",
+  "class": "section section-theme-categories",
+  "max_blocks": 12,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Discover by Theme 🧱"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Explore our building block collections"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        },
+        {
+          "value": "hxl",
+          "label": "Extra large"
+        },
+        {
+          "value": "hxxl",
+          "label": "Extra extra large"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 6,
+      "label": "Number of columns on desktop"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 column"
+        },
+        {
+          "value": "2",
+          "label": "2 columns"
+        },
+        {
+          "value": "3",
+          "label": "3 columns"
+        }
+      ],
+      "default": "2",
+      "label": "Number of columns on mobile"
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta_button",
+      "label": "Show CTA button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA button text",
+      "default": "Shop All Building Blocks"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA button URL",
+      "info": "Leave empty to link to all collections"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Category title",
+          "default": "Animals"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Select a collection or use custom URL below"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Custom URL",
+          "info": "Override collection URL with a custom link"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category image",
+          "info": "Recommended: 400x400px. Leave empty to use collection image"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Build amazing creations"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color",
+          "default": "#00A8CC"
+        },
+        {
+          "type": "color",
+          "id": "hover_color",
+          "label": "Hover color",
+          "info": "Leave empty to use background color"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_sparkle",
+          "label": "Show sparkle effect",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Theme Categories",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "title": "Animals",
+            "background_color": "#00A8CC"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Space",
+            "background_color": "#1E3A5F"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Cars",
+            "background_color": "#E63946"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Houses",
+            "background_color": "#F77F00"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Robots",
+            "background_color": "#FCBF49"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "title": "Fantasy",
+            "background_color": "#06A77D"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

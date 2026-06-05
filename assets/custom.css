@@ -1,0 +1,618 @@
+@font-face {
+  font-family: Kopiku;
+  src: url(https://cdn.shopify.com/s/files/1/0624/0311/7119/files/Kopiku.woff2?v=1777911629) format("woff2"), url(https://cdn.shopify.com/s/files/1/0624/0311/7119/files/Kopiku.woff?v=1777911630) format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap
+}
+
+.card-wrapper {
+  height: 100%
+}
+
+.card-wrapper .card {
+  box-shadow: none;
+  background: #fafafa;
+  border-radius: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  box-sizing: border-box;
+  transition: border-color .2s, box-shadow .2s
+}
+
+.card-wrapper .card__inner {
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 1 / 1 !important;
+  width: 100%;
+  background: #d6edff;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 0 !important
+}
+
+.card-wrapper .card__media {
+  border-radius: 0;
+  width: 100%;
+  height: 100%
+}
+
+.card-wrapper .card__media .media {
+  border-radius: 0
+}
+
+.card-wrapper .card__media img {
+  object-fit: contain;
+  padding: 16px
+}
+
+.card-wrapper .card__content {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column
+}
+
+.card-wrapper .card__information {
+  flex: 1;
+  flex-direction: column;
+  display: flex
+}
+
+.card-wrapper .card__heading {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 18px;
+  color: #000;
+  font-family: poppins;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden
+}
+
+.card-wrapper .card__heading a {
+  color: inherit;
+  text-decoration: none
+}
+
+.card-wrapper .card-information .price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111
+}
+
+.card-wrapper .card-information .price__regular .price-item {
+  font-weight: 700;
+  color: #111
+}
+
+.card-wrapper .card .media.media--hover-effect>img,
+.card-wrapper .media.media--hover-effect>img {
+  padding: 0;
+  display: block
+}
+
+.card-wrapper .card--standard>.card__content .card__information {
+  padding: 0
+}
+
+.card-wrapper .card-information .price-item {
+  font-size: 20px;
+  color: #e52227;
+  line-height: 1;
+  font-family: Poppins;
+  letter-spacing: 0;
+  font-weight: 800
+}
+
+.card-wrapper .card-information .price--on-sale s.price-item--regular {
+  font-size: 16px;
+  color: rgba(var(--color-foreground), .75);
+  font-weight: 400
+}
+
+.card-wrapper .card-information .price-atc {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px
+}
+
+.card-wrapper .card-information .price-atc .card__quantity-selector {
+  margin: 0
+}
+
+
+.card-wrapper .card-information .price-atc .card__quantity-selector .product-form__buttons {
+  margin-top: 0
+}
+
+.card-wrapper .card-information .price-atc .card__quantity-selector .product-form__cart-submit {
+  padding: 9px 22px 11px;
+  font-size: 16px;
+  min-height: auto;
+  height: auto;
+  min-width: auto;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  margin: 0;
+  box-shadow: 3px 3px #0003 !important
+}
+
+.card-wrapper .card-information .price-atc .card__quantity-selector .product-form__cart-submit:after {
+  box-shadow: none !important
+}
+
+.card-wrapper .card--standard>.card__content .card__information .card-information {
+  margin: auto 0 0
+}
+
+.card-wrapper .card__content .card__information .card__stock-badge {
+  display: none
+}
+
+.card__quantity-selector {
+  position: relative;
+}
+
+.card__quantity-selector {
+  position: relative;
+}
+
+.card__quantity-selector .product-form__quantity {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.card__quantity-selector .product-form__quantity quantity-input.quantity {
+  width: 100%;
+  height: 100%;
+  min-height: auto;
+  border-color: #9b1919;
+  overflow: hidden;
+}
+
+button.quantity__button {}
+
+.card__quantity-selector .product-form__quantity quantity-input>* {
+  width: 33.33%;
+  padding: 0;
+  min-width: 0;
+}
+
+button.quantity__button {}
+
+.card__quantity-selector.has-cart {}
+
+.card__quantity-selector.has-cart .product-form__quantity {
+  opacity: 1;
+  visibility: visible;
+}
+
+.card__quantity-selector.has-cart .product-form__buttons {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.card__quantity-selector .product-form__buttons {}
+
+quantity-input.quantity {}
+
+quantity-input.quantity {}
+
+@media(max-width:749px) {
+  .card-wrapper .card {
+    padding: 8px
+  }
+
+  .card-wrapper .card__inner {
+    margin-bottom: 12px
+  }
+
+  .card-wrapper .card__heading {
+    font-size: 13px;
+    margin-bottom: 10px
+  }
+
+  .card-wrapper .card-information .price--on-sale s.price-item--regular {
+    font-size: 12px
+  }
+
+  .card-wrapper .card-information .price-item {
+    font-size: 14px
+  }
+
+  .card-wrapper .card-information .price-atc .card__quantity-selector .product-form__cart-submit {
+    font-size: 11px;
+    padding: 7px 16px
+  }
+
+  .card-wrapper .card-information .price-atc {
+    align-items: center
+  }
+}
+
+/* ── Header search modal — pill input, icon left, brand focus ── */
+.search-modal__content .search-modal__form {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.search-modal__content .field {
+  background: #fff;
+  border: 2px solid #040202 !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: 0 4px 0 #040202;
+  transition: box-shadow .15s, border-color .15s;
+}
+.search-modal__content .field::before,
+.search-modal__content .field::after { display: none !important; content: none !important; }
+.search-modal__content .field:focus-within {
+  border-color: #e52227 !important;
+  box-shadow: 0 4px 0 #e52227, 0 0 0 3px rgba(229,34,39,.18);
+}
+.search-modal__content .search__input.field__input {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  padding: 14px 18px 14px 48px !important;
+  font-size: 15px !important;
+  color: #040202 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  outline: none !important;
+  min-height: 0 !important;
+  font-weight: 500;
+}
+.search-modal__content .field__label { display: none !important; }
+.search-modal__content .search__button.field__button {
+  position: absolute !important;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent !important;
+  border: none !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  min-height: 0;
+  color: #040202 !important;
+  cursor: pointer;
+  z-index: 2;
+}
+.search-modal__content .search__button.field__button:hover {
+  background: rgba(0,0,0,0.06) !important;
+}
+.search-modal__content .search__button .svg-wrapper svg {
+  width: 18px; height: 18px;
+}
+.search-modal__content .reset__button {
+  background: transparent !important;
+  border: none !important;
+  color: #040202 !important;
+  padding: 0 12px !important;
+  min-height: 0;
+}
+.search-modal__content .predictive-search {
+  margin-top: 12px;
+  border-radius: 16px;
+}
+@media (max-width: 749px) {
+  .search-modal__content .field { box-shadow: 0 3px 0 #040202; }
+  .search-modal__content .search__input.field__input { font-size: 14px !important; padding: 12px 14px 12px 44px !important; }
+  .search-modal__content .search__button.field__button { width: 36px; height: 36px; left: 3px; }
+}
+
+/* ── Newsletter / Email signup — Dawbu brand restyle ── */
+.newsletter .newsletter__wrapper {
+  background: #faed17 !important;
+  border-radius: 24px;
+  padding: 48px 24px !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 0 #040202;
+  border: 2px solid #040202;
+}
+.newsletter .newsletter__wrapper h2,
+.newsletter .newsletter__wrapper .newsletter__subheading,
+.newsletter .newsletter__wrapper .h0,
+.newsletter .newsletter__wrapper .h1,
+.newsletter .newsletter__wrapper .h2 {
+  color: #040202 !important;
+  margin-bottom: 12px;
+}
+.newsletter .newsletter__wrapper h2 {
+  font-size: clamp(24px, 4vw, 38px) !important;
+  font-weight: 900 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+.newsletter .newsletter__wrapper .newsletter__subheading {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 24px !important;
+}
+.newsletter .newsletter-form__field-wrapper {
+  max-width: 520px;
+  margin: 0 auto;
+}
+.newsletter .newsletter-form__field-wrapper .field {
+  background: #fff;
+  border: 2px solid #040202;
+  border-radius: 999px;
+  padding: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: 0 4px 0 #040202;
+}
+.newsletter .newsletter-form__field-wrapper .field::before,
+.newsletter .newsletter-form__field-wrapper .field::after { display: none !important; content: none !important; }
+.newsletter .newsletter-form__field-wrapper .field__input {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  padding: 14px 18px !important;
+  font-size: 15px !important;
+  color: #040202 !important;
+  border-radius: 999px;
+  box-shadow: none !important;
+  outline: none !important;
+  font-weight: 500;
+  min-height: 0 !important;
+}
+.newsletter .newsletter-form__field-wrapper .field__label {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6c6c6c !important;
+  background: transparent !important;
+  font-size: 14px !important;
+  font-weight: 500;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: opacity .15s;
+}
+.newsletter .newsletter-form__field-wrapper .field__input:focus + .field__label,
+.newsletter .newsletter-form__field-wrapper .field__input:not(:placeholder-shown) + .field__label {
+  opacity: 0;
+}
+.newsletter .newsletter-form__field-wrapper .field__button {
+  background: #e52227 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  padding: 12px 24px !important;
+  margin: 4px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  transition: transform .15s, background .15s;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+}
+.newsletter .newsletter-form__field-wrapper .field__button::after,
+.newsletter .newsletter-form__field-wrapper .field__button::before { content: none !important; display: none !important; }
+.newsletter .newsletter-form__field-wrapper .field__button:hover { background: #c81a1f !important; transform: translateY(-1px); }
+.newsletter .newsletter-form__field-wrapper .field__button:active { transform: translateY(0); }
+.newsletter .newsletter-form__field-wrapper .field__button .svg-wrapper { display: inline-flex; }
+.newsletter .newsletter-form__field-wrapper .field__button .svg-wrapper svg { width: 16px; height: 16px; fill: currentColor; }
+.newsletter .newsletter-form__message {
+  color: #040202 !important;
+  font-weight: 600 !important;
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.newsletter .newsletter-form__message--success {
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 18px;
+  display: inline-flex;
+}
+@media (max-width: 749px) {
+  .newsletter .newsletter__wrapper {
+    border-radius: 20px;
+    padding: 32px 18px !important;
+    box-shadow: 0 6px 0 #040202;
+  }
+  .newsletter .newsletter__wrapper h2 { font-size: 22px !important; }
+  .newsletter .newsletter__wrapper .newsletter__subheading { font-size: 13px !important; }
+  .newsletter .newsletter-form__field-wrapper .field__input { font-size: 14px !important; padding: 12px 14px !important; }
+  .newsletter .newsletter-form__field-wrapper .field__button { padding: 10px 18px !important; font-size: 13px !important; }
+}
+
+/* ── Defensive: hide predictive-search spinner until JS attaches (was flashing on load) ── */
+.predictive-search__loading-state { display: none !important; }
+.predictive-search[data-predictive-search]:not(.is-visible) { display: none; }
+
+/* ── Body default: Poppins (soft, no !important — section CSS like Kopiku wins) ── */
+body {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+}
+
+/* Header + Footer: force Poppins everywhere inside */
+.header-wrapper,
+.header-wrapper *,
+.footer,
+.footer * {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Product card overrides: removed by request — using theme defaults. */
+
+/* ── Even vertical rhythm: name → chips → price+ATC ── */
+.card-wrapper .card__heading { margin: 0 0 12px !important; }
+.card-wrapper .dqc { margin: 0 0 12px !important; }
+.card-wrapper .card-information .price-atc { margin: 0 !important; }
+@media (max-width: 749px) {
+  .card-wrapper .card__heading { margin: 0 0 10px !important; }
+  .card-wrapper .dqc { margin: 0 0 10px !important; }
+}
+
+/* Dawbu quantity chips (1/2/4/8 + custom qty) */
+.dqc {
+  margin: 8px 0 6px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+}
+.dqc__row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+}
+.dqc .dqc__chip {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 34px;
+  padding: 0 4px;
+  border: 1px solid #d4d4d4;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  color: #1a1a1a;
+  transition: border-color .15s, background .15s, color .15s, transform .1s;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.dqc .dqc__chip:hover { border-color: #e52227; }
+.dqc .dqc__chip:active { transform: scale(0.96); }
+.dqc .dqc__chip.is-active {
+  background: #e52227;
+  color: #fff;
+  border-color: #e52227;
+}
+.dqc input[type='number'].dqc__custom {
+  flex: 1.2 1 0;
+  width: 0;
+  min-width: 0;
+  max-width: 100%;
+  height: 34px;
+  padding: 0 6px;
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: #fff;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  text-align: center;
+  box-sizing: border-box;
+  line-height: 1;
+}
+.dqc .dqc__custom::-webkit-outer-spin-button,
+.dqc .dqc__custom::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.dqc .dqc__custom::placeholder { color: #9aa3af; font-size: 11px; }
+.dqc .dqc__custom:focus {
+  outline: none;
+  border-color: #e52227;
+  box-shadow: 0 0 0 2px rgba(229,34,39,.18);
+}
+.dqc--compact .dqc__chip, .dqc--compact .dqc__custom { height: 28px; font-size: 11px; }
+
+/* Hide chips in tight contexts (cart drawer, search popups) */
+.cart-drawer .dqc,
+.minicart .dqc,
+search-popup .dqc,
+search-drawer .dqc { display: none !important; }
+
+/* Hide all per-item qty controls inside any "buy entire collection" surface
+   (standalone bundle page AND Fan Favourites section on home).
+   Bundle math relies on qty=1 per item. */
+.bundle-product-card .dqc,
+.bundle-product-card .bundle-product-card__quantity,
+[class*="collection-bundle"] .bundle-product-card__quantity,
+.ff-section .dqc,
+.fan-favourites .dqc { display: none !important; }
+
+/* Mobile tweaks */
+@media (max-width: 749px) {
+  .dqc__row { gap: 4px; }
+  .dqc .dqc__chip { height: 32px; font-size: 12px; border-radius: 7px; }
+  .dqc input[type='number'].dqc__custom { height: 32px; font-size: 11px; border-radius: 7px; }
+}
+
+/* PDP: Poppins */
+product-info,
+product-info *,
+.product__info-wrapper,
+.product__info-wrapper *,
+.product__info-container,
+.product__info-container *,
+.product-form,
+.product-form * {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Collection filter / facets: Poppins */
+.facets,
+.facets *,
+.facets-wrapper,
+.facets-wrapper *,
+.mobile-facets,
+.mobile-facets *,
+.facets-vertical,
+.facets-vertical *,
+facet-filters-form,
+facet-filters-form * {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif !important;
+}
+
+/* ── SagePilot widget: lift above mobile bottom bar (works alongside the JS lifter in theme.liquid) ── */
+@media (max-width: 749px) {
+  #btn-trigger-chat,
+  #chat-frame-widget {
+    bottom: 75px !important;
+  }
+  #chat-bubble {
+    bottom: 125px !important;
+  }
+}
+

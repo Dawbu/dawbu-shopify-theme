@@ -1,0 +1,134 @@
+{% comment %}
+  Renders breadcrumb navigation
+  
+  Usage:
+  {% render 'breadcrumbs' %}
+{% endcomment %}
+
+{%- unless template.name == 'index' or template.name == 'cart' or template.name == 'list-collections' -%}
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol class="breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
+      <li class="breadcrumbs__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href="{{ routes.root_url }}" class="breadcrumbs__link" itemprop="item">
+          <span itemprop="name">Home</span>
+        </a>
+        <meta itemprop="position" content="1" />
+      </li>
+
+      {%- case template.name -%}
+        {%- when 'product' -%}
+          {%- if collection -%}
+            <li class="breadcrumbs__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+              <a href="{{ collection.url }}" class="breadcrumbs__link" itemprop="item">
+                <span itemprop="name">{{ collection.title }}</span>
+              </a>
+              <meta itemprop="position" content="2" />
+            </li>
+          {%- endif -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ product.title }}</span>
+            <meta itemprop="position" content="{% if collection %}3{% else %}2{% endif %}" />
+          </li>
+
+        {%- when 'collection' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ collection.title }}</span>
+            <meta itemprop="position" content="2" />
+          </li>
+
+        {%- when 'article' -%}
+          <li class="breadcrumbs__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <a href="{{ blog.url }}" class="breadcrumbs__link" itemprop="item">
+              <span itemprop="name">{{ blog.title }}</span>
+            </a>
+            <meta itemprop="position" content="2" />
+          </li>
+          <li class="breadcrumbs__item breadcrumbs__item--current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ article.title }}</span>
+            <meta itemprop="position" content="3" />
+          </li>
+
+        {%- when 'page' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ page.title }}</span>
+            <meta itemprop="position" content="2" />
+          </li>
+
+        {%- when 'search' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ 'general.search.search' | t }}</span>
+            <meta itemprop="position" content="2" />
+          </li>
+
+        {%- when 'customers' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ 'customer.account.title' | t | default: 'Account' }}</span>
+            <meta itemprop="position" content="2" />
+          </li>
+      {%- endcase -%}
+    </ol>
+  </nav>
+
+  <style>
+    .breadcrumbs {
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+    }
+
+    .breadcrumbs__list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .breadcrumbs__item {
+      display: flex;
+      align-items: center;
+      color: rgba(var(--color-foreground), 0.6);
+    }
+
+    .breadcrumbs__item::after {
+      content: '/';
+      margin-left: 0.5rem;
+      color: rgba(var(--color-foreground), 0.4);
+    }
+
+    .breadcrumbs__item:last-child::after {
+      display: none;
+    }
+
+    .breadcrumbs__item--current {
+      color: rgb(var(--color-foreground));
+      font-weight: 500;
+    }
+
+    .breadcrumbs__link {
+      color: rgba(var(--color-foreground), 0.7);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumbs__link:hover {
+      color: rgb(var(--color-button));
+      text-decoration: underline;
+    }
+
+    @media screen and (max-width: 749px) {
+      .breadcrumbs {
+        padding: 0.75rem 0;
+        margin-bottom: 0.75rem;
+      }
+
+      .breadcrumbs__list {
+        font-size: 0.8125rem;
+        gap: 0.375rem;
+      }
+    }
+  </style>
+{%- endunless -%}
+

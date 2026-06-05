@@ -1,0 +1,196 @@
+<section class="price-collection-section section-{{ section.id }}-padding">
+    <div class="page-width ">
+        <div class="section-title">
+            <h2 class="inline-richtext h1 scroll-trigger animate--slide-in">{{ section.settings.heading }}</h2>
+        </div>
+  <div class="price-grid">
+
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.collection.url }}"
+         class="price-card"
+         {{ block.shopify_attributes }}>
+
+        {% if block.settings.image != blank %}
+          {{
+            block.settings.image
+            | image_url: width: 900
+            | image_tag:
+              loading: 'lazy',
+              class: 'price-image'
+          }}
+        {% endif %}
+
+        <span class="price-label">
+          {{ block.settings.text }}
+        </span>
+      </a>
+    {% endfor %}
+
+  </div>
+  </div>
+</section>
+<style>
+    .price-collection-section {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.price-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.price-card {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  display: block;
+}
+
+.price-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+
+.price-card:hover .price-image {
+  transform: scale(1.05);
+}
+.section-title {
+    text-align: center;
+}
+.price-label {
+ position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+    text-shadow: 0 6px 20px rgba(0, 0, 0, .6);
+    pointer-events: none;
+}
+
+/* Responsive */
+/* Mobile slider */
+@media screen and (max-width: 768px) {
+  .price-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 10px;
+  }
+
+  .price-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .price-card {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+  }
+{% comment %} 
+  .price-image {
+    height: 220px;
+  } {% endcomment %}
+}
+@media screen and (max-width: 768px) {
+  .price-card {
+    flex: 0 0 70%;
+  }
+}
+@media screen and (max-width: 990px) {
+  .price-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .price-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+    </style>
+{% schema %}
+{
+  "name": "Price Collection Grid",
+  "max_blocks": 4,
+   "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+     {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+   ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Collection Card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Overlay text",
+          "default": "Under ₹99"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Price Collection Grid"
+    }
+  ]
+}
+{% endschema %}
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}

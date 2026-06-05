@@ -1,0 +1,153 @@
+{% comment %}
+  Section: Dawbu Image Banner
+  Brand-matched image banner (eyebrow, heading, sub, CTA) with mobile image override.
+  Theme editor → Add section → Dawbu Image Banner.
+{% endcomment %}
+
+<section
+  class="dib dib--{{ section.settings.text_position }} dib--align-{{ section.settings.text_alignment }}"
+  id="dib-{{ section.id }}"
+  data-track-section="image_banner"
+  style="
+    --dib-bg: {{ section.settings.background_color }};
+    --dib-text: {{ section.settings.text_color }};
+    --dib-btn-bg: {{ section.settings.button_bg }};
+    --dib-btn-text: {{ section.settings.button_text_color }};
+    --dib-radius: {{ section.settings.corner_radius }}px;
+    --dib-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+  "
+>
+  <div class="dib__inner">
+    {%- if section.settings.image != blank or section.settings.image_mobile != blank -%}
+      <picture class="dib__media">
+        {%- if section.settings.image_mobile != blank -%}
+          <source media="(max-width: 749px)"
+            srcset="{{ section.settings.image_mobile | image_url: width: 800 }} 1x, {{ section.settings.image_mobile | image_url: width: 1200 }} 2x">
+        {%- endif -%}
+        {%- if section.settings.image != blank -%}
+          <img
+            src="{{ section.settings.image | image_url: width: 1600 }}"
+            srcset="{{ section.settings.image | image_url: width: 800 }} 800w, {{ section.settings.image | image_url: width: 1200 }} 1200w, {{ section.settings.image | image_url: width: 1600 }} 1600w, {{ section.settings.image | image_url: width: 2400 }} 2400w"
+            sizes="100vw"
+            alt="{{ section.settings.image.alt | default: section.settings.heading | escape }}"
+            loading="{{ section.settings.image_loading }}"
+            fetchpriority="{{ section.settings.image_priority }}"
+            width="{{ section.settings.image.width }}"
+            height="{{ section.settings.image.height }}"
+          >
+        {%- endif -%}
+      </picture>
+    {%- endif -%}
+    {%- if section.settings.overlay_opacity > 0 -%}<span class="dib__overlay" aria-hidden="true"></span>{%- endif -%}
+
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.subheading != blank or section.settings.button_label != blank -%}
+      <div class="dib__content">
+        {%- if section.settings.eyebrow != blank -%}<span class="dib__eyebrow">{{ section.settings.eyebrow }}</span>{%- endif -%}
+        {%- if section.settings.heading != blank -%}<h2 class="dib__heading">{{ section.settings.heading }}</h2>{%- endif -%}
+        {%- if section.settings.subheading != blank -%}<p class="dib__sub">{{ section.settings.subheading }}</p>{%- endif -%}
+        {%- if section.settings.button_label != blank -%}
+          <a class="dib__btn" href="{{ section.settings.button_link | default: '#' }}"
+            data-track-click="banner_cta_click"
+            data-track-params='{"label":"{{ section.settings.button_label | escape }}"}'>
+            {{ section.settings.button_label }}{% if section.settings.button_arrow %} <span aria-hidden="true">→</span>{% endif %}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  #dib-{{ section.id }} { background: var(--dib-bg); padding: {{ section.settings.padding_top_desktop }}px 16px {{ section.settings.padding_bottom_desktop }}px; box-sizing: border-box; }
+  #dib-{{ section.id }} .dib__inner {
+    position: relative; max-width: {{ section.settings.max_width }}px; margin: 0 auto;
+    border-radius: var(--dib-radius); overflow: hidden;
+    min-height: {{ section.settings.min_height_desktop }}px;
+    display: flex; align-items: center;
+    justify-content: {% if section.settings.text_position == 'left' %}flex-start{% elsif section.settings.text_position == 'right' %}flex-end{% else %}center{% endif %};
+  }
+  #dib-{{ section.id }} .dib__media { position: absolute; inset: 0; z-index: 0; display: block; }
+  #dib-{{ section.id }} .dib__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #dib-{{ section.id }} .dib__overlay { position: absolute; inset: 0; background: rgba(0,0,0,var(--dib-overlay)); z-index: 1; }
+  #dib-{{ section.id }} .dib__content {
+    position: relative; z-index: 2; padding: 36px; max-width: 560px;
+    color: var(--dib-text); text-align: {{ section.settings.text_alignment }};
+  }
+  #dib-{{ section.id }} .dib__eyebrow {
+    display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 1px;
+    text-transform: uppercase; padding: 6px 12px; background: #faed17; color: #040202;
+    border-radius: 999px; margin-bottom: 14px;
+  }
+  #dib-{{ section.id }} .dib__heading { font-size: clamp(24px, 4vw, 44px); font-weight: 900; line-height: 1.1; margin: 0 0 12px; color: inherit; }
+  #dib-{{ section.id }} .dib__sub { font-size: 16px; line-height: 1.45; margin: 0 0 20px; opacity: .92; }
+  #dib-{{ section.id }} .dib__btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 26px; background: var(--dib-btn-bg); color: var(--dib-btn-text);
+    text-decoration: none; border-radius: 999px; font-weight: 800; font-size: 14px;
+    letter-spacing: .5px; text-transform: uppercase;
+    box-shadow: 0 4px 0 rgba(0,0,0,.18); transition: transform .15s, box-shadow .15s;
+  }
+  #dib-{{ section.id }} .dib__btn:hover { transform: translateY(-1px); box-shadow: 0 6px 0 rgba(0,0,0,.22); }
+
+  @media (max-width: 749px) {
+    #dib-{{ section.id }} { padding: {{ section.settings.padding_top_mobile }}px 12px {{ section.settings.padding_bottom_mobile }}px; }
+    #dib-{{ section.id }} .dib__inner { min-height: {{ section.settings.min_height_mobile }}px; border-radius: calc(var(--dib-radius) - 4px); }
+    #dib-{{ section.id }} .dib__content { padding: 24px 18px; max-width: 100%; }
+    #dib-{{ section.id }} .dib__sub { font-size: 14px; margin-bottom: 16px; }
+    #dib-{{ section.id }} .dib__btn { padding: 11px 20px; font-size: 13px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Dawbu Image Banner",
+  "tag": "section",
+  "class": "section-dawbu-image-banner",
+  "settings": [
+    { "type": "header", "content": "Image" },
+    { "type": "image_picker", "id": "image", "label": "Desktop image" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image (optional)", "info": "Falls back to desktop image if blank." },
+    { "type": "select", "id": "image_loading", "label": "Loading", "options": [
+        { "value": "lazy", "label": "Lazy (below the fold)" },
+        { "value": "eager", "label": "Eager (above the fold / hero)" }
+      ], "default": "lazy" },
+    { "type": "select", "id": "image_priority", "label": "Fetch priority", "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "high", "label": "High (LCP image)" },
+        { "value": "low",  "label": "Low" }
+      ], "default": "auto" },
+    { "type": "range", "id": "overlay_opacity", "label": "Dark overlay", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 0 },
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow / badge" },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "Build It. Display It. Love It." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop now" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "checkbox", "id": "button_arrow", "label": "Show arrow on button", "default": true },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "text_position", "label": "Text position", "options": [
+        { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }
+      ], "default": "center" },
+    { "type": "select", "id": "text_alignment", "label": "Text alignment", "options": [
+        { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }
+      ], "default": "center" },
+    { "type": "range", "id": "max_width", "label": "Max content width (px)", "min": 600, "max": 1600, "step": 20, "default": 1200 },
+    { "type": "range", "id": "min_height_desktop", "label": "Min height — desktop (px)", "min": 200, "max": 800, "step": 10, "default": 420 },
+    { "type": "range", "id": "min_height_mobile",  "label": "Min height — mobile (px)",  "min": 160, "max": 600, "step": 10, "default": 320 },
+    { "type": "range", "id": "corner_radius", "label": "Corner radius (px)", "min": 0, "max": 32, "step": 2, "default": 16 },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Section background", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#ffffff" },
+    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#e52227" },
+    { "type": "color", "id": "button_text_color", "label": "Button text color", "default": "#ffffff" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top_desktop", "label": "Padding top — desktop", "min": 0, "max": 120, "step": 4, "default": 32 },
+    { "type": "range", "id": "padding_bottom_desktop", "label": "Padding bottom — desktop", "min": 0, "max": 120, "step": 4, "default": 32 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top — mobile", "min": 0, "max": 80, "step": 4, "default": 20 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom — mobile", "min": 0, "max": 80, "step": 4, "default": 20 }
+  ],
+  "presets": [
+    { "name": "Dawbu Image Banner" }
+  ]
+}
+{% endschema %}
