@@ -189,6 +189,21 @@
         "padding_bottom": 64
       }
     },
+    "byob_builder_home": {
+      "type": "byob-builder",
+      "blocks": {},
+      "block_order": [],
+      "name": "Build Your Own Collection",
+      "settings": {
+        "eyebrow": "Build Your Own",
+        "heading": "Build Your Own Collection",
+        "lede": "Pick any {N} minis — pay just Rs. {P}. Mix and match whatever you love.",
+        "slots_title": "Add Any {N} Products In The Box",
+        "collection": "byob-block-69",
+        "quantity": 6,
+        "price": 390
+      }
+    },
     "collection_grid_ByLdQT": {
       "type": "collection-grid",
       "name": "Collection Grid",
@@ -786,6 +801,7 @@
   "order": [
     "summer_hero_main",
     "tiny_show_pieces_main",
+    "byob_builder_home",
     "collection_grid_ByLdQT",
     "fan_favourites_YxtPg4",
     "grab_and_go_aFNKW8",
