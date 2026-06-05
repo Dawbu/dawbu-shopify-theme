@@ -360,19 +360,25 @@
     #SummerHero-{{ section.id }} .summer-hero__content { max-width: 100%; padding: 22px 20px; }
     #SummerHero-{{ section.id }} .summer-hero__arrow { width: 38px; height: 38px; }
     #SummerHero-{{ section.id }} .summer-hero__cats {
-      flex-wrap: nowrap;
-      justify-content: flex-start;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      margin-top: -36px;
-      padding-bottom: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 8px;
+      margin-top: -32px;
+      padding: 0 12px;
     }
-    #SummerHero-{{ section.id }} .summer-hero__cats::-webkit-scrollbar { display: none; }
     #SummerHero-{{ section.id }} .summer-hero__cat {
-      flex: 0 0 38vw;
-      max-width: 38vw;
-      scroll-snap-align: start;
+      flex: 0 0 calc((100% - 16px) / 3);
+      max-width: calc((100% - 16px) / 3);
+    }
+    #SummerHero-{{ section.id }} .summer-hero__cat-media {
+      border-radius: 12px 12px 4px 4px;
+      padding: 6px;
+    }
+    #SummerHero-{{ section.id }} .summer-hero__cat-label {
+      margin-top: -8px;
+      padding: 5px 6px;
+      font-size: 11px;
+      border-radius: 8px;
     }
   }
 </style>
