@@ -545,11 +545,11 @@
         "cta_text": "",
         "cta_url": "#",
         "animate_text": "30,000+ HAPPY KIDS",
-        "bg_color": "#111",
-        "heading_color": "#fff",
-        "highlight_color": "#ffd700",
-        "badge_bg": "#e3000b",
-        "cta_color": "#ffd700",
+        "bg_color": "#fff0f6",
+        "heading_color": "#241c2e",
+        "highlight_color": "#ff5c8a",
+        "badge_bg": "#ff5c8a",
+        "cta_color": "#ff5c8a",
         "autoplay_seconds": 4
       }
     },
