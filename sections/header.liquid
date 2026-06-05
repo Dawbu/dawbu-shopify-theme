@@ -312,6 +312,60 @@
   endif
 -%}
 
+<style>
+  .dawbu-header__main { position: relative; }
+  .dawbu-header__icons { margin-left: auto; }
+  .dawbu-header__icon--search { background: none; border: 0; cursor: pointer; padding: 0; }
+
+  .dawbu-search.dawbu-search--collapsible {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    flex: none;
+    background: #fff;
+    border: 1px solid var(--dh-search-border, #e3e5e9);
+    border-radius: 1.2rem;
+    padding: 1.2rem 1.4rem;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+  }
+  .dawbu-search.dawbu-search--collapsible[hidden] { display: none; }
+
+  .dawbu-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.8rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .dawbu-nav::-webkit-scrollbar { display: none; }
+  .dawbu-nav__item {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.3rem;
+    border-radius: 50px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--dh-text, #121212);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .dawbu-nav__item:hover { background: var(--dh-search-bg, #f4f5f7); color: var(--dh-accent, #0b3a6f); }
+  .dawbu-nav__home { padding: 0.7rem 1rem; }
+  .dawbu-nav__home .svg-wrapper svg { width: 2rem; height: 2rem; display: block; }
+
+  @media (min-width: 990px) {
+    .dawbu-nav { justify-content: center; gap: 0.8rem; margin-top: 1rem; }
+  }
+</style>
+
 <{{ header_tag }} {% if header_tag == 'sticky-header' %}data-sticky-type="{{ section.settings.sticky_header_type }}"{% endif %} data-track-section="header" class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}">
   <header class="dawbu-header page-width">
 
@@ -347,7 +401,7 @@
         {%- endif -%}
       </a>
 
-      <div class="dawbu-search">
+      <div class="dawbu-search dawbu-search--collapsible" data-search-panel hidden>
         {%- if settings.predictive_search_enabled -%}
           <predictive-search data-loading-text="{{ 'accessibility.loading' | t }}">
         {%- else -%}
@@ -407,6 +461,10 @@
       </div>
 
       <div class="dawbu-header__icons">
+        <button type="button" class="dawbu-header__icon dawbu-header__icon--search" data-search-toggle aria-label="{{ 'general.search.search' | t }}" aria-expanded="false">
+          <span class="svg-wrapper">{{- 'icon-search.svg' | inline_asset_content -}}</span>
+        </button>
+
         {%- if section.settings.show_wishlist -%}
           <a href="{{ section.settings.wishlist_link | default: routes.search_url }}" class="dawbu-header__icon dawbu-header__icon--wishlist" aria-label="Wishlist">
             <span class="svg-wrapper">{{- 'icon-heart.svg' | inline_asset_content -}}</span>
@@ -453,15 +511,18 @@
       </div>
     </div>
 
-    {%- if section.settings.menu != blank and section.settings.menu_type_desktop != 'drawer' -%}
-      <div class="dawbu-header__nav small-hide medium-hide">
-        {%- if section.settings.menu_type_desktop == 'dropdown' -%}
-          {%- render 'header-dropdown-menu' -%}
-        {%- else -%}
-          {%- render 'header-mega-menu' -%}
-        {%- endif -%}
-      </div>
-    {%- endif -%}
+    <nav class="dawbu-nav" aria-label="Primary">
+      <a class="dawbu-nav__item dawbu-nav__home" href="{{ routes.root_url }}" aria-label="Home">
+        <span class="svg-wrapper">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+      {%- if section.settings.nav1_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav1_url | default: '/collections/all' }}">{{ section.settings.nav1_label }}</a>{%- endif -%}
+      {%- if section.settings.nav2_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav2_url | default: '/collections/miniature-toys' }}">{{ section.settings.nav2_label }}</a>{%- endif -%}
+      {%- if section.settings.nav3_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav3_url | default: '/collections/glowing-products' }}">{{ section.settings.nav3_label }}</a>{%- endif -%}
+      {%- if section.settings.nav4_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav4_url | default: '/collections/bundles' }}">{{ section.settings.nav4_label }}</a>{%- endif -%}
+      {%- if section.settings.nav5_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav5_url | default: '/pages/byob-builder' }}">{{ section.settings.nav5_label }}</a>{%- endif -%}
+    </nav>
   </header>
 </{{ header_tag }}>
 
@@ -484,6 +545,28 @@
           input.setAttribute('placeholder', prefix + ' "' + terms[i] + '"');
         }, 2800);
       }
+    }
+
+    var sToggle = document.querySelector('[data-search-toggle]');
+    var sPanel = document.querySelector('[data-search-panel]');
+    if (sToggle && sPanel) {
+      sToggle.addEventListener('click', function () {
+        if (sPanel.hasAttribute('hidden')) {
+          sPanel.removeAttribute('hidden');
+          sToggle.setAttribute('aria-expanded', 'true');
+          var f = sPanel.querySelector('input[type="search"]');
+          if (f) f.focus();
+        } else {
+          sPanel.setAttribute('hidden', '');
+          sToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+      document.addEventListener('click', function (e) {
+        if (!sPanel.hasAttribute('hidden') && !sPanel.contains(e.target) && !sToggle.contains(e.target)) {
+          sPanel.setAttribute('hidden', '');
+          sToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
     }
 
     var pinEls = document.querySelectorAll('[data-dawbu-pincode]');
@@ -767,6 +850,21 @@
       "label": "Rotating search terms",
       "info": "One per line. Shown as an animated placeholder."
     },
+    {
+      "type": "header",
+      "content": "Navigation bar",
+      "info": "A Home icon is always shown first. Leave a label blank to hide that link. URLs fall back to sensible defaults if left empty."
+    },
+    { "type": "text", "id": "nav1_label", "label": "Link 1 label", "default": "All" },
+    { "type": "url", "id": "nav1_url", "label": "Link 1 URL" },
+    { "type": "text", "id": "nav2_label", "label": "Link 2 label", "default": "Miniatures" },
+    { "type": "url", "id": "nav2_url", "label": "Link 2 URL" },
+    { "type": "text", "id": "nav3_label", "label": "Link 3 label", "default": "Glow" },
+    { "type": "url", "id": "nav3_url", "label": "Link 3 URL" },
+    { "type": "text", "id": "nav4_label", "label": "Link 4 label", "default": "Bundles" },
+    { "type": "url", "id": "nav4_url", "label": "Link 4 URL" },
+    { "type": "text", "id": "nav5_label", "label": "Link 5 label", "default": "BYOB" },
+    { "type": "url", "id": "nav5_url", "label": "Link 5 URL" },
     {
       "type": "header",
       "content": "Wishlist & icons"
