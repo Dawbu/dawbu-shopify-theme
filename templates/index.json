@@ -208,9 +208,9 @@
       "type": "bundle-deals",
       "name": "Bundle Deals",
       "settings": {
-        "badge_text": "BEST VALUE PACKS",
-        "heading_black": "BUNDLE",
-        "heading_red": "DEALS",
+        "badge_text": "MIX, MATCH & SAVE",
+        "heading_black": "BLOCK PARTY",
+        "heading_red": "BUNDLES",
         "collection": "bundles",
         "products_to_show": 12,
         "columns_desktop": "5",
