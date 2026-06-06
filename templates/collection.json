@@ -1,1 +1,134 @@
-{"sections":{"banner":{"type":"main-collection-banner","disabled":true,"settings":{"show_collection_description":true,"show_collection_image":false,"color_scheme":"scheme-1"}},"bundle_banner_kqU3gY":{"type":"bundle-banner","name":"Bundle Banner","settings":{"eyebrow":"Special Feature Added: surprise me!","heading":"Build your own bundle, your way","subheading":"Mix any items across packs. The more you build, the more you save.","cta_label":"Start building","cta_link":"shopify:\/\/pages\/byob","background_color":"#e52227","text_color":"#ffffff","accent_color":"#faed17"}},"17742670467b8e0bfb":{"type":"apps","settings":{"include_margins":true}},"product-grid":{"type":"main-collection-product-grid","settings":{"products_per_page":36,"columns_desktop":4,"columns_mobile":"2","color_scheme":"scheme-1","image_ratio":"adapt","image_shape":"default","show_secondary_image":true,"show_vendor":false,"show_rating":false,"quick_add":"quantity","enable_filtering":true,"filter_type":"vertical","enable_sorting":false,"padding_top":0,"padding_bottom":36}},"video_carousel_Pf3ArW":{"type":"video-carousel","blocks":{"video_zKikai":{"type":"video","settings":{"html5_video":"shopify:\/\/files\/videos\/Video-582.mp4","product":"","collection":"space-products"}},"video_hNqTLP":{"type":"video","settings":{"html5_video":"shopify:\/\/files\/videos\/Video-963.mp4","product":"","collection":"plants"}},"video_BztjgM":{"type":"video","settings":{"html5_video":"shopify:\/\/files\/videos\/sir building blocks .mp4","product":"","collection":"space-products"}},"video_A6Tx8L":{"type":"video","settings":{"html5_video":"shopify:\/\/files\/videos\/reviews.mp4","product":"","collection":"building-blocks"}}},"block_order":["video_zKikai","video_hNqTLP","video_BztjgM","video_A6Tx8L"],"disabled":true,"name":"Video carousel","settings":{"slide_width":300,"image_crop":"none","aspect_ratio":"9:16","autoplay":8,"gap":10,"show_arrows":true,"text_size":100,"text_alignment":"left","text_color":"#121212","border_color":"#121212","background_color":"","border_radius":10,"base_width":100,"max_width":"","inner_padding":40,"outer_margin":0,"custom_css":"","mobile_custom_css":"","anchor_id":"","override_theme_font":false,"heading_font":"serif","main_font":"system_ui_n4"}}},"order":["banner","bundle_banner_kqU3gY","17742670467b8e0bfb","product-grid","video_carousel_Pf3ArW"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "banner": {
+      "type": "main-collection-banner",
+      "disabled": true,
+      "settings": {
+        "show_collection_description": true,
+        "show_collection_image": false,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "bundle_banner_kqU3gY": {
+      "type": "bundle-banner",
+      "name": "Bundle Banner",
+      "settings": {
+        "eyebrow": "Special Feature Added: surprise me!",
+        "heading": "Build your own bundle, your way",
+        "subheading": "Mix any items across packs. The more you build, the more you save.",
+        "cta_label": "Start building",
+        "cta_link": "shopify://pages/byob",
+        "background_color": "#e52227",
+        "text_color": "#ffffff",
+        "accent_color": "#faed17"
+      }
+    },
+    "17742670467b8e0bfb": {
+      "type": "apps",
+      "settings": {
+        "include_margins": true
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "settings": {
+        "products_per_page": 36,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "color_scheme": "scheme-1",
+        "image_ratio": "adapt",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "quantity",
+        "enable_filtering": true,
+        "filter_type": "vertical",
+        "enable_sorting": false,
+        "padding_top": 0,
+        "padding_bottom": 36
+      }
+    },
+    "video_carousel_Pf3ArW": {
+      "type": "video-carousel",
+      "blocks": {
+        "video_zKikai": {
+          "type": "video",
+          "settings": {
+            "product": "",
+            "collection": "space-products"
+          }
+        },
+        "video_hNqTLP": {
+          "type": "video",
+          "settings": {
+            "product": "",
+            "collection": "plants"
+          }
+        },
+        "video_BztjgM": {
+          "type": "video",
+          "settings": {
+            "product": "",
+            "collection": "space-products"
+          }
+        },
+        "video_A6Tx8L": {
+          "type": "video",
+          "settings": {
+            "product": "",
+            "collection": "building-blocks"
+          }
+        }
+      },
+      "block_order": [
+        "video_zKikai",
+        "video_hNqTLP",
+        "video_BztjgM",
+        "video_A6Tx8L"
+      ],
+      "disabled": true,
+      "name": "Video carousel",
+      "settings": {
+        "slide_width": 300,
+        "image_crop": "none",
+        "aspect_ratio": "9:16",
+        "autoplay": 8,
+        "gap": 10,
+        "show_arrows": true,
+        "text_size": 100,
+        "text_alignment": "left",
+        "text_color": "#121212",
+        "border_color": "#121212",
+        "background_color": "",
+        "border_radius": 10,
+        "base_width": 100,
+        "max_width": "",
+        "inner_padding": 40,
+        "outer_margin": 0,
+        "custom_css": "",
+        "mobile_custom_css": "",
+        "anchor_id": "",
+        "override_theme_font": false,
+        "heading_font": "serif",
+        "main_font": "system_ui_n4"
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "bundle_banner_kqU3gY",
+    "17742670467b8e0bfb",
+    "product-grid",
+    "video_carousel_Pf3ArW"
+  ]
+}
