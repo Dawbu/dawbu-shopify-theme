@@ -73,6 +73,10 @@
 </style>
 
 {%- style -%}
+  .header {
+    padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
+  }
+
   .section-header {
     position: sticky; /* This is for fixing a Safari z-index issue. PR #2147 */
     margin-bottom: {{ section.settings.margin_bottom | times: 0.75 | round: 0 }}px;
@@ -84,186 +88,12 @@
     }
   }
 
-  /* ---------- Dawbu header (HUFT-style search bar) ---------- */
-  .dawbu-header {
-    position: relative;
-    --dh-accent: {{ section.settings.accent_color }};
-    --dh-text: {{ section.settings.text_color }};
-    --dh-muted: {{ section.settings.muted_color }};
-    --dh-search-bg: {{ section.settings.search_bg }};
-    --dh-search-border: {{ section.settings.search_border }};
-    --dh-icon: {{ section.settings.icon_color }};
-    padding-top: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px;
-  }
-
   @media screen and (min-width: 990px) {
-    .dawbu-header {
+    .header {
       padding-top: {{ section.settings.padding_top }}px;
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
-
-  .dawbu-header__utility {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.2rem 0 0.4rem;
-    font-size: 1.2rem;
-    color: var(--dh-muted);
-  }
-
-  .dawbu-locate {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    font: inherit;
-    color: inherit;
-    cursor: pointer;
-  }
-
-  .dawbu-locate .svg-wrapper svg {
-    width: 1.5rem;
-    height: 1.5rem;
-    fill: var(--dh-accent);
-  }
-
-  .dawbu-locate__pin { color: var(--dh-text); font-weight: 600; }
-  .dawbu-locate__change { color: var(--dh-accent); font-weight: 600; margin-left: 0.2rem; }
-
-  .dawbu-header__main {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-  }
-
-  .dawbu-header__logo { display: none; flex: 0 0 auto; line-height: 0; }
-  .dawbu-header__logo img { display: block; height: auto; }
-
-  @media screen and (min-width: 750px) {
-    .dawbu-header__logo { display: block; }
-  }
-
-  /* search */
-  .dawbu-search {
-    position: relative;
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-  .dawbu-search__form { position: relative; display: flex; align-items: center; margin: 0; }
-  .dawbu-search__field { position: relative; width: 100%; display: flex; align-items: center; }
-
-  .dawbu-search__input {
-    width: 100%;
-    height: 4.4rem;
-    border: 1px solid var(--dh-search-border);
-    border-radius: 4rem;
-    background: var(--dh-search-bg);
-    padding: 0 8rem 0 1.8rem;
-    font-size: 1.4rem;
-    line-height: 4.4rem;
-    color: var(--dh-text);
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .dawbu-search__input::placeholder { color: var(--dh-muted); opacity: 1; }
-  .dawbu-search__input:focus {
-    outline: none;
-    border-color: var(--dh-accent);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(11, 58, 111, 0.08);
-  }
-  .dawbu-search__input::-webkit-search-decoration,
-  .dawbu-search__input::-webkit-search-cancel-button { -webkit-appearance: none; }
-
-  .dawbu-search__btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: 0;
-    padding: 0.6rem;
-    cursor: pointer;
-    color: var(--dh-icon);
-  }
-  .dawbu-search__btn .svg-wrapper svg { width: 2rem; height: 2rem; }
-  .dawbu-search__submit { right: 0.6rem; }
-  .dawbu-search__reset { right: 3.6rem; color: var(--dh-muted); }
-  .dawbu-search__reset.hidden { display: none; }
-
-  /* predictive results dropdown */
-  .dawbu-search predictive-search { display: block; }
-  .dawbu-search .predictive-search {
-    position: absolute;
-    top: calc(100% + 0.8rem);
-    left: 0;
-    right: 0;
-    z-index: 6;
-    background: #fff;
-    border: 1px solid var(--dh-search-border);
-    border-radius: 1.4rem;
-    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12);
-    overflow: hidden;
-    max-height: 70vh;
-    overflow-y: auto;
-  }
-  .dawbu-search .predictive-search[hidden] { display: none; }
-
-  /* icons */
-  .dawbu-header__icons {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    flex: 0 0 auto;
-  }
-  .dawbu-header__icon {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 4.2rem;
-    height: 4.2rem;
-    border-radius: 50%;
-    color: var(--dh-icon);
-    text-decoration: none;
-  }
-  .dawbu-header__icon:hover { background: var(--dh-search-bg); }
-  .dawbu-header__icon .svg-wrapper svg { width: 2.2rem; height: 2.2rem; }
-  .dawbu-header__icon--account { display: none; }
-  @media screen and (min-width: 750px) {
-    .dawbu-header__icon--account { display: inline-flex; }
-  }
-
-  .dawbu-header__icon .cart-count-bubble {
-    position: absolute;
-    top: 0.4rem;
-    right: 0.2rem;
-    min-width: 1.7rem;
-    height: 1.7rem;
-    padding: 0 0.4rem;
-    border-radius: 1rem;
-    background: var(--dh-accent);
-    color: #fff;
-    font-size: 1rem;
-    line-height: 1.7rem;
-    text-align: center;
-  }
-  .dawbu-header__icon .cart-count-bubble span { color: #fff; }
-
-  /* desktop nav row */
-  .dawbu-header__nav {
-    margin-top: 0.8rem;
-    display: flex;
-    justify-content: center;
-  }
-  .dawbu-header__nav .list-menu--inline { gap: 0.4rem 2rem; }
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
@@ -284,340 +114,185 @@
   endif
 %}
 
-{%- liquid
-  assign rotate_raw = section.settings.search_rotate_terms | newline_to_br | split: '<br />'
-  assign first_term = blank
-  capture terms_json
-    echo '['
-    assign printed = 0
-    for t in rotate_raw
-      assign tt = t | strip
-      if tt != blank
-        if first_term == blank
-          assign first_term = tt
-        endif
-        if printed > 0
-          echo ','
-        endif
-        echo tt | json
-        assign printed = printed | plus: 1
-      endif
-    endfor
-    echo ']'
-  endcapture
-  if first_term == blank
-    assign search_placeholder = 'general.search.search' | t
-  else
-    assign search_placeholder = section.settings.search_prefix | append: ' "' | append: first_term | append: '"'
-  endif
--%}
-
-<style>
-  .dawbu-header__main { position: relative; }
-  .dawbu-header__icons { margin-left: auto; }
-  .dawbu-header__icon--search { background: none; border: 0; cursor: pointer; padding: 0; }
-
-  .dawbu-search.dawbu-search--collapsible {
-    position: absolute;
-    top: calc(100% + 0.6rem);
-    left: 0;
-    right: 0;
-    z-index: 20;
-    flex: none;
-    background: #fff;
-    border: 1px solid var(--dh-search-border, #e3e5e9);
-    border-radius: 1.2rem;
-    padding: 1.2rem 1.4rem;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
-  }
-  .dawbu-search.dawbu-search--collapsible[hidden] { display: none; }
-
-  /* hamburger (mobile) */
-  .dawbu-burger {
-    display: none; flex-direction: column; gap: 4px; flex: 0 0 auto;
-    background: none; border: 0; cursor: pointer; padding: 6px; margin-left: -0.4rem;
-  }
-  .dawbu-burger span { display: block; width: 22px; height: 2.5px; border-radius: 2px; background: var(--dh-text, #121212); transition: transform .2s ease, opacity .2s ease; }
-  .dawbu-burger.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-  .dawbu-burger.is-open span:nth-child(2) { opacity: 0; }
-  .dawbu-burger.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-
-  /* primary nav — inline on desktop */
-  .dawbu-nav {
-    display: flex; align-items: center; gap: 0.6rem;
-    flex: 1 1 auto; justify-content: center; min-width: 0;
-    overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
-  }
-  .dawbu-nav::-webkit-scrollbar { display: none; }
-  .dawbu-nav__item {
-    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.7rem 1.2rem; border-radius: 50px; font-size: 1.4rem; font-weight: 600; line-height: 1;
-    color: var(--dh-text, #121212); text-decoration: none; white-space: nowrap;
-    transition: background 0.2s ease, color 0.2s ease;
-  }
-  .dawbu-nav__item:hover { background: var(--dh-search-bg, #f4f5f7); color: var(--dh-accent, #0b3a6f); }
-  .dawbu-nav__home { padding: 0.7rem 1rem; }
-  .dawbu-nav__home .svg-wrapper svg { width: 1.9rem; height: 1.9rem; display: block; }
-  .dawbu-nav__home-label { display: none; }
-
-  /* mobile: icons only; links collapse into the hamburger dropdown */
-  @media (max-width: 989px) {
-    .dawbu-burger { display: flex; }
-    .dawbu-nav {
-      position: absolute; top: 100%; left: 0; right: 0; z-index: 25;
-      display: none; flex-direction: column; align-items: stretch; gap: 0.2rem;
-      background: #fff; padding: 0.8rem; border-top: 1px solid var(--dh-search-border, #e3e5e9);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
-    }
-    .dawbu-nav.is-open { display: flex; }
-    .dawbu-nav__item { width: 100%; justify-content: flex-start; font-size: 1.6rem; padding: 1rem 1.2rem; }
-    .dawbu-nav__home-label { display: inline; }
-  }
-</style>
-
 <{{ header_tag }} {% if header_tag == 'sticky-header' %}data-sticky-type="{{ section.settings.sticky_header_type }}"{% endif %} data-track-section="header" class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}">
-  <header class="dawbu-header page-width">
+  {%- liquid
+    assign social_links = false
+    assign localization_forms = false
 
-    {%- if section.settings.show_location_bar -%}
-      <div class="dawbu-header__utility">
-        <button type="button" class="dawbu-locate" data-dawbu-locate aria-label="{{ section.settings.location_prefix | escape }}">
-          <span class="svg-wrapper">{{- 'icon-map-pin.svg' | inline_asset_content -}}</span>
-          <span>{{ section.settings.location_prefix }} <b class="dawbu-locate__pin" data-dawbu-pincode>{{ section.settings.default_pincode }}</b></span>
-          <span class="dawbu-locate__change">{{ section.settings.location_change_label }}</span>
-        </button>
-      </div>
+    if settings.social_twitter_link != blank or settings.social_facebook_link != blank or settings.social_pinterest_link != blank or settings.social_instagram_link != blank or settings.social_youtube_link != blank or settings.social_vimeo_link != blank or settings.social_tiktok_link != blank or settings.social_tumblr_link != blank or settings.social_snapchat_link != blank
+      assign social_links = true
+    endif
+
+    if localization.available_countries.size > 1 and section.settings.enable_country_selector or section.settings.enable_language_selector and localization.available_languages.size > 1
+      assign localization_forms = true
+    endif
+  -%}
+  <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if localization_forms %} header--has-localizations{% endif %}">
+    {%- liquid
+      if section.settings.menu != blank
+        render 'header-drawer'
+      endif
+
+      if section.settings.logo_position == 'top-center' or section.settings.menu == blank
+        render 'header-search', input_id: 'Search-In-Modal-1'
+      endif
+    -%}
+
+    {%- if section.settings.logo_position != 'middle-center' -%}
+      {%- if request.page_type == 'index' -%}
+        <h1 class="header__heading">
+      {%- endif -%}
+          <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+            {%- if settings.logo != blank -%}
+              <div class="header__heading-logo-wrapper">
+                {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
+                {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
+                {% capture sizes %}(max-width: {{ settings.logo_width | times: 2 }}px) 50vw, {{ settings.logo_width }}px{% endcapture %}
+                {% capture widths %}{{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}
+                {{ settings.logo | image_url: width: 600 | image_tag:
+                  class: 'header__heading-logo motion-reduce',
+                  widths: widths,
+                  height: logo_height,
+                  width: settings.logo_width,
+                  alt: logo_alt,
+                  sizes: sizes,
+                  preload: true
+                }}
+              </div>
+            {%- else -%}
+              <span class="h2">{{ shop.name }}</span>
+            {%- endif -%}
+          </a>
+      {%- if request.page_type == 'index' -%}
+        </h1>
+      {%- endif -%}
     {%- endif -%}
 
-    <div class="dawbu-header__main">
-      <button type="button" class="dawbu-burger" data-nav-toggle aria-label="Menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+    {%- liquid
+      if section.settings.menu != blank
+        if section.settings.menu_type_desktop == 'dropdown'
+          render 'header-dropdown-menu'
+        elsif section.settings.menu_type_desktop != 'drawer'
+          render 'header-mega-menu'
+        endif
+      endif
+    %}
 
-      <a href="{{ routes.root_url }}" class="dawbu-header__logo" aria-label="{{ shop.name | escape }}">
-        {%- if settings.logo != blank -%}
-          {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
-          {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
-          {{ settings.logo | image_url: width: 600 | image_tag:
-            class: 'header__heading-logo motion-reduce',
-            widths: '120, 180, 240',
-            height: logo_height,
-            width: settings.logo_width,
-            alt: logo_alt,
-            preload: true
-          }}
-        {%- else -%}
-          <span class="h3">{{ shop.name }}</span>
+    {%- if section.settings.logo_position == 'middle-center' -%}
+      {%- if request.page_type == 'index' -%}
+        <h1 class="header__heading">
+      {%- endif -%}
+          <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+            {%- if settings.logo != blank -%}
+              <div class="header__heading-logo-wrapper">
+                {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
+                {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
+                {% capture sizes %}(min-width: 750px) {{ settings.logo_width }}px, 50vw{% endcapture %}
+                {% capture widths %}{{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}
+                {{ settings.logo | image_url: width: 600 | image_tag:
+                  class: 'header__heading-logo',
+                  widths: widths,
+                  height: logo_height,
+                  width: settings.logo_width,
+                  alt: logo_alt,
+                  sizes: sizes,
+                  preload: true
+                }}
+              </div>
+            {%- else -%}
+              <span class="h2">{{ shop.name }}</span>
+            {%- endif -%}
+          </a>
+      {%- if request.page_type == 'index' -%}
+        </h1>
+      {%- endif -%}
+    {%- endif -%}
+
+    <div class="header__icons{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header__icons--localization header-localization{% endif %}">
+      <div class="desktop-localization-wrapper">
+        {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+          <localization-form class="small-hide medium-hide" data-prevent-hide>
+            {%- form 'localization', id: 'HeaderCountryForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="visually-hidden" id="HeaderCountryLabel">{{ 'localization.country_label' | t }}</h2>
+                {%- render 'country-localization', localPosition: 'HeaderCountry' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {% endif %}
+
+        {%- if section.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+          <localization-form class="small-hide medium-hide" data-prevent-hide>
+            {%- form 'localization', id: 'HeaderLanguageForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="visually-hidden" id="HeaderLanguageLabel">{{ 'localization.language_label' | t }}</h2>
+                {%- render 'language-localization', localPosition: 'HeaderLanguage' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+      </div>
+      {% render 'header-search', input_id: 'Search-In-Modal' %}
+
+      {%- if shop.customer_accounts_enabled -%}
+        <a
+          href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+          class="header__icon header__icon--account link focus-inset{% if section.settings.menu != blank %} small-hide{% endif %}"
+          rel="nofollow"
+        >
+          {%- if section.settings.enable_customer_avatar -%}
+            <account-icon>
+              {%- if customer and customer.has_avatar? -%}
+                {{ customer | avatar }}
+              {%- else -%}
+                <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+              {%- endif -%}
+            </account-icon>
+          {%- else -%}
+            <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+          {%- endif -%}
+          <span class="visually-hidden">
+            {%- liquid
+              if customer
+                echo 'customer.account_fallback' | t
+              else
+                echo 'customer.log_in' | t
+              endif
+            -%}
+          </span>
+        </a>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            {% render block %}
+        {%- endcase -%}
+      {%- endfor -%}
+
+      <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
+          {% if cart == empty %}
+            <span class="svg-wrapper">{{'icon-cart-empty.svg' | inline_asset_content }}</span>
+          {% else %}
+            <span class="svg-wrapper">{{'icon-cart.svg' | inline_asset_content }}</span>
+          {% endif %}
+        <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+        {%- if cart != empty -%}
+          <div class="cart-count-bubble">
+            {%- if cart.item_count < 100 -%}
+              <span aria-hidden="true">{{ cart.item_count }}</span>
+            {%- endif -%}
+            <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+          </div>
         {%- endif -%}
       </a>
-
-      <nav class="dawbu-nav" aria-label="Primary" data-nav>
-        <a class="dawbu-nav__item dawbu-nav__home" href="{{ routes.root_url }}" aria-label="Home">
-          <span class="svg-wrapper">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          <span class="dawbu-nav__home-label">Home</span>
-        </a>
-        {%- if section.settings.nav1_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav1_url | default: '/collections/all' }}">{{ section.settings.nav1_label }}</a>{%- endif -%}
-        {%- if section.settings.nav2_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav2_url | default: '/collections/miniature-toys' }}">{{ section.settings.nav2_label }}</a>{%- endif -%}
-        {%- if section.settings.nav3_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav3_url | default: '/collections/glowing-products' }}">{{ section.settings.nav3_label }}</a>{%- endif -%}
-        {%- if section.settings.nav4_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav4_url | default: '/collections/bundles' }}">{{ section.settings.nav4_label }}</a>{%- endif -%}
-        {%- if section.settings.nav5_label != blank -%}<a class="dawbu-nav__item" href="{{ section.settings.nav5_url | default: '/pages/byob-builder' }}">{{ section.settings.nav5_label }}</a>{%- endif -%}
-      </nav>
-
-      <div class="dawbu-search dawbu-search--collapsible" data-search-panel hidden>
-        {%- if settings.predictive_search_enabled -%}
-          <predictive-search data-loading-text="{{ 'accessibility.loading' | t }}">
-        {%- else -%}
-          <search-form>
-        {%- endif -%}
-          <form action="{{ routes.search_url }}" method="get" role="search" class="dawbu-search__form">
-            <div class="dawbu-search__field">
-              <input
-                class="dawbu-search__input"
-                id="Search-Dawbu"
-                type="search"
-                name="q"
-                value="{{ search.terms | escape }}"
-                placeholder="{{ search_placeholder | escape }}"
-                data-rotate='{{ terms_json }}'
-                data-prefix="{{ section.settings.search_prefix | escape }}"
-                {%- if settings.predictive_search_enabled -%}
-                  role="combobox"
-                  aria-expanded="false"
-                  aria-owns="predictive-search-results"
-                  aria-controls="predictive-search-results"
-                  aria-haspopup="listbox"
-                  aria-autocomplete="list"
-                  autocorrect="off"
-                  autocomplete="off"
-                  autocapitalize="off"
-                  spellcheck="false"
-                {%- endif -%}
-              >
-              <label class="visually-hidden" for="Search-Dawbu">{{ 'general.search.search' | t }}</label>
-              <input type="hidden" name="options[prefix]" value="last">
-
-              <button
-                type="reset"
-                class="dawbu-search__btn dawbu-search__reset{% if search.terms == blank %} hidden{% endif %}"
-                aria-label="{{ 'general.search.reset' | t }}"
-              >
-                <span class="svg-wrapper">{{- 'icon-close.svg' | inline_asset_content -}}</span>
-              </button>
-              <button type="submit" class="dawbu-search__btn dawbu-search__submit" aria-label="{{ 'general.search.search' | t }}">
-                <span class="svg-wrapper">{{- 'icon-search.svg' | inline_asset_content -}}</span>
-              </button>
-            </div>
-
-            {%- if settings.predictive_search_enabled -%}
-              <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
-                {%- render 'loading-spinner', class: 'predictive-search__loading-state' -%}
-              </div>
-              <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
-            {%- endif -%}
-          </form>
-        {%- if settings.predictive_search_enabled -%}
-          </predictive-search>
-        {%- else -%}
-          </search-form>
-        {%- endif -%}
-      </div>
-
-      <div class="dawbu-header__icons">
-        <button type="button" class="dawbu-header__icon dawbu-header__icon--search" data-search-toggle aria-label="{{ 'general.search.search' | t }}" aria-expanded="false">
-          <span class="svg-wrapper">{{- 'icon-search.svg' | inline_asset_content -}}</span>
-        </button>
-
-        {%- if section.settings.show_wishlist -%}
-          <a href="{{ section.settings.wishlist_link | default: routes.search_url }}" class="dawbu-header__icon dawbu-header__icon--wishlist" aria-label="Wishlist">
-            <span class="svg-wrapper">{{- 'icon-heart.svg' | inline_asset_content -}}</span>
-          </a>
-        {%- endif -%}
-
-        {%- if shop.customer_accounts_enabled -%}
-          <a
-            href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
-            class="dawbu-header__icon dawbu-header__icon--account"
-            rel="nofollow"
-            aria-label="{% if customer %}{{ 'customer.account_fallback' | t }}{% else %}{{ 'customer.log_in' | t }}{% endif %}"
-          >
-            {%- if section.settings.enable_customer_avatar and customer and customer.has_avatar? -%}
-              <account-icon>{{ customer | avatar }}</account-icon>
-            {%- else -%}
-              <span class="svg-wrapper">{{- 'icon-account.svg' | inline_asset_content -}}</span>
-            {%- endif -%}
-          </a>
-        {%- endif -%}
-
-        {%- for block in section.blocks -%}
-          {%- case block.type -%}
-            {%- when '@app' -%}
-              {% render block %}
-          {%- endcase -%}
-        {%- endfor -%}
-
-        <a href="{{ routes.cart_url }}" class="dawbu-header__icon dawbu-header__icon--cart" id="cart-icon-bubble" aria-label="{{ 'templates.cart.cart' | t }}">
-          {%- if cart == empty -%}
-            <span class="svg-wrapper">{{- 'icon-cart-empty.svg' | inline_asset_content -}}</span>
-          {%- else -%}
-            <span class="svg-wrapper">{{- 'icon-cart.svg' | inline_asset_content -}}</span>
-          {%- endif -%}
-          {%- if cart != empty -%}
-            <div class="cart-count-bubble">
-              {%- if cart.item_count < 100 -%}
-                <span aria-hidden="true">{{ cart.item_count }}</span>
-              {%- endif -%}
-              <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
-            </div>
-          {%- endif -%}
-        </a>
-      </div>
     </div>
-
   </header>
 </{{ header_tag }}>
 
 {%- if settings.cart_type == "notification" -%}
   {%- render 'cart-notification', color_scheme: section.settings.color_scheme, desktop_menu_type: section.settings.menu_type_desktop -%}
 {%- endif -%}
-
-<script>
-  (function () {
-    var input = document.getElementById('Search-Dawbu');
-    if (input) {
-      var prefix = input.getAttribute('data-prefix') || 'Search for';
-      var terms = [];
-      try { terms = JSON.parse(input.getAttribute('data-rotate') || '[]'); } catch (e) {}
-      if (terms.length > 1) {
-        var i = 0;
-        setInterval(function () {
-          if (document.activeElement === input || input.value) return;
-          i = (i + 1) % terms.length;
-          input.setAttribute('placeholder', prefix + ' "' + terms[i] + '"');
-        }, 2800);
-      }
-    }
-
-    var sToggle = document.querySelector('[data-search-toggle]');
-    var sPanel = document.querySelector('[data-search-panel]');
-    if (sToggle && sPanel) {
-      sToggle.addEventListener('click', function () {
-        if (sPanel.hasAttribute('hidden')) {
-          sPanel.removeAttribute('hidden');
-          sToggle.setAttribute('aria-expanded', 'true');
-          var f = sPanel.querySelector('input[type="search"]');
-          if (f) f.focus();
-        } else {
-          sPanel.setAttribute('hidden', '');
-          sToggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-      document.addEventListener('click', function (e) {
-        if (!sPanel.hasAttribute('hidden') && !sPanel.contains(e.target) && !sToggle.contains(e.target)) {
-          sPanel.setAttribute('hidden', '');
-          sToggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-
-    var navToggle = document.querySelector('[data-nav-toggle]');
-    var navEl = document.querySelector('[data-nav]');
-    if (navToggle && navEl) {
-      navToggle.addEventListener('click', function () {
-        var open = navEl.classList.toggle('is-open');
-        navToggle.classList.toggle('is-open', open);
-        navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-      navEl.addEventListener('click', function (e) {
-        if (e.target.closest('a')) {
-          navEl.classList.remove('is-open');
-          navToggle.classList.remove('is-open');
-          navToggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-
-    var pinEls = document.querySelectorAll('[data-dawbu-pincode]');
-    var saved = null;
-    try { saved = localStorage.getItem('dawbu_pincode'); } catch (e) {}
-    if (saved) { pinEls.forEach(function (el) { el.textContent = saved; }); }
-
-    document.querySelectorAll('[data-dawbu-locate]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var current = (pinEls[0] && pinEls[0].textContent) || '';
-        var v = window.prompt('Enter your 6-digit pincode', current);
-        if (v === null) return;
-        v = v.trim();
-        if (/^\d{6}$/.test(v)) {
-          pinEls.forEach(function (el) { el.textContent = v; });
-          try { localStorage.setItem('dawbu_pincode', v); } catch (e) {}
-        } else {
-          window.alert('Please enter a valid 6-digit pincode.');
-        }
-      });
-    });
-  })();
-</script>
 
 {% javascript %}
   class StickyHeader extends HTMLElement {
@@ -724,7 +399,7 @@
 
     closeSearchModal() {
       this.searchModal = this.searchModal || this.header.querySelector('details-modal');
-      if (this.searchModal) this.searchModal.close(false);
+      this.searchModal.close(false);
     }
   }
 
@@ -777,6 +452,47 @@
   "class": "section-header",
   "max_blocks": 3,
   "settings": [
+    {
+      "type": "select",
+      "id": "logo_position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "t:sections.header.settings.logo_position.options__2.label"
+        },
+        {
+          "value": "top-center",
+          "label": "t:sections.header.settings.logo_position.options__3.label"
+        },
+        {
+          "value": "middle-left",
+          "label": "t:sections.header.settings.logo_position.options__1.label"
+        },
+        {
+          "value": "middle-center",
+          "label": "t:sections.header.settings.logo_position.options__4.label"
+        }
+      ],
+      "default": "middle-left",
+      "label": "t:sections.header.settings.logo_position.label",
+      "info": "t:sections.header.settings.logo_help.content"
+    },
+    {
+      "type": "select",
+      "id": "mobile_logo_position",
+      "options": [
+        {
+          "value": "center",
+          "label": "t:sections.header.settings.mobile_logo_position.options__1.label"
+        },
+        {
+          "value": "left",
+          "label": "t:sections.header.settings.mobile_logo_position.options__2.label"
+        }
+      ],
+      "default": "center",
+      "label": "t:sections.header.settings.mobile_logo_position.label"
+    },    
     {
       "type": "link_list",
       "id": "menu",
@@ -835,90 +551,7 @@
     },
     {
       "type": "header",
-      "content": "Location bar"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_location_bar",
-      "default": true,
-      "label": "Show delivery location bar"
-    },
-    {
-      "type": "text",
-      "id": "location_prefix",
-      "default": "Delivering to",
-      "label": "Location prefix text"
-    },
-    {
-      "type": "text",
-      "id": "default_pincode",
-      "default": "560034",
-      "label": "Default pincode"
-    },
-    {
-      "type": "text",
-      "id": "location_change_label",
-      "default": "… Change",
-      "label": "Change link text"
-    },
-    {
-      "type": "header",
-      "content": "Search bar"
-    },
-    {
-      "type": "text",
-      "id": "search_prefix",
-      "default": "Search for",
-      "label": "Placeholder prefix"
-    },
-    {
-      "type": "textarea",
-      "id": "search_rotate_terms",
-      "default": "Dinosaurs\nFlowers\nSpace Sets\nAnimals\nNew Arrivals",
-      "label": "Rotating search terms",
-      "info": "One per line. Shown as an animated placeholder."
-    },
-    {
-      "type": "header",
-      "content": "Navigation bar",
-      "info": "A Home icon is always shown first. Leave a label blank to hide that link. URLs fall back to sensible defaults if left empty."
-    },
-    { "type": "text", "id": "nav1_label", "label": "Link 1 label", "default": "All" },
-    { "type": "url", "id": "nav1_url", "label": "Link 1 URL" },
-    { "type": "text", "id": "nav2_label", "label": "Link 2 label", "default": "Miniatures" },
-    { "type": "url", "id": "nav2_url", "label": "Link 2 URL" },
-    { "type": "text", "id": "nav3_label", "label": "Link 3 label", "default": "Glow" },
-    { "type": "url", "id": "nav3_url", "label": "Link 3 URL" },
-    { "type": "text", "id": "nav4_label", "label": "Link 4 label", "default": "Bundles" },
-    { "type": "url", "id": "nav4_url", "label": "Link 4 URL" },
-    { "type": "text", "id": "nav5_label", "label": "Link 5 label", "default": "BYOB" },
-    { "type": "url", "id": "nav5_url", "label": "Link 5 URL" },
-    {
-      "type": "header",
-      "content": "Wishlist & icons"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_wishlist",
-      "default": true,
-      "label": "Show wishlist (heart) icon"
-    },
-    {
-      "type": "url",
-      "id": "wishlist_link",
-      "label": "Wishlist link",
-      "info": "Where the heart icon points. Leave blank to use search."
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_customer_avatar",
-      "default": true,
-      "label": "t:sections.header.settings.enable_customer_avatar.label",
-      "info": "t:sections.header.settings.enable_customer_avatar.info"
-    },
-    {
-      "type": "header",
-      "content": "Colors"
+      "content": "t:sections.header.settings.header__1.content"
     },
     {
       "type": "color_scheme",
@@ -933,40 +566,29 @@
       "default": "scheme-1"
     },
     {
-      "type": "color",
-      "id": "accent_color",
-      "default": "#0b3a6f",
-      "label": "Accent color"
+      "type": "header",
+      "content": "t:sections.header.settings.header__utilities.content"
     },
     {
-      "type": "color",
-      "id": "text_color",
-      "default": "#121212",
-      "label": "Text color"
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": true,
+      "label": "t:sections.header.settings.enable_country_selector.label",
+      "info":"t:sections.header.settings.enable_country_selector.info"
     },
     {
-      "type": "color",
-      "id": "muted_color",
-      "default": "#6b7280",
-      "label": "Muted text color"
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": true,
+      "label": "t:sections.header.settings.enable_language_selector.label",
+      "info":"t:sections.header.settings.enable_language_selector.info"
     },
     {
-      "type": "color",
-      "id": "icon_color",
-      "default": "#121212",
-      "label": "Icon color"
-    },
-    {
-      "type": "color",
-      "id": "search_bg",
-      "default": "#f4f5f7",
-      "label": "Search background"
-    },
-    {
-      "type": "color",
-      "id": "search_border",
-      "default": "#e3e5e9",
-      "label": "Search border"
+      "type": "checkbox",
+      "id": "enable_customer_avatar",
+      "default": true,
+      "label": "t:sections.header.settings.enable_customer_avatar.label",
+      "info": "t:sections.header.settings.enable_customer_avatar.info"
     },
     {
       "type": "header",
@@ -994,7 +616,7 @@
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_top",
-      "default": 12
+      "default": 20
     },
     {
       "type": "range",
@@ -1004,7 +626,7 @@
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
-      "default": 12
+      "default": 20
     }
   ],
   "blocks": [
