@@ -159,7 +159,7 @@
               {%- endif -%}
             {%- endif -%}
             {%- if quick_add == 'quantity' -%}
-              {% render 'dawbu-qty-chips', target_input_id: 'Quantity-' | append: section_id | append: '-' | append: card_product.id %}
+              {% render 'dawbu-qty-chips', target_input_id: 'Quantity-', append: card_product.id %}
             {%- endif -%}
             <div class="price-atc">
               {% render 'price', product: card_product, price_class: '', show_compare_at_price: true %}
@@ -243,3 +243,15 @@
     </div>
   </div>
 {%- endif -%}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% render 'dawbu-qty-chips', target_input_id: 'Quantity-' | append: section_id
+    | append: '-' | append: card_product.id %}"
+  to: "{% render 'dawbu-qty-chips', target_input_id: 'Quantity-', append: card_product.id
+    %}"
+  position: 10004..10089
+{% endcomment %}
